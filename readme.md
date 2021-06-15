@@ -20,14 +20,18 @@ To get a local copy up and running follow these simple example steps.
 ### Installation
 
 1. Find the nuget package [https://nuget.org](https://www.nuget.org/packages/LowlandTech.TinyTools/)
-2. Clone the repo
+2. Or clone the repo
+
    ```sh
    git clone https://github.com/wendellmva/tinytools.git
    ```
+
 3. Install nuget packages
+
    ```sh
-   dotnet add package Lowlandech.TinyTools
+   dotnet add package LowlandTech.TinyTools
    ```
+
 4. Or user visual studio to add the package
 
 
@@ -91,4 +95,4 @@ Project Link: [https://github.com/wendellmva/tinytools](https://github.com/wende
 
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
-* [GitHub Emoji Cheat Sheet](https://www.webpagefx.com/tools/emoji-cheat-sheet)
+* [Awesome assertion library Shouldly](https://docs.shouldly.io/)
