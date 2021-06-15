@@ -1,4 +1,5 @@
 using Shouldly;
+using System;
 using Xunit;
 
 namespace TinyTools.Test
@@ -32,16 +33,30 @@ namespace TinyTools.Test
             result.ShouldBe("Hello world, I'm 20 years old");
         }
 
-    }
-
-    internal class Person
-    {
-        public Person()
+        [Fact]
+        public void ShouldReplaceBooleans()
         {
+            var person = new Person
+            {
+                IsMarried = true
+            };
+            var template = "Hello world, married: {IsMarried}";
+
+            var result = template.Interpolate(person);
+            result.ShouldBe("Hello world, married: True");
         }
 
-        public string FirstName { get; internal set; }
-        public string LastName { get; internal set; }
-        public int Age { get; internal set; }
+        [Fact]
+        public void ShouldReplaceDate()
+        {
+            var person = new Person
+            {
+                Dob = new DateTime(2001, 1, 25)
+            };
+            var template = "Hello world, date of birth: {Dob}";
+
+            var result = template.Interpolate(person);
+            result.ShouldBe("Hello world, date of birth: 25/01/2001 00:00:00");
+        }
     }
 }
