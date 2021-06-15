@@ -6,7 +6,7 @@ namespace TinyTools.Test
     public class ReplacementTests
     {
         [Fact]
-        public void ShoulReplaceStrings()
+        public void ShouldReplaceStrings()
         {
             var person = new Person
             {
@@ -20,7 +20,7 @@ namespace TinyTools.Test
         }
 
         [Fact]
-        public void ShoulReplaceIntegers()
+        public void ShouldReplaceIntegers()
         {
             var person = new Person
             {
