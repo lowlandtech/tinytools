@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.6.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyTools", "TinyTools\TinyTools.csproj", "{732B92F5-3751-45A5-8F4E-CF68A00632BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LowlandTech.TinyTools", "TinyTools\LowlandTech.TinyTools.csproj", "{732B92F5-3751-45A5-8F4E-CF68A00632BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyTools.Test", "..\tests\TinyTools.Test\TinyTools.Test.csproj", "{DC1D7D48-7C54-42D9-9118-FAAEA4A46A2B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LowlandTech.TinyTools.Test", "..\tests\TinyTools.Test\LowlandTech.TinyTools.Test.csproj", "{DC1D7D48-7C54-42D9-9118-FAAEA4A46A2B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{732B92F5-3751-45A5-8F4E-CF68A00632BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -44,5 +41,11 @@ Global
 		{DC1D7D48-7C54-42D9-9118-FAAEA4A46A2B}.Release|x64.Build.0 = Release|Any CPU
 		{DC1D7D48-7C54-42D9-9118-FAAEA4A46A2B}.Release|x86.ActiveCfg = Release|Any CPU
 		{DC1D7D48-7C54-42D9-9118-FAAEA4A46A2B}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7EF2CDD3-64E4-45F4-99DC-545826A75CFC}
 	EndGlobalSection
 EndGlobal
