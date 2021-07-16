@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
+    <Authors>Wendell Muntslag van Amzink</Authors>
+    <Company>LowlandTech</Company>
+    <Description>Performs string interpolation on an object's properties.</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
+    <Product>Tiny tools</Product>
+    <Copyright>Copyright 2021</Copyright>
+    <RepositoryUrl>https://github.com/wendellmva/tinytools</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/wendellmva/tinytools</PackageProjectUrl>
+  </PropertyGroup>
+
+</Project>

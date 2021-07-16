@@ -8,6 +8,9 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>1.0.1</Version>
+    <Product>Tiny tools</Product>
+    <Copyright>Copyright 2021</Copyright>
+    <RepositoryUrl>https://github.com/wendellmva/tinytools</RepositoryUrl>
   </PropertyGroup>
 
 </Project>
