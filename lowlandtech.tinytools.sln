@@ -5,11 +5,16 @@ VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{52389109-35EA-46D8-A304-5DB1D9FDFCC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowlandTech.TinyTools.Test", "test\lowlandtech.tinytools.tests\LowlandTech.TinyTools.Test.csproj", "{04981A62-5372-438C-B18B-4C76C33CFEB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LowlandTech.TinyTools.Test", "test\lowlandtech.tinytools.tests\LowlandTech.TinyTools.Test.csproj", "{04981A62-5372-438C-B18B-4C76C33CFEB6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{73F9EEC1-AD87-4E35-927F-523BBFD3E81C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LowlandTech.TinyTools", "src\lowlandtech.tinytools\LowlandTech.TinyTools.csproj", "{3FB04BE2-C77E-4509-AB1C-74FFF779C25B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LowlandTech.TinyTools", "src\lowlandtech.tinytools\LowlandTech.TinyTools.csproj", "{3FB04BE2-C77E-4509-AB1C-74FFF779C25B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{CFAB905A-53AF-4AA8-9C67-3C90D1D01763}"
+	ProjectSection(SolutionItems) = preProject
+		.gitlab-ci.yml = .gitlab-ci.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,9 +24,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{04981A62-5372-438C-B18B-4C76C33CFEB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -49,8 +51,14 @@ Global
 		{3FB04BE2-C77E-4509-AB1C-74FFF779C25B}.Release|x86.ActiveCfg = Release|Any CPU
 		{3FB04BE2-C77E-4509-AB1C-74FFF779C25B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{04981A62-5372-438C-B18B-4C76C33CFEB6} = {52389109-35EA-46D8-A304-5DB1D9FDFCC6}
 		{3FB04BE2-C77E-4509-AB1C-74FFF779C25B} = {73F9EEC1-AD87-4E35-927F-523BBFD3E81C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8E4C6435-4E8C-4CD6-BCA3-D7B746B8405D}
 	EndGlobalSection
 EndGlobal

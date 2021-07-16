@@ -11,8 +11,6 @@
     <Product>Tiny tools</Product>
     <Copyright>Copyright 2021</Copyright>
     <RepositoryUrl>https://github.com/wendellmva/tinytools</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/wendellmva/tinytools</PackageProjectUrl>
   </PropertyGroup>
 
 </Project>
