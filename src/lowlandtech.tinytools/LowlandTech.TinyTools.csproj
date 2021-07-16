@@ -6,7 +6,6 @@
     <Company>LowlandTech</Company>
     <Description>Performs string interpolation on an object's properties.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>1.0.1</Version>
     <Product>Tiny tools</Product>
     <Copyright>Copyright 2021</Copyright>
