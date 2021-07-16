@@ -56,7 +56,7 @@ namespace TinyTools.Test
             var template = "Hello world, date of birth: {Dob}";
 
             var result = template.Interpolate(person);
-            result.ShouldBe("Hello world, date of birth: 25/01/2001 00:00:00");
+            result.ShouldBe("Hello world, date of birth: 01/25/2001 00:00:00");
         }
     }
 }
