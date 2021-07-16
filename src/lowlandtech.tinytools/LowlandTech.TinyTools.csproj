@@ -12,6 +12,8 @@
     <RepositoryUrl>https://github.com/wendellmva/tinytools</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/wendellmva/tinytools</PackageProjectUrl>
+    <licenseUrl>https://github.com/wendellmva/tinytools/license</licenseUrl>
+    <releaseNotesUrl>https://github.com/wendellmva/tinytools/release-notes</releaseNotesUrl>
   </PropertyGroup>
 
 </Project>

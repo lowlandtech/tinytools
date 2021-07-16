@@ -14,6 +14,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{CFAB905A-53AF-4AA8-9C67-3C90D1D01763}"
 	ProjectSection(SolutionItems) = preProject
 		.gitlab-ci.yml = .gitlab-ci.yml
+		release-notes = release-notes
 	EndProjectSection
 EndProject
 Global

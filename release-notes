@@ -1,0 +1,16 @@
+v:1.0.3
+- add push for github
+- add release notes
+- add license
+- remove csproj backup file
+- fix bug in test
+
+v:1.0.2: 
+- rearrange repository layout
+- added ci
+
+v:1.0.1
+- added some more tests
+
+v:1.0.0
+- created interpolation extension for strings
