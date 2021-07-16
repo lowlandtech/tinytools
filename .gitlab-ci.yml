@@ -27,6 +27,6 @@ release:
   - dotnet nuget add source "${NUGET_REGISTRY}" --name lowlandtech
   - dotnet nuget push "src/*/bin/Release/*.nupkg" --source gitlab
   - dotnet nuget push "src/*/bin/Release/*.nupkg" --source lowlandtech -k "${NUGET_REGISTRY_KEY}"
-  - dotnet nuget push "src/*/bin/Release/*.nupkg" --source nuget -k "${NUGET_REGISTRY_KEY}"
+  - dotnet nuget push "src/*/bin/Release/*.nupkg" --source "https://api.nuget.org/v3/index.json" -k "${NUGET_REGISTRY_KEY}"
   only:
   - tags
