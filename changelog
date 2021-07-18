@@ -1,3 +1,8 @@
+v:1.0.4
+- changed namespaces
+- add test harness
+- replace shouldy with fluentassertions
+
 v:1.0.3
 - add push for github
 - add release notes
