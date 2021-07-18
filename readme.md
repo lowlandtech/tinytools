@@ -51,7 +51,7 @@ To get a local copy up and running follow these simple example steps.
     var template = "Hello world, I'm {FirstName} {LastName}";
 
     var result = template.Interpolate(person);
-    result.ShouldBe("Hello world, I'm John Smith");
+    result.Should().Be("Hello world, I'm John Smith");
 ```
 
 

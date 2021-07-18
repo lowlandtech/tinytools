@@ -4,16 +4,24 @@
     <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
     <Authors>Wendell Muntslag van Amzink</Authors>
     <Company>LowlandTech</Company>
-    <Description>Performs string interpolation on an object's properties.</Description>
+    <Description>Performs string interpolation on an object's properties. And exposes a test harness for testing</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Version>1.0.1</Version>
+    <Version>1.0.4</Version>
     <Product>Tiny tools</Product>
     <Copyright>Copyright 2021</Copyright>
     <RepositoryUrl>https://github.com/wendellmva/tinytools</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/wendellmva/tinytools</PackageProjectUrl>
     <licenseUrl>https://github.com/wendellmva/tinytools/license</licenseUrl>
-    <releaseNotesUrl>https://github.com/wendellmva/tinytools/release-notes</releaseNotesUrl>
   </PropertyGroup>
+
+  <Target Name="PreparePackageReleaseNotesFromFile" BeforeTargets="GenerateNuspec">
+    <ReadLinesFromFile File="../../changelog">
+      <Output TaskParameter="Lines" ItemName="ReleaseNoteLines" />
+    </ReadLinesFromFile>
+    <PropertyGroup>
+      <PackageReleaseNotes>@(ReleaseNoteLines, '%0a')</PackageReleaseNotes>
+    </PropertyGroup>
+  </Target>
 
 </Project>

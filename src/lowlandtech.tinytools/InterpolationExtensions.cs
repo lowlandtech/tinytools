@@ -1,7 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 
-namespace TinyTools
+namespace LowlandTech.TinyTools
 {
     public static class InterpolationExtensions
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TinyTools.Test
+namespace LowlandTech.TinyTools.Test.Fakes
 {
     internal class Person
     {
