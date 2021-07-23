@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
-using LowlandTech.TinyTools.Test.Fakes;
+using LowlandTech.TinyTools.UnitTests.Fakes;
 using Xunit;
 
-namespace LowlandTech.TinyTools.Tests
+namespace LowlandTech.TinyTools.UnitTests
 {
     public class WhenInterpolatingIntegersTest : WhenTestingFor<string>
     {
