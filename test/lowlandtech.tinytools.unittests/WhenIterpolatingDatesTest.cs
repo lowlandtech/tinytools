@@ -1,9 +1,9 @@
-using FluentAssertions;
-using LowlandTech.TinyTools.Test.Fakes;
 using System;
+using FluentAssertions;
+using LowlandTech.TinyTools.UnitTests.Fakes;
 using Xunit;
 
-namespace LowlandTech.TinyTools.Tests
+namespace LowlandTech.TinyTools.UnitTests
 {
     public class WhenInterpolatingDatesTest : WhenTestingFor<string>
     {
@@ -29,7 +29,7 @@ namespace LowlandTech.TinyTools.Tests
         }
 
         [Fact]
-        public void ShouldIterpolateDateOfbBirth()
+        public void ShouldInterpolateDateOfbBirth()
         {
             _result.Should().Be("Hello world, date of birth: " + _person.Dob);
         }

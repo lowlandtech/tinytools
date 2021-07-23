@@ -15,9 +15,9 @@ namespace LowlandTech.TinyTools
         }
 
         protected virtual void SetupData() { }
-        protected abstract void Given();
+        protected virtual void Given() { }
         protected abstract T For();
-        protected abstract void When();
+        protected virtual void When() { }
         public virtual void Dispose() { }
     }
 }

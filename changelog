@@ -1,3 +1,7 @@
+v:1.0.5
+- make methods testharness virtual
+- change namespaces for the unittests
+
 v:1.0.4
 - changed namespaces
 - add test harness
