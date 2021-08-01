@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Ardalis.GuardClauses;
 
 namespace LowlandTech.TinyTools
 {
@@ -6,6 +7,9 @@ namespace LowlandTech.TinyTools
     {
         public static string Interpolate<T>(this string template, T model)
         {
+            Guard.Against.NullOrEmpty(template, nameof(template), "Template should be supplied.");
+            Guard.Against.Null(model, nameof(model), "Model should be supplied.");
+
             var props = model.GetType().GetProperties();
             foreach (var prop in props.Where(p => p.GetValue(model) != null))
             {
