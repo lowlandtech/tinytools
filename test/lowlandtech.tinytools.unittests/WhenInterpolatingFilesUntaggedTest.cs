@@ -34,7 +34,7 @@ namespace LowlandTech.TinyTools.UnitTests
         }
 
         [Fact]
-        public void ItShouldIterpolateFileFolder()
+        public void ItShouldInterpolateFileFolder()
         {
             var replacements = new Dictionary<string, string>()
             {
@@ -42,7 +42,7 @@ namespace LowlandTech.TinyTools.UnitTests
                 { "subfolder2","lowlandtech" }
             };
             Sut.Interpolate(replacements)
-               .Count(file => file.Contains("src\\lowlandtech"))
+               .Count(file => file.Contains(Path.Combine("src", "lowlandtech")))
                .Should()
                .Be(2);
         }
