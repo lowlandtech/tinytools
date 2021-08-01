@@ -1,4 +1,5 @@
-v:1.6.0
+v:1.6.1
+- fix path bug
 - add support for files and collection of templates
 
 v:1.0.5
