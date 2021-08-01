@@ -1,3 +1,6 @@
+v:1.6.0
+- add support for files and collection of templates
+
 v:1.0.5
 - make methods testharness virtual
 - change namespaces for the unittests
