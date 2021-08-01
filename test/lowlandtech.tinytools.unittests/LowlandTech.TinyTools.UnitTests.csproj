@@ -24,4 +24,10 @@
     <ProjectReference Include="..\..\src\lowlandtech.tinytools\LowlandTech.TinyTools.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="files.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
