@@ -6,7 +6,7 @@
     <Company>LowlandTech</Company>
     <Description>Performs string interpolation on an object's properties. And exposes a test harness for testing</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Version>1.6.0</Version>
+    <Version>1.6.1</Version>
     <Product>Tiny tools</Product>
     <Copyright>Copyright 2021</Copyright>
     <RepositoryUrl>https://github.com/wendellmva/tinytools</RepositoryUrl>
