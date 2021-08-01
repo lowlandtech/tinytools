@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Ardalis.GuardClauses;
 
 namespace LowlandTech.TinyTools
@@ -10,10 +11,20 @@ namespace LowlandTech.TinyTools
             Guard.Against.NullOrEmpty(template, nameof(template), "Template should be supplied.");
             Guard.Against.Null(model, nameof(model), "Model should be supplied.");
 
-            var props = model.GetType().GetProperties();
-            foreach (var prop in props.Where(p => p.GetValue(model) != null))
+            if (model is IDictionary<string, string> dictionary)
             {
-                template = template.Replace($"{{{prop.Name}}}", prop.GetValue(model).ToString());
+                foreach (var entry in dictionary)
+                {
+                    template = template.Replace($"{{{entry.Key}}}", entry.Value);
+                }
+            }
+            else
+            {
+                var props = model.GetType().GetProperties();
+                foreach (var prop in props.Where(p => p.GetValue(model) != null))
+                {
+                    template = template.Replace($"{{{prop.Name}}}", prop.GetValue(model).ToString());
+                }
             }
             return template;
         }
