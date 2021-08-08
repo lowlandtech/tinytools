@@ -89,5 +89,10 @@ namespace LowlandTech.TinyTools.UnitTests
             File.ReadAllText(result)
                 .Should().Be("Hello world");
         }
+
+        public override void Dispose()
+        {
+            if (Directory.Exists(_folder)) Directory.Delete(_folder, true); ;
+        }
     }
 }

@@ -1,6 +1,6 @@
-﻿using System.Collections;
+﻿using FluentAssertions;
+using System.Collections;
 using System.Collections.Generic;
-using FluentAssertions;
 using Xunit;
 
 namespace LowlandTech.TinyTools.UnitTests
