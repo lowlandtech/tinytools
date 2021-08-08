@@ -99,8 +99,7 @@ namespace LowlandTech.TinyTools.UnitTests
 
         public override void Dispose()
         {
-            if (Directory.Exists(_folder)) Directory.Delete(_folder, true);
-            base.Dispose();
+            if (Directory.Exists(_folder)) Directory.Delete(_folder, true); ;
         }
     }
 }
