@@ -5,6 +5,7 @@ namespace LowlandTech.TinyTools
     public abstract class WhenTestingFor<T> : IDisposable
     {
         protected T Sut;
+        private readonly object _sut = null;
 
         public WhenTestingFor()
         {
@@ -16,7 +17,7 @@ namespace LowlandTech.TinyTools
 
         protected virtual void SetupData() { }
         protected virtual void Given() { }
-        protected abstract T For();
+        protected virtual T For() { return (T)_sut; }
         protected virtual void When() { }
         public virtual void Dispose() { }
     }
