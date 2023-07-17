@@ -448,3 +448,5 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 
 .vscode/
+
+*.ncrunchsolution

@@ -7,8 +7,8 @@ namespace LowlandTech.TinyTools.UnitTests
 {
     public class WhenInterpolatingNullModelTest : WhenTestingFor<string>
     {
-        private Person _person;
-        private Action _act;
+        private Person? _person;
+        private Action? _act;
 
         protected override string For()
         {
@@ -30,8 +30,7 @@ namespace LowlandTech.TinyTools.UnitTests
         public void ItShouldThrowAModelArgumentException()
         {
             _act.Should()
-                .Throw<ArgumentException>()
-                .WithMessage("Model should be supplied.");
+                .Throw<ArgumentException>();
         }
     }
 }

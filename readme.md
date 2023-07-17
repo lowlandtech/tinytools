@@ -1,4 +1,15 @@
-# Why TinyTools
+<div align="center">
+<h1>LowlandTech.Tinytools</h1>
+<br />
+<img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue" />
+<br />
+Contains the lowlandtech tinytools library
+<br />
+<br />
+<br />
+</div>
+
+## Why TinyTools
 
 I came accross this post on stackoverflow: [String interpolation using named parameters](https://stackoverflow.com/questions/36745164/string-interpolation-using-named-parameters-in-c6) and I have looked to solve this problem in the past, so I decided to start my tiny tools project to put all my tiny solutions into one project. Please leave a star if you like it.
 

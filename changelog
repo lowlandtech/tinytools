@@ -1,3 +1,9 @@
+v:2.0.0
+- upgrade to .net 7
+- upgrade dependencies
+- remove support for legacy framework
+- move from gitlab to github
+
 v:1.6.1
 - fix path bug
 - add support for files and collection of templates
