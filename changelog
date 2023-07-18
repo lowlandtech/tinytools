@@ -1,3 +1,6 @@
+v:2.0.1
+- fix tests
+
 v:2.0.0
 - upgrade to .net 7
 - upgrade dependencies
