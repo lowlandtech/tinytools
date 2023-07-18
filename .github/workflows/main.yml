@@ -27,8 +27,6 @@ jobs:
     - name: Test
       run: dotnet test --configuration Release
     - name: Pack
-      run: dotnet pack src/lowlandtech.tinytools/LowlandTech.Tinytools.csproj -c Release  
+      run: dotnet pack src/lowlandtech.tinytools/LowlandTech.TinyTools.csproj -c Release  
     - name: Publish to GitHub packages 
-      run: dotnet nuget push src/lowlandtech.tinytools/bin/Release/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }}  --source "lowlandtech"  
-    - name: Publish to Nuget packages 
-      run: dotnet nuget push src/lowlandtech.tinytools/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_APIKEY }}  --source "nuget"  
+      run: dotnet nuget push src/lowlandtech.tinytools/bin/Release/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "lowlandtech"
