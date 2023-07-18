@@ -29,4 +29,4 @@ jobs:
     - name: Pack
       run: dotnet pack src/lowlandtech.tinytools/LowlandTech.TinyTools.csproj -c Release  
     - name: Publish to GitHub packages 
-      run: dotnet nuget push src/lowlandtech.tinytools/bin/Release/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "lowlandtech"
+      run: dotnet nuget push src/lowlandtech.tinytools/bin/Release/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "lowlandtech" --skip-duplicate
