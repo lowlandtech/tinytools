@@ -1,24 +1,15 @@
-﻿using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Reflection;
-using Xunit;
-
-namespace LowlandTech.TinyTools.UnitTests
+﻿namespace LowlandTech.TinyTools.UnitTests
 {
     public class WhenInterpolatingFilesTest : WhenTestingFor<List<string>>
     {
-        private string _root;
-        private string _folder;
+        private string _root = null!;
+        private string _folder = null!;
 
         protected override void SetupData()
         {
             var codeBaseUrl = new Uri(Assembly.GetExecutingAssembly().Location);
             var codeBasePath = Uri.UnescapeDataString(codeBaseUrl.AbsolutePath);
-            _root = Path.GetDirectoryName(codeBasePath);
+            _root = Path.GetDirectoryName(codeBasePath)!;
             _folder = Path.Combine(_root, Path.GetFileNameWithoutExtension(Path.GetRandomFileName()));
             ZipFile.ExtractToDirectory(Path.Combine(_root, "files.zip"), _folder);
         }

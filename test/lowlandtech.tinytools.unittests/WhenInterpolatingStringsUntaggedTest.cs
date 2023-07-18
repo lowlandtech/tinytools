@@ -1,37 +1,32 @@
-﻿using FluentAssertions;
-using LowlandTech.TinyTools.UnitTests.Fakes;
-using Xunit;
+﻿namespace LowlandTech.TinyTools.UnitTests;
 
-namespace LowlandTech.TinyTools.UnitTests
+public class WhenInterpolatingStringsUntaggedTest : WhenTestingFor<string>
 {
-    public class WhenInterpolatingStringsUntaggedTest : WhenTestingFor<string>
+    private Person _person = null!;
+    private string? _result;
+
+    protected override string For()
     {
-        private Person _person;
-        private string _result;
+        return "Hello world, I'm FirstName LastName";
+    }
 
-        protected override string For()
+    protected override void Given()
+    {
+        _person = new Person
         {
-            return "Hello world, I'm FirstName LastName";
-        }
+            FirstName = "John",
+            LastName = "Smith"
+        };
+    }
 
-        protected override void Given()
-        {
-            _person = new Person
-            {
-                FirstName = "John",
-                LastName = "Smith"
-            };
-        }
+    protected override void When()
+    {
+        _result = Sut.Interpolate(_person, hasTags: false);
+    }
 
-        protected override void When()
-        {
-            _result = Sut.Interpolate(_person, hasTags: false);
-        }
-
-        [Fact]
-        public void ItShouldInterpolateFirstAndLastName()
-        {
-            _result.Should().Be("Hello world, I'm John Smith");
-        }
+    [Fact]
+    public void ItShouldInterpolateFirstAndLastName()
+    {
+        _result.Should().Be("Hello world, I'm John Smith");
     }
 }

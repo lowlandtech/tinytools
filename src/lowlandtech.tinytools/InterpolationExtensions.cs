@@ -28,11 +28,11 @@ public static class InterpolationExtensions
             {
                 if (hasTags)
                 {
-                    template = template.Replace($"{{{prop.Name}}}", prop.GetValue(model).ToString());
+                    template = template.Replace($"{{{prop.Name}}}", prop.GetValue(model)!.ToString());
                 }
                 else
                 {
-                    template = template.Replace($"{prop.Name}", prop.GetValue(model).ToString());
+                    template = template.Replace($"{prop.Name}", prop.GetValue(model)!.ToString());
                 }
             }
         }

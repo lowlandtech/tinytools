@@ -1,36 +1,31 @@
-﻿using FluentAssertions;
-using LowlandTech.TinyTools.UnitTests.Fakes;
-using Xunit;
+﻿namespace LowlandTech.TinyTools.UnitTests;
 
-namespace LowlandTech.TinyTools.UnitTests
+public class WhenInterpolatingIntegersTest : WhenTestingFor<string>
 {
-    public class WhenInterpolatingIntegersTest : WhenTestingFor<string>
+    private Person _person = null!;
+    private string? _result;
+
+    protected override string For()
     {
-        private Person _person;
-        private string _result;
+        return "Hello world, I'm {Age} years old";
+    }
 
-        protected override string For()
+    protected override void Given()
+    {
+        _person = new Person
         {
-            return "Hello world, I'm {Age} years old";
-        }
+            Age = 20
+        };
+    }
 
-        protected override void Given()
-        {
-            _person = new Person
-            {
-                Age = 20
-            };
-        }
+    protected override void When()
+    {
+        _result = Sut.Interpolate(_person);
+    }
 
-        protected override void When()
-        {
-            _result = Sut.Interpolate(_person);
-        }
-
-        [Fact]
-        public void ItShouldInterpolateAge()
-        {
-            _result.Should().Be("Hello world, I'm 20 years old");
-        }
+    [Fact]
+    public void ItShouldInterpolateAge()
+    {
+        _result.Should().Be("Hello world, I'm 20 years old");
     }
 }

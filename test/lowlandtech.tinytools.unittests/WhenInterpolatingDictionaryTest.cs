@@ -1,38 +1,32 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using FluentAssertions;
-using Xunit;
+﻿namespace LowlandTech.TinyTools.UnitTests;
 
-namespace LowlandTech.TinyTools.UnitTests
+public class WhenInterpolatingDictionaryTest : WhenTestingFor<string>
 {
-    public class WhenInterpolatingDictionaryTest : WhenTestingFor<string>
+    private IDictionary _person = null!;
+    private string? _result;
+
+    protected override string For()
     {
-        private IDictionary _person;
-        private string _result;
+        return "Hello world, I'm {FirstName} {LastName}";
+    }
 
-        protected override string For()
+    protected override void Given()
+    {
+        _person = new Dictionary<string, string>()
         {
-            return "Hello world, I'm {FirstName} {LastName}";
-        }
+            { "FirstName","John" },
+            { "LastName","Smith" }
+        };
+    }
 
-        protected override void Given()
-        {
-            _person = new Dictionary<string, string>()
-            {
-                { "FirstName","John" },
-                { "LastName","Smith" }
-            };
-        }
+    protected override void When()
+    {
+        _result = Sut.Interpolate(_person);
+    }
 
-        protected override void When()
-        {
-            _result = Sut.Interpolate(_person);
-        }
-
-        [Fact]
-        public void ItShouldInterpolateFirstAndLastName()
-        {
-            _result.Should().Be("Hello world, I'm John Smith");
-        }
+    [Fact]
+    public void ItShouldInterpolateFirstAndLastName()
+    {
+        _result.Should().Be("Hello world, I'm John Smith");
     }
 }

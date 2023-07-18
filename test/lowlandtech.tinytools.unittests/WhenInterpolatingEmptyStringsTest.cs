@@ -1,40 +1,34 @@
-﻿using System;
-using FluentAssertions;
-using LowlandTech.TinyTools.UnitTests.Fakes;
-using Xunit;
+﻿namespace LowlandTech.TinyTools.UnitTests;
 
-namespace LowlandTech.TinyTools.UnitTests
+public class WhenInterpolatingEmptyStringsTest : WhenTestingFor<string>
 {
-    public class WhenInterpolatingEmptyStringsTest : WhenTestingFor<string>
+    private Person _person = null!;
+    private Action? _act;
+
+    protected override string For()
     {
-        private Person _person;
-        private Action _act;
+        return "";
+    }
 
-        protected override string For()
+    protected override void Given()
+    {
+        _person = new Person
         {
-            return "";
-        }
+            FirstName = "John",
+            LastName = "Smith"
+        };
+    }
 
-        protected override void Given()
-        {
-            _person = new Person
-            {
-                FirstName = "John",
-                LastName = "Smith"
-            };
-        }
+    protected override void When()
+    {
+        _act = () => Sut.Interpolate(_person);
+    }
 
-        protected override void When()
-        {
-            _act = () => Sut.Interpolate(_person);
-        }
-
-        [Fact]
-        public void ItShouldThrowATemplateArgumentException()
-        {
-            _act.Should()
-                .Throw<ArgumentException>()
-                .WithMessage("Template should be supplied. (Parameter 'template')");
-        }
+    [Fact]
+    public void ItShouldThrowATemplateArgumentException()
+    {
+        _act.Should()
+            .Throw<ArgumentException>()
+            .WithMessage("Template should be supplied. (Parameter 'template')");
     }
 }

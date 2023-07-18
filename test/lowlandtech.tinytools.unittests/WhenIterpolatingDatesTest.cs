@@ -1,37 +1,31 @@
-using System;
-using FluentAssertions;
-using LowlandTech.TinyTools.UnitTests.Fakes;
-using Xunit;
+namespace LowlandTech.TinyTools.UnitTests;
 
-namespace LowlandTech.TinyTools.UnitTests
+public class WhenInterpolatingDatesTest : WhenTestingFor<string>
 {
-    public class WhenInterpolatingDatesTest : WhenTestingFor<string>
+    private Person _person = null!;
+    private string? _result;
+
+    protected override string For()
     {
-        private Person _person;
-        private string _result;
+        return "Hello world, date of birth: {Dob}";
+    }
 
-        protected override string For()
+    protected override void Given()
+    {
+        _person = new Person
         {
-            return "Hello world, date of birth: {Dob}";
-        }
+            Dob = new DateTime(2001, 1, 25)
+        };
+    }
 
-        protected override void Given()
-        {
-            _person = new Person
-            {
-                Dob = new DateTime(2001, 1, 25)
-            };
-        }
+    protected override void When()
+    {
+        _result = Sut.Interpolate(_person);
+    }
 
-        protected override void When()
-        {
-            _result = Sut.Interpolate(_person);
-        }
-
-        [Fact]
-        public void ShouldInterpolateDateOfbBirth()
-        {
-            _result.Should().Be("Hello world, date of birth: " + _person.Dob);
-        }
+    [Fact]
+    public void ShouldInterpolateDateOfbBirth()
+    {
+        _result.Should().Be("Hello world, date of birth: " + _person.Dob);
     }
 }
