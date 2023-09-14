@@ -10,7 +10,7 @@
     <Product>Tiny tools</Product>
     <Description>Performs string interpolation on an object's properties. And exposes a test harness for testing</Description>
     <Copyright>Copyright 2023</Copyright>    
-    <PackageId>Lowlandtech.TinyTools</PackageId>
+    <PackageId>LowlandTech.TinyTools</PackageId>
     <Version>2.0.1</Version>
 
     <RepositoryUrl>https://github.com/lowlandtech/tinytools</RepositoryUrl>
