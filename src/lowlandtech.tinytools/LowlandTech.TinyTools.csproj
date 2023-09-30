@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -10,8 +10,8 @@
     <Product>Tiny tools</Product>
     <Description>Performs string interpolation on an object's properties. And exposes a test harness for testing</Description>
     <Copyright>Copyright 2023</Copyright>    
-    <PackageId>Lowlandtech.TinyTools</PackageId>
-    <Version>2.0.1</Version>
+    <PackageId>LowlandTech.TinyTools</PackageId>
+    <Version>2.0.2</Version>
 
     <RepositoryUrl>https://github.com/lowlandtech/tinytools</RepositoryUrl>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
@@ -24,7 +24,7 @@
   </ItemGroup>
   
   <Target Name="PreparePackageReleaseNotesFromFile" BeforeTargets="GenerateNuspec">
-    <ReadLinesFromFile File="../../changelog">
+    <ReadLinesFromFile File="../../changelog.md">
       <Output TaskParameter="Lines" ItemName="ReleaseNoteLines" />
     </ReadLinesFromFile>
     <PropertyGroup>
@@ -34,6 +34,8 @@
 
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
+    <PackageReference Include="Moq" Version="4.20.69" />
   </ItemGroup>
 
 </Project>
