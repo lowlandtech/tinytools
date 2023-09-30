@@ -1,5 +1,9 @@
-﻿namespace LowlandTech.TinyTools;
+﻿
+namespace LowlandTech.TinyTools;
 
+/// <summary>
+/// https://adamstorr.azurewebsites.net/blog/mocking-ilogger-with-moq
+/// </summary>
 public static class LoggerExtensions
 {
     public static Mock<ILogger<T>> VerifyDebugWasCalled<T>(this Mock<ILogger<T>> logger, string expectedMessage)
