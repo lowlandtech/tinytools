@@ -451,3 +451,5 @@ $RECYCLE.BIN/
 
 *.ncrunchsolution
 /nuget.config
+
+*.ncrunchproject
