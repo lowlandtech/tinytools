@@ -20,6 +20,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="*ncrunch*" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <None Include="..\..\readme.md" Pack="true" PackagePath="\" />
   </ItemGroup>
   
