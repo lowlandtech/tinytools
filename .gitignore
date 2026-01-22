@@ -450,3 +450,6 @@ $RECYCLE.BIN/
 .vscode/
 
 *.ncrunchsolution
+/nuget.config
+
+*.ncrunchproject

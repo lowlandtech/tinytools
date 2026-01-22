@@ -1,41 +1,70 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <LangVersion>12.0</LangVersion>
 
+    <!-- Package Information -->
+    <PackageId>LowlandTech.TinyTools</PackageId>
+    <Version>2026.1.0</Version>
     <Authors>wendellmva</Authors>
     <Company>LowlandTech</Company>
-    <Product>Tiny tools</Product>
-    <Description>Performs string interpolation on an object's properties. And exposes a test harness for testing</Description>
-    <Copyright>Copyright 2023</Copyright>    
-    <PackageId>LowlandTech.TinyTools</PackageId>
-    <Version>2.0.2</Version>
-
-    <RepositoryUrl>https://github.com/lowlandtech/tinytools</RepositoryUrl>
+    <Product>TinyTemplateEngine</Product>
+    <Description>A lightweight template engine for .NET with minimal dependencies. Designed for data composition, not view rendering. Supports variable interpolation, control flow, pipe helpers, and extensible template services.</Description>
+    <Copyright>Copyright © 2023-2025 LowlandTech</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://components.lowlandtech.com/tinytools</PackageProjectUrl>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
-    <PackRelease>true</PackRelease>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageTags>template;templating;code-generation;text-generation;interpolation;razor-alternative;lightweight;zero-dependency</PackageTags>
+    <PackageReleaseNotes>See changelog.md for release notes</PackageReleaseNotes>
+    
+    <!-- Repository Information -->
+    <RepositoryUrl>https://github.com/lowlandtech/tinytools</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    
+    <!-- Build Configuration -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    
+    <!-- NuGet Package Settings -->
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    
+    <!-- Source Link -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\readme.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
   
   <Target Name="PreparePackageReleaseNotesFromFile" BeforeTargets="GenerateNuspec">
-    <ReadLinesFromFile File="../../changelog.md">
+    <ReadLinesFromFile File="../../changelog.md" Condition="Exists('../../changelog.md')">
       <Output TaskParameter="Lines" ItemName="ReleaseNoteLines" />
     </ReadLinesFromFile>
     <PropertyGroup>
-      <PackageReleaseNotes>@(ReleaseNoteLines, '%0a')</PackageReleaseNotes>
+      <PackageReleaseNotes Condition="'@(ReleaseNoteLines)' != ''">@(ReleaseNoteLines, '%0a')</PackageReleaseNotes>
     </PropertyGroup>
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="Ardalis.GuardClauses" Version="4.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
-    <PackageReference Include="Moq" Version="4.20.69" />
+    <PackageReference Include="Ardalis.GuardClauses" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.102" PrivateAssets="All" />
+    <PackageReference Include="Moq" Version="4.20.72" />
   </ItemGroup>
 
 </Project>
+

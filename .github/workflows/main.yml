@@ -1,32 +1,88 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: lowlandtech/tinytools
+name: CI
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_NOLOGO: true
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
+  build-and-test:
+    name: Build & Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        dotnet-version: ['8.0.x', '9.0.x']
+    
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
       with:
-        dotnet-version: 7.0.x
+        fetch-depth: 0  # Full history for better source link support
+    
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ matrix.dotnet-version }}
+    
     - name: Restore dependencies
       run: dotnet restore
+    
     - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --configuration Release
+      run: dotnet build --configuration Release --no-restore
+    
+    - name: Run tests
+      run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+    
+    - name: Upload coverage to Codecov
+      if: matrix.os == 'ubuntu-latest' && matrix.dotnet-version == '9.0.x'
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./coverage/**/coverage.cobertura.xml
+        fail_ci_if_error: false
+        verbose: true
+
+  pack:
+    name: Pack NuGet Package
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    
     - name: Pack
-      run: dotnet pack src/lowlandtech.tinytools/LowlandTech.TinyTools.csproj -c Release  
-    - name: Publish to GitHub packages 
-      run: dotnet nuget push src/lowlandtech.tinytools/bin/Release/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "lowlandtech" --skip-duplicate
+      run: dotnet pack src/lowlandtech.tinytools/LowlandTech.TinyTools.csproj --configuration Release --no-build --output ./artifacts
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages
+        path: ./artifacts/*.nupkg
+        retention-days: 7
+    
+    - name: Publish to GitHub Packages
+      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "https://nuget.pkg.github.com/lowlandtech/index.json" --skip-duplicate
+      continue-on-error: true
