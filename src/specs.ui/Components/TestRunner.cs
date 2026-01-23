@@ -28,20 +28,29 @@ public class TestRunner
         
         try
         {
-            // Parse JSON into state object
-            var stateData = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(jsonData);
-            if (stateData == null)
+            // Parse JSON - expecting Given/When/Then structure
+            var useCaseData = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(jsonData);
+            if (useCaseData == null)
             {
                 result.Success = false;
                 result.ErrorMessage = "Invalid JSON format";
                 return result;
             }
 
-            // Create initial state from JSON
-            var initialState = new Dictionary<string, object?>();
-            foreach (var kvp in stateData)
+            // Extract Given (initial state)
+            Dictionary<string, object?> initialState;
+            if (useCaseData.TryGetValue("Given", out var givenElement))
             {
-                initialState[kvp.Key] = ConvertJsonElement(kvp.Value);
+                initialState = ParseStateObject(givenElement);
+            }
+            else
+            {
+                // Fallback: treat entire JSON as state (backwards compatibility)
+                initialState = new Dictionary<string, object?>();
+                foreach (var kvp in useCaseData)
+                {
+                    initialState[kvp.Key] = ConvertJsonElement(kvp.Value);
+                }
             }
             result.InitialState = initialState;
 
@@ -64,21 +73,41 @@ public class TestRunner
                 }
             }
 
-            // Simulate When action (for demo purposes)
+            // Extract When (action data) - use custom or from JSON
+            string? effectiveActionData = actionData;
+            if (string.IsNullOrWhiteSpace(effectiveActionData) && 
+                useCaseData.TryGetValue("When", out var whenElement))
+            {
+                effectiveActionData = ExtractActionData(whenElement);
+            }
+
+            // Simulate When action
             var finalState = new Dictionary<string, object?>(initialState);
-            SimulateAction(scenario.WhenAttribute, finalState, actionData);
+            SimulateAction(scenario.WhenAttribute, finalState, effectiveActionData);
             result.FinalState = finalState;
+
+            // Extract Then (expected outcomes)
+            Dictionary<string, object?>? expectedOutcomes = null;
+            if (useCaseData.TryGetValue("Then", out var thenElement))
+            {
+                expectedOutcomes = ParseStateObject(thenElement);
+            }
 
             // Execute Then assertions
             foreach (var then in scenario.ThenAttributes)
             {
-                // Get custom expected value if provided
+                // Get expected value: custom UI input > Then JSON > attribute default
                 var expectedValue = then.Attribute.Expected;
                 var expectedKey = then.MethodName + "_" + then.Attribute.Property;
+                
                 if (customExpectedValues?.TryGetValue(expectedKey, out var customExpected) == true && 
                     !string.IsNullOrWhiteSpace(customExpected))
                 {
                     expectedValue = ParseExpectedValue(customExpected);
+                }
+                else if (expectedOutcomes?.TryGetValue(then.Attribute.Property, out var jsonExpected) == true)
+                {
+                    expectedValue = jsonExpected;
                 }
                 
                 // Primary assertion
@@ -109,10 +138,15 @@ public class TestRunner
                 {
                     var postconditionExpected = then.Attribute.PostconditionExpected;
                     var postconditionKey = then.MethodName + "_" + then.Attribute.PostconditionProperty;
+                    
                     if (customExpectedValues?.TryGetValue(postconditionKey, out var customPostcondition) == true && 
                         !string.IsNullOrWhiteSpace(customPostcondition))
                     {
                         postconditionExpected = ParseExpectedValue(customPostcondition);
+                    }
+                    else if (expectedOutcomes?.TryGetValue(then.Attribute.PostconditionProperty, out var jsonPostcondition) == true)
+                    {
+                        postconditionExpected = jsonPostcondition;
                     }
                     
                     var postconditionAssertion = new AssertionResult
@@ -219,6 +253,35 @@ public class TestRunner
         return defaultValue;
     }
 
+    private static Dictionary<string, object?> ParseStateObject(JsonElement element)
+    {
+        var state = new Dictionary<string, object?>();
+        if (element.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var property in element.EnumerateObject())
+            {
+                state[property.Name] = ConvertJsonElement(property.Value);
+            }
+        }
+        return state;
+    }
+
+    private static string? ExtractActionData(JsonElement whenElement)
+    {
+        if (whenElement.ValueKind != JsonValueKind.Object)
+            return null;
+
+        var parts = new List<string>();
+        foreach (var property in whenElement.EnumerateObject())
+        {
+            if (!property.Name.Equals("ActionType", StringComparison.OrdinalIgnoreCase))
+            {
+                parts.Add($"{property.Name}: {property.Value}");
+            }
+        }
+        return parts.Any() ? string.Join(", ", parts) : null;
+    }
+
     private static object? ParseExpectedValue(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -273,26 +336,101 @@ public class TestRunner
     {
         var example = new Dictionary<string, object?>();
         
-        // Include all Given properties
-        foreach (var given in scenario.GivenAttributes)
+        // Build Given section from Given attributes
+        var given = new Dictionary<string, object?>();
+        foreach (var givenAttr in scenario.GivenAttributes)
         {
-            example[given.Property] = given.Value;
+            given[givenAttr.Property] = givenAttr.Value;
         }
         
-        // Include postcondition properties if they don't already exist
-        // Initialize them to sensible defaults (0 for numeric types, etc.)
-        foreach (var then in scenario.ThenAttributes)
+        // Add postcondition properties to Given if they don't exist (for initial state)
+        foreach (var thenAttr in scenario.ThenAttributes)
         {
-            if (!string.IsNullOrWhiteSpace(then.Attribute.PostconditionProperty) &&
-                !example.ContainsKey(then.Attribute.PostconditionProperty))
+            if (!string.IsNullOrWhiteSpace(thenAttr.Attribute.PostconditionProperty) &&
+                !given.ContainsKey(thenAttr.Attribute.PostconditionProperty))
             {
                 // Initialize to 0 for properties that look like counters
-                if (then.Attribute.PostconditionProperty.Contains("Count", StringComparison.OrdinalIgnoreCase))
+                if (thenAttr.Attribute.PostconditionProperty.Contains("Count", StringComparison.OrdinalIgnoreCase))
                 {
-                    example[then.Attribute.PostconditionProperty] = 0;
+                    given[thenAttr.Attribute.PostconditionProperty] = 0;
                 }
             }
         }
+        
+        example["Given"] = given;
+        
+        // Build When section from WhenAttribute
+        if (scenario.WhenAttribute != null)
+        {
+            var when = new Dictionary<string, object?>();
+            
+            if (!string.IsNullOrWhiteSpace(scenario.WhenAttribute.ActionType))
+            {
+                when["ActionType"] = scenario.WhenAttribute.ActionType;
+                
+                // Add default parameters based on action type
+                // These are example values that users can modify
+                switch (scenario.WhenAttribute.ActionType)
+                {
+                    case "DEPOSIT":
+                        when["Amount"] = 50;
+                        break;
+                    case "WITHDRAWAL":
+                        when["Amount"] = 25;
+                        break;
+                    case "TRANSFER":
+                        when["Amount"] = 100;
+                        when["ToAccount"] = "ACC-002";
+                        break;
+                    // Add more action types as needed
+                }
+            }
+            
+            // Override with ActionData from attribute if provided (backwards compatibility)
+            if (!string.IsNullOrWhiteSpace(scenario.WhenAttribute.ActionData))
+            {
+                var parts = scenario.WhenAttribute.ActionData.Split(',', StringSplitOptions.TrimEntries);
+                foreach (var part in parts)
+                {
+                    var keyValue = part.Split(':', StringSplitOptions.TrimEntries);
+                    if (keyValue.Length == 2)
+                    {
+                        // Try to parse as number
+                        if (int.TryParse(keyValue[1], out var intVal))
+                            when[keyValue[0]] = intVal;
+                        else if (decimal.TryParse(keyValue[1], out var decVal))
+                            when[keyValue[0]] = decVal;
+                        else
+                            when[keyValue[0]] = keyValue[1];
+                    }
+                }
+            }
+            
+            example["When"] = when;
+        }
+        
+        // Build Then section from Then attributes
+        var then = new Dictionary<string, object?>();
+        foreach (var thenAttr in scenario.ThenAttributes)
+        {
+            // Debug: Log what we're reading
+            Console.WriteLine($"DEBUG Then: Property={thenAttr.Attribute.Property}, Expected={thenAttr.Attribute.Expected}, ExpectedType={thenAttr.Attribute.Expected?.GetType().Name}");
+            
+            if (!string.IsNullOrWhiteSpace(thenAttr.Attribute.Property) && 
+                thenAttr.Attribute.Expected != null)
+            {
+                then[thenAttr.Attribute.Property] = thenAttr.Attribute.Expected;
+            }
+            if (!string.IsNullOrWhiteSpace(thenAttr.Attribute.PostconditionProperty) &&
+                thenAttr.Attribute.PostconditionExpected != null)
+            {
+                Console.WriteLine($"DEBUG Postcondition: Property={thenAttr.Attribute.PostconditionProperty}, Expected={thenAttr.Attribute.PostconditionExpected}");
+                then[thenAttr.Attribute.PostconditionProperty] = thenAttr.Attribute.PostconditionExpected;
+            }
+        }
+        
+        Console.WriteLine($"DEBUG Final Then JSON: {JsonSerializer.Serialize(then)}");
+        example["Then"] = then;
 
         return JsonSerializer.Serialize(example, new JsonSerializerOptions 
         { 

@@ -13,7 +13,7 @@
     <Company>LowlandTech</Company>
     <Product>LowlandTech.Specs</Product>
     <Description>A BDD testing framework with executable specifications integrated with xUnit. Supports Gherkin-style scenarios with auto-execution capabilities for Given/When/Then patterns.</Description>
-    <Copyright>Copyright © 2023-2025 LowlandTech</Copyright>
+    <Copyright>Copyright Â© 2023-2025 LowlandTech</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://components.lowlandtech.com/specs</PackageProjectUrl>
     <PackageTags>bdd;gherkin;testing;xunit;executable-specifications;given-when-then;specification;test-framework</PackageTags>

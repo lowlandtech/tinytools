@@ -14,76 +14,20 @@
     @if (showTryIt)
     {
         <div class="mt-4 space-y-4">
-            <!-- State Use Case Data (Given) -->
+            <!-- State Use Case Data (full Given/When/Then) -->
             <div>
                 <div class="flex items-center justify-between mb-2">
-                    <label class="text-sm font-medium text-gray-300">State Use Case Data</label>
+                    <label class="text-sm font-medium text-gray-300">Use Case Data (Given/When/Then)</label>
                     <button @onclick="LoadExample" 
                             class="text-xs text-blue-400 hover:text-blue-300">
                         Load Example
                     </button>
                 </div>
                 <textarea @bind="jsonInput" 
-                          class="w-full h-48 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-100 font-mono text-sm focus:outline-none focus:border-blue-500"
-                          placeholder='{ "Balance": 100, "AccountStatus": "Active" }'></textarea>
-                <p class="text-xs text-gray-500 mt-1">Defines the Given clause - initial state for the scenario</p>
+                          class="w-full h-64 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-100 font-mono text-sm focus:outline-none focus:border-blue-500"
+                          placeholder='{ "Given": {...}, "When": {...}, "Then": {...} }'></textarea>
+                <p class="text-xs text-gray-500 mt-1">Complete test scenario with initial state (Given), action parameters (When), and expected outcomes (Then)</p>
             </div>
-            
-            <!-- Action Data (When) -->
-            @if (!string.IsNullOrWhiteSpace(Scenario.WhenAttribute?.ActionType))
-            {
-                <div>
-                    <label class="text-sm font-medium text-gray-300 mb-2 block">
-                        Action Use Case Data (@Scenario.WhenAttribute.ActionType)
-                    </label>
-                    <input type="text" 
-                           @bind="actionData" 
-                           class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-100 font-mono text-sm focus:outline-none focus:border-blue-500"
-                           placeholder="Amount: 50" />
-                    <p class="text-xs text-gray-500 mt-1">Defines the When clause - action parameters (e.g., "Amount: 50")</p>
-                </div>
-            }
-            
-            <!-- Expected Outcomes (Then) -->
-            @if (Scenario.ThenAttributes.Any())
-            {
-                <div>
-                    <label class="text-sm font-medium text-gray-300 mb-2 block">
-                        Expected Use Case Outcomes
-                    </label>
-                    <div class="space-y-3">
-                        @foreach (var then in Scenario.ThenAttributes)
-                        {
-                            var propertyKey = then.MethodName + "_" + then.Attribute.Property;
-                            var postconditionKey = then.MethodName + "_" + then.Attribute.PostconditionProperty;
-                            
-                            @if (!string.IsNullOrWhiteSpace(then.Attribute.Property))
-                            {
-                                <div>
-                                    <label class="text-xs font-medium text-gray-400 mb-1 block">@then.Attribute.Property</label>
-                                    <input type="text" 
-                                           value="@GetExpectedValue(propertyKey)"
-                                           @oninput="@(e => SetExpectedValue(propertyKey, e.Value?.ToString() ?? ""))"
-                                           class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-100 font-mono text-sm focus:outline-none focus:border-blue-500"
-                                           placeholder="@then.Attribute.Expected?.ToString()" />
-                                </div>
-                            }
-                            @if (!string.IsNullOrWhiteSpace(then.Attribute.PostconditionProperty))
-                            {
-                                <div>
-                                    <label class="text-xs font-medium text-gray-400 mb-1 block">@then.Attribute.PostconditionProperty</label>
-                                    <input type="text" 
-                                           value="@GetExpectedValue(postconditionKey)"
-                                           @oninput="@(e => SetExpectedValue(postconditionKey, e.Value?.ToString() ?? ""))"
-                                           class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-100 font-mono text-sm focus:outline-none focus:border-blue-500"
-                                           placeholder="@then.Attribute.PostconditionExpected?.ToString()" />
-                                </div>
-                            }
-                        }
-                    </div>
-                    <p class="text-xs text-gray-500 mt-1">Defines the Then clause - adjust expected values to match your action data</p>
-                </div>
-            }
 
             <!-- Run Button -->
             <button @onclick="RunTest" 
@@ -196,62 +140,38 @@
 
     private bool showTryIt = false;
     private string jsonInput = "";
-    private string actionData = "";
-    private Dictionary<string, string> expectedValues = new();
     private bool isRunning = false;
     private TestExecutionResult? result = null;
 
     private void ToggleTryIt()
     {
         showTryIt = !showTryIt;
-        if (showTryIt)
+        if (showTryIt && string.IsNullOrWhiteSpace(jsonInput))
         {
-            if (string.IsNullOrWhiteSpace(jsonInput))
-            {
-                LoadExample();
-            }
-            if (string.IsNullOrWhiteSpace(actionData))
-            {
-                actionData = Scenario.WhenAttribute?.ActionData ?? "";
-            }
-            if (!expectedValues.Any())
-            {
-                LoadExpectedValues();
-            }
+            LoadExample();
         }
     }
 
     private void LoadExample()
     {
         jsonInput = TestRunner.GetExampleJson(Scenario);
-    }
-
-    private void LoadExpectedValues()
-    {
-        expectedValues.Clear();
-        foreach (var then in Scenario.ThenAttributes)
+        
+        // Debug: Log scenario info to browser console
+        var debug = new
         {
-            if (!string.IsNullOrWhiteSpace(then.Attribute.Property))
+            ScenarioId = Scenario.ScenarioAttribute.ScenarioId,
+            Label = Scenario.ScenarioAttribute.Label,
+            ThenCount = Scenario.ThenAttributes.Count,
+            ThenProperties = Scenario.ThenAttributes.Select(t => new
             {
-                expectedValues[then.MethodName + "_" + then.Attribute.Property] = 
-                    then.Attribute.Expected?.ToString() ?? "";
-            }
-            if (!string.IsNullOrWhiteSpace(then.Attribute.PostconditionProperty))
-            {
-                expectedValues[then.MethodName + "_" + then.Attribute.PostconditionProperty] = 
-                    then.Attribute.PostconditionExpected?.ToString() ?? "";
-            }
-        }
-    }
-
-    private string GetExpectedValue(string key)
-    {
-        return expectedValues.TryGetValue(key, out var value) ? value : "";
-    }
-
-    private void SetExpectedValue(string key, string value)
-    {
-        expectedValues[key] = value;
+                Property = t.Attribute.Property,
+                Expected = t.Attribute.Expected,
+                ExpectedType = t.Attribute.Expected?.GetType().Name,
+                PostconditionProperty = t.Attribute.PostconditionProperty,
+                PostconditionExpected = t.Attribute.PostconditionExpected
+            }).ToList()
+        };
+        System.Diagnostics.Debug.WriteLine($"SCENARIO DEBUG: {System.Text.Json.JsonSerializer.Serialize(debug)}");
     }
 
     private async Task RunTest()
@@ -262,7 +182,8 @@
         // Simulate async execution
         await Task.Delay(500);
         
-        result = TestRunner.ExecuteScenario(Scenario, jsonInput, actionData, expectedValues);
+        // All data comes from JSON now - no separate actionData or expectedValues
+        result = TestRunner.ExecuteScenario(Scenario, jsonInput);
         
         isRunning = false;
     }

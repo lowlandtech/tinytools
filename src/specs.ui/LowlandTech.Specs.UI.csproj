@@ -19,10 +19,6 @@
     <PackageTags>blazor;bdd;specs;visualization;tailwind;shadcn;gherkin;ui-components</PackageTags>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\specs\LowlandTech.Specs.csproj" />
-  </ItemGroup>
-
   <!-- Install npm packages -->
   <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('wwwroot\node_modules')">
     <Exec Command="npm install" WorkingDirectory="wwwroot" />

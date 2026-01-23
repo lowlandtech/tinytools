@@ -95,7 +95,7 @@ public class BddAutoExecutionExample
             // _state.AccountStatus = "Active"
         }
 
-        [When(Action = "depositing funds", ActionType = "DEPOSIT", ActionData = "Amount: 50")]
+        [When(Action = "depositing funds", ActionType = "DEPOSIT")]
         protected override void When()
         {
             _state = Sut.Reduce(_state, new DepositAction(50));
