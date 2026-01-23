@@ -11,7 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LowlandTech.TinyTools", "sr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{CFAB905A-53AF-4AA8-9C67-3C90D1D01763}"
 	ProjectSection(SolutionItems) = preProject
-		infra\BUILDR = infra\BUILDR
 		changelog.md = changelog.md
 		license.md = license.md
 		nuget.config = nuget.config
@@ -24,6 +23,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\main.yml = .github\workflows\main.yml
 		.github\workflows\tags.yml = .github\workflows\tags.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{590CA426-786A-4658-8C24-554E21E806D4}"
+	ProjectSection(SolutionItems) = preProject
+		infra\build.cake = infra\build.cake
+		infra\build.ps1 = infra\build.ps1
+		infra\BUILDR = infra\BUILDR
+		infra\README.md = infra\README.md
 	EndProjectSection
 EndProject
 Global
@@ -68,6 +75,7 @@ Global
 		{3FB04BE2-C77E-4509-AB1C-74FFF779C25B} = {73F9EEC1-AD87-4E35-927F-523BBFD3E81C}
 		{2AD8F503-49D4-4D37-97C7-CE2E56F89EE8} = {52389109-35EA-46D8-A304-5DB1D9FDFCC6}
 		{7CF4C561-D661-47A1-BFC8-0523BCC382ED} = {CFAB905A-53AF-4AA8-9C67-3C90D1D01763}
+		{590CA426-786A-4658-8C24-554E21E806D4} = {CFAB905A-53AF-4AA8-9C67-3C90D1D01763}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8E4C6435-4E8C-4CD6-BCA3-D7B746B8405D}
