@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\lowlandtech.tinytools\LowlandTech.TinyTools.csproj" />
+    <ProjectReference Include="..\..\src\specs\LowlandTech.Specs.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
@@ -7,19 +7,16 @@
     <LangVersion>12.0</LangVersion>
 
     <!-- Package Information -->
-    <PackageId>LowlandTech.TinyTools</PackageId>
+    <PackageId>LowlandTech.Specs</PackageId>
     <Version>2026.1.0</Version>
     <Authors>wendellmva</Authors>
     <Company>LowlandTech</Company>
-    <Product>TinyTemplateEngine</Product>
-    <Description>A lightweight template engine for .NET with minimal dependencies. Designed for data composition, not view rendering. Supports variable interpolation, control flow, pipe helpers, and extensible template services.</Description>
-    <Copyright>Copyright © 2023-2025 LowlandTech</Copyright>
+    <Product>LowlandTech.Specs</Product>
+    <Description>A BDD testing framework with executable specifications integrated with xUnit. Supports Gherkin-style scenarios with auto-execution capabilities for Given/When/Then patterns.</Description>
+    <Copyright>Copyright � 2023-2025 LowlandTech</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://components.lowlandtech.com/tinytools</PackageProjectUrl>
-    <PackageReadmeFile>readme.md</PackageReadmeFile>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageTags>template;templating;code-generation;text-generation;interpolation;razor-alternative;lightweight;zero-dependency</PackageTags>
-    <PackageReleaseNotes>See changelog.md for release notes</PackageReleaseNotes>
+    <PackageProjectUrl>https://components.lowlandtech.com/specs</PackageProjectUrl>
+    <PackageTags>bdd;gherkin;testing;xunit;executable-specifications;given-when-then;specification;test-framework</PackageTags>
     
     <!-- Repository Information -->
     <RepositoryUrl>https://github.com/lowlandtech/tinytools</RepositoryUrl>
@@ -46,26 +43,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\readme.md" Pack="true" PackagePath="\" />
-    <None Include="..\..\icon.png" Pack="true" PackagePath="\" />
-  </ItemGroup>
-  
-  <Target Name="PreparePackageReleaseNotesFromFile" BeforeTargets="GenerateNuspec">
-    <ReadLinesFromFile File="../../changelog.md" Condition="Exists('../../changelog.md')">
-      <Output TaskParameter="Lines" ItemName="ReleaseNoteLines" />
-    </ReadLinesFromFile>
-    <PropertyGroup>
-      <PackageReleaseNotes Condition="'@(ReleaseNoteLines)' != ''">@(ReleaseNoteLines, '%0a')</PackageReleaseNotes>
-    </PropertyGroup>
-  </Target>
-
-  <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.102" PrivateAssets="All" />
-    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="xunit.v3.extensibility.core" Version="3.2.2" />
   </ItemGroup>
 
 </Project>
-
-

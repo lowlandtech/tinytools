@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>12.0</LangVersion>
+
+    <!-- Package Information -->
+    <PackageId>LowlandTech.Specs.UI</PackageId>
+    <Version>2026.1.0</Version>
+    <Authors>wendellmva</Authors>
+    <Company>LowlandTech</Company>
+    <Product>LowlandTech.Specs.UI</Product>
+    <Description>Blazor Server app for visualizing BDD executable specifications with Tailwind CSS styling.</Description>
+    <Copyright>Copyright © 2023-2025 LowlandTech</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://components.lowlandtech.com/specs</PackageProjectUrl>
+    <PackageTags>blazor;bdd;specs;visualization;tailwind;shadcn;gherkin;ui-components</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\specs\LowlandTech.Specs.csproj" />
+  </ItemGroup>
+
+  <!-- Install npm packages -->
+  <Target Name="NpmInstall" BeforeTargets="BeforeBuild" Condition="!Exists('wwwroot\node_modules')">
+    <Exec Command="npm install" WorkingDirectory="wwwroot" />
+  </Target>
+
+  <!-- Build Tailwind CSS -->
+  <Target Name="BuildTailwind" BeforeTargets="BeforeBuild" DependsOnTargets="NpmInstall">
+    <Exec Command="npm run css:build" WorkingDirectory="wwwroot" />
+  </Target>
+
+  <!-- Watch Tailwind CSS in development -->
+  <Target Name="WatchTailwind" Condition="'$(Configuration)' == 'Debug'" AfterTargets="Build">
+    <Message Importance="high" Text="Run 'npm run css:watch' in wwwroot folder for Tailwind hot reload" />
+  </Target>
+
+</Project>
+
+
+

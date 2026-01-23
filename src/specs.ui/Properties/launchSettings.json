@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "LowlandTech.Specs.UI": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:62467;http://localhost:62468"
+    }
+  }
+}

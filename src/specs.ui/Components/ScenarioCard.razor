@@ -1,0 +1,66 @@
+@using static LowlandTech.Specs.UI.Components.ScenarioInfo
+
+<div class="card hover:shadow-lg transition-shadow duration-200">
+    <!-- Header -->
+    <div class="card-header">
+        <div class="flex items-start justify-between">
+            <div class="flex-1">
+                <div class="flex flex-wrap gap-2 mb-3">
+                    @if (!string.IsNullOrWhiteSpace(Scenario.ScenarioAttribute.SpecId))
+                    {
+                        <span class="badge badge-primary">@Scenario.ScenarioAttribute.SpecId</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Scenario.ScenarioAttribute.UserStory))
+                    {
+                        <span class="badge badge-secondary">@Scenario.ScenarioAttribute.UserStory</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Scenario.ScenarioAttribute.ScenarioId))
+                    {
+                        <span class="badge badge-success">@Scenario.ScenarioAttribute.ScenarioId</span>
+                    }
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    @(Scenario.ScenarioAttribute.Label ?? "Untitled Scenario")
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 font-mono">
+                    @Scenario.ClassName
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Body with Gherkin -->
+    <div class="card-body">
+        <GherkinCodeBlock Scenario="@Scenario" />
+        
+        <!-- Method details -->
+        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <details class="group">
+                <summary class="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 flex items-center">
+                    <svg class="w-4 h-4" width="$(4*4)" height="$(4*4)" mr-2 transform group-open:rotate-90 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    Test Methods (@Scenario.ThenAttributes.Count)
+                </summary>
+                <div class="mt-3 pl-6 space-y-2">
+                    @foreach (var then in Scenario.ThenAttributes)
+                    {
+                        <div class="flex items-center text-sm">
+                            <svg class="w-4 h-4" width="$(4*4)" height="$(4*4)" text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <code class="text-gray-600 dark:text-gray-400">@then.MethodName</code>
+
+                        </div>
+                    }
+                </div>
+            </details>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public ScenarioInfo Scenario { get; set; } = null!;
+}
+

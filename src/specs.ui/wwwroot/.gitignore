@@ -1,0 +1,7 @@
+# Node
+node_modules/
+package-lock.json
+
+# Generated CSS (committed but can be regenerated)
+# Uncomment if you want to ignore the generated file:
+# css/app.css

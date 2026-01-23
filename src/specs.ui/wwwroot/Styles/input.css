@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Flowbite-inspired card styles */
+@layer components {
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm;
+  }
+
+  .card-header {
+    @apply px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900;
+  }
+
+  .card-body {
+    @apply px-6 py-4;
+  }
+
+  /* Gherkin code block styling */
+  .gherkin-block {
+    @apply rounded-lg overflow-hidden font-mono text-sm;
+    background: hsl(var(--gherkin-background));
+  }
+
+  .gherkin-line {
+    @apply px-4 py-1 hover:bg-white/5 transition-colors;
+  }
+
+  .gherkin-keyword {
+    @apply font-bold;
+    color: hsl(var(--gherkin-keyword));
+  }
+
+  .gherkin-tag {
+    @apply font-semibold;
+    color: hsl(var(--gherkin-tag));
+  }
+
+  .gherkin-comment {
+    @apply italic;
+    color: hsl(var(--gherkin-comment));
+  }
+
+  .gherkin-string {
+    color: hsl(var(--gherkin-string));
+  }
+
+  .gherkin-number {
+    color: hsl(var(--gherkin-number));
+  }
+
+  .gherkin-property {
+    @apply text-cyan-400;
+  }
+
+  .gherkin-operator {
+    @apply text-pink-400;
+  }
+
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300;
+  }
+
+  .badge-secondary {
+    @apply bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300;
+  }
+
+  .badge-success {
+    @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300;
+  }
+}
