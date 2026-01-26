@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CodeBlock } from "@/components/code-block";
-import { ArrowRight, Zap, Code2, Layers, Settings } from "lucide-react";
+import { ArrowRight, Zap, Code2, Layers, Settings, Wrench } from "lucide-react";
 
 const features = [
   {
@@ -53,9 +53,9 @@ export function HomePage() {
   return (
     <div className="space-y-16">
       {/* Hero Section */}
-      <section className="space-y-6 py-12">
+      <section className="text-center space-y-6 py-12">
         <div className="inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-medium">
-          <span className="text-secondary">??</span>
+          <Wrench className="h-4 w-4 text-primary" />
           <span className="ml-2 text-muted-foreground">
             Factory tools for .NET code generation
           </span>
@@ -63,11 +63,11 @@ export function HomePage() {
         <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
           <span className="text-primary">Factory</span>Tools
         </h1>
-        <p className="max-w-2xl text-lg text-muted-foreground">
+        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
           A lightweight, powerful template engine and toolset for .NET code generation.
           Perfect for source generators, scaffolding, and dynamic content creation.
         </p>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-center gap-4">
           <Button asChild size="lg">
             <Link to="/getting-started">
               Get Started

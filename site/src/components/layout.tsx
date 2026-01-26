@@ -10,6 +10,7 @@ const navigation = [
   { name: "Template Engine", href: "/template-engine" },
   { name: "Variable Resolver", href: "/variable-resolver" },
   { name: "Execution Context", href: "/execution-context" },
+  { name: "Examples", href: "/examples" },
   { name: "API Reference", href: "/api-reference" },
 ];
 
@@ -44,7 +45,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">LT</span>
             </div>
-            <span className="font-bold text-lg">LT FactoryTools</span>
+            <span className="font-bold text-lg">FactoryTools</span>
           </Link>
 
           {/* Breadcrumb */}
