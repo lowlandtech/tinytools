@@ -35,8 +35,9 @@ const helloWorldExample = `// Simple string interpolation
 var template = "Hello {FirstName} {LastName}!";
 var model = new { FirstName = "John", LastName = "Smith" };
 
-var result = template.Interpolate(model);
-// Output: "Hello John Smith!"`;
+var result = template.Interpolate(model);`;
+
+const helloWorldOutput = `Hello John Smith!`;
 
 const emailExample = `// Email template example
 var template = """
@@ -57,6 +58,13 @@ var model = new
 };
 
 var email = template.Interpolate(model);`;
+
+const emailOutput = `Hi Alice,
+
+Thank you for your order #12345.
+Your total is $99.99.
+
+We'll send confirmation to alice@example.com.`;
 
 export function HomePage() {
   return (
@@ -122,15 +130,27 @@ export function HomePage() {
           Get started in seconds with simple string interpolation.
         </p>
         
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="max-w-4xl mx-auto space-y-8">
           <div>
             <h3 className="text-lg font-semibold mb-3">Hello World</h3>
             <CodeBlock code={helloWorldExample} language="csharp" />
+            <div className="mt-3">
+              <p className="text-sm font-medium text-muted-foreground mb-2">Output:</p>
+              <div className="bg-muted p-4 rounded-lg">
+                <code className="text-sm">{helloWorldOutput}</code>
+              </div>
+            </div>
           </div>
           
           <div>
             <h3 className="text-lg font-semibold mb-3">Email Template</h3>
             <CodeBlock code={emailExample} language="csharp" />
+            <div className="mt-3">
+              <p className="text-sm font-medium text-muted-foreground mb-2">Output:</p>
+              <div className="bg-muted p-4 rounded-lg">
+                <pre className="text-sm whitespace-pre-wrap">{emailOutput}</pre>
+              </div>
+            </div>
           </div>
         </div>
       </section>
