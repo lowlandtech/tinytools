@@ -2,15 +2,14 @@ import { CodeBlock } from "@/components/code-block";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function ExecutionContextPage() {
-  return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div className="space-y-4">
-        <h1 className="text-3xl font-bold">Execution Context</h1>
-        <p className="text-lg text-muted-foreground">
-          The ExecutionContext provides a hierarchical key-value store for template data
-          with support for parent-child relationships.
-        </p>
-      </div>
+return (
+  <div className="max-w-4xl mx-auto space-y-8">
+    <div className="space-y-4">
+      <p className="text-lg text-muted-foreground">
+        The ExecutionContext provides a hierarchical key-value store for template data
+        with support for parent-child relationships.
+      </p>
+    </div>
 
       <Card>
         <CardHeader>

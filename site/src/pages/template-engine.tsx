@@ -36,17 +36,16 @@ const comparisonExample = `@if(Context.Value >= 10) {
 }`;
 
 export function TemplateEnginePage() {
-  return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div className="space-y-4">
-        <h1 className="text-3xl font-bold">Template Engine</h1>
-        <p className="text-lg text-muted-foreground">
-          The TinyTemplateEngine provides Razor-like syntax for control flow with
-          <code className="mx-1 px-1 py-0.5 bg-muted rounded">@if</code>,
-          <code className="mx-1 px-1 py-0.5 bg-muted rounded">@foreach</code>,
-          and comments.
-        </p>
-      </div>
+return (
+  <div className="max-w-4xl mx-auto space-y-8">
+    <div className="space-y-4">
+      <p className="text-lg text-muted-foreground">
+        The TinyTemplateEngine provides Razor-like syntax for control flow with
+        <code className="mx-1 px-1 py-0.5 bg-muted rounded">@if</code>,
+        <code className="mx-1 px-1 py-0.5 bg-muted rounded">@foreach</code>,
+        and comments.
+      </p>
+    </div>
 
       <Tabs defaultValue="if" className="space-y-4">
         <TabsList>

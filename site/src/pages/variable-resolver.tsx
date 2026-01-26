@@ -2,15 +2,14 @@ import { CodeBlock } from "@/components/code-block";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function VariableResolverPage() {
-  return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div className="space-y-4">
-        <h1 className="text-3xl font-bold">Variable Resolver</h1>
-        <p className="text-lg text-muted-foreground">
-          The VariableResolver handles <code className="px-1 py-0.5 bg-muted rounded">${"${...}"}</code> interpolation
-          with support for nested property access.
-        </p>
-      </div>
+return (
+  <div className="max-w-4xl mx-auto space-y-8">
+    <div className="space-y-4">
+      <p className="text-lg text-muted-foreground">
+        The VariableResolver handles <code className="px-1 py-0.5 bg-muted rounded">${"${...}"}</code> interpolation
+        with support for nested property access.
+      </p>
+    </div>
 
       <Card>
         <CardHeader>

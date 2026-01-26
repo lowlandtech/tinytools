@@ -2,14 +2,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CodeBlock } from "@/components/code-block";
 
 export function ApiReferencePage() {
-  return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div className="space-y-4">
-        <h1 className="text-3xl font-bold">API Reference</h1>
-        <p className="text-lg text-muted-foreground">
-          Complete API documentation for FactoryTools.
-        </p>
-      </div>
+return (
+  <div className="max-w-4xl mx-auto space-y-8">
+    <div className="space-y-4">
+      <p className="text-lg text-muted-foreground">
+        Complete API documentation for FactoryTools.
+      </p>
+    </div>
 
       {/* TinyTemplateEngine */}
       <Card>

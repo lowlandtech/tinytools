@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Github } from "lucide-react";
+import { Moon, Sun, Github, ChevronRight } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const navigation = [
@@ -14,12 +14,14 @@ const navigation = [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
-const location = useLocation();
-const [isDark, setIsDark] = useState(() => {
-  const saved = localStorage.getItem("theme");
-  if (saved) return saved === "dark";
-  return true; // Default to dark mode
-});
+  const location = useLocation();
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved) return saved === "dark";
+    return true; // Default to dark mode
+  });
+
+  const currentPage = navigation.find(item => item.href === location.pathname);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -36,13 +38,21 @@ const [isDark, setIsDark] = useState(() => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto flex h-14 items-center px-4">
+        <div className="flex h-14 items-center px-4 gap-4">
           <Link to="/" className="flex items-center space-x-2">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">FT</span>
             </div>
             <span className="font-bold text-lg">FactoryTools</span>
           </Link>
+
+          {/* Breadcrumb */}
+          {currentPage && currentPage.href !== "/" && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <ChevronRight className="h-4 w-4" />
+              <span className="font-medium text-foreground">{currentPage.name}</span>
+            </div>
+          )}
 
           <div className="flex items-center ml-auto space-x-2">
             <Button
@@ -88,7 +98,7 @@ const [isDark, setIsDark] = useState(() => {
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto">
-          <div className="container mx-auto px-4 py-8 max-w-5xl">
+          <div className="container mx-auto px-4 py-6 max-w-5xl">
             {children}
           </div>
         </main>
