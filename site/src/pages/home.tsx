@@ -26,28 +26,37 @@ const features = [
   {
     icon: Zap,
     title: "High Performance",
-    description: "Optimized for code generation scenarios with minimal allocations.",
+    description: "Optimized for all scenarios with minimal allocations.",
     href: "/getting-started",
   },
 ];
 
-const quickExample = `// Create a template
-var template = @"
-@foreach(var item in Context.Items) {
-    public ${'${item.Type}'} ${'${item.Name}'} { get; set; }
-}
-";
+const helloWorldExample = `// Simple string interpolation
+var template = "Hello {FirstName} {LastName}!";
+var model = new { FirstName = "John", LastName = "Smith" };
 
-// Set up context
-var context = new ExecutionContext();
-context.Set("Items", new[] {
-    new { Type = "string", Name = "FirstName" },
-    new { Type = "int", Name = "Age" }
-});
+var result = template.Interpolate(model);
+// Output: "Hello John Smith!"`;
 
-// Render
-var engine = new TinyTemplateEngine();
-var result = engine.Render(template, context);`;
+const emailExample = `// Email template example
+var template = """
+    Hi {CustomerName},
+    
+    Thank you for your order #{OrderNumber}.
+    Your total is {Total}.
+    
+    We'll send confirmation to {Email}.
+    """;
+
+var model = new 
+{
+    CustomerName = "Alice",
+    OrderNumber = "12345",
+    Total = "$99.99",
+    Email = "alice@example.com"
+};
+
+var email = template.Interpolate(model);`;
 
 export function HomePage() {
   return (
@@ -108,9 +117,21 @@ export function HomePage() {
 
       {/* Quick Example */}
       <section className="space-y-6">
-        <h2 className="text-2xl font-bold text-center">Quick Example</h2>
-        <div className="max-w-4xl mx-auto">
-          <CodeBlock code={quickExample} language="csharp" />
+        <h2 className="text-2xl font-bold text-center">Quick Start</h2>
+        <p className="text-center text-muted-foreground max-w-2xl mx-auto">
+          Get started in seconds with simple string interpolation.
+        </p>
+        
+        <div className="max-w-4xl mx-auto space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Hello World</h3>
+            <CodeBlock code={helloWorldExample} language="csharp" />
+          </div>
+          
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Email Template</h3>
+            <CodeBlock code={emailExample} language="csharp" />
+          </div>
         </div>
       </section>
 
