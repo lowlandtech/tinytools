@@ -14,11 +14,12 @@ const navigation = [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  const location = useLocation();
-  const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem("theme");
-    return saved === "dark";
-  });
+const location = useLocation();
+const [isDark, setIsDark] = useState(() => {
+  const saved = localStorage.getItem("theme");
+  if (saved) return saved === "dark";
+  return true; // Default to dark mode
+});
 
   useEffect(() => {
     const root = document.documentElement;
