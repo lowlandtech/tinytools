@@ -234,7 +234,9 @@ To keep TinyTools **tiny**, we explicitly **won't** add:
 Track all open issues on GitHub: [View All Issues](https://github.com/lowlandtech/tinytools/issues)
 
 #### ?? Bugs
-- No open bugs currently tracked
+- [#10](https://github.com/lowlandtech/tinytools/issues/10) - ~~Operator precedence bug~~ **ALREADY FIXED** ?
+- [#11](https://github.com/lowlandtech/tinytools/issues/11) - ~~@foreach iterates over string characters~~ **FIXED** ?  
+- [#12](https://github.com/lowlandtech/tinytools/issues/12) - ~~Floating-point equality precision~~ **FIXED** ?
 
 #### ? Enhancements
 - No open enhancement requests currently tracked

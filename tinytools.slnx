@@ -1,4 +1,5 @@
 <Solution>
+  <Folder Name="/files/" />
   <Folder Name="/src/">
     <Project Path="src/lib/LowlandTech.TinyTools.csproj" />
     <Project Path="src/test/LowlandTech.TinyTools.UnitTests.csproj" />

@@ -215,6 +215,13 @@ public partial class TinyTemplateEngine : ITemplateEngine
 
         // Iterate and render
         var result = new StringBuilder();
+        
+        // Don't iterate over strings as IEnumerable (would iterate chars)
+        if (collection is string)
+        {
+            throw new InvalidOperationException($"Cannot iterate over string value in @foreach. Collection expression: {collectionExpr}");
+        }
+        
         var items = collection as System.Collections.IEnumerable;
         if (items != null)
         {
@@ -382,7 +389,10 @@ public partial class TinyTemplateEngine : ITemplateEngine
         if (left == null || right == null) return false;
         if (IsNumeric(left) && IsNumeric(right))
         {
-            return Convert.ToDouble(left) == Convert.ToDouble(right);
+            // Use tolerance-based comparison for floating-point values
+            var leftValue = Convert.ToDouble(left);
+            var rightValue = Convert.ToDouble(right);
+            return Math.Abs(leftValue - rightValue) < 1e-10;
         }
         return string.Equals(left.ToString(), right.ToString(), StringComparison.OrdinalIgnoreCase);
     }
