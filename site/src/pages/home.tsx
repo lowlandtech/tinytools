@@ -34,7 +34,7 @@ const features = [
 const quickExample = `// Create a template
 var template = @"
 @foreach(var item in Context.Items) {
-    public ${item.Type} ${item.Name} { get; set; }
+    public ${'${item.Type}'} ${'${item.Name}'} { get; set; }
 }
 ";
 

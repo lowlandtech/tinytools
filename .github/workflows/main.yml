@@ -1,11 +1,11 @@
 name: CI
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-  workflow_dispatch:
+push:
+  branches: [ "main", "develop" ]
+pull_request:
+  branches: [ "main", "develop" ]
+workflow_dispatch:
 
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
