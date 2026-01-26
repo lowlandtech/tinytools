@@ -1219,17 +1219,17 @@ Item: ${item}
         _context.Set("Value2", 0.3);
         
         var template = @"@if (Context.Value1 == Context.Value2) {
-Equal
+Values Are Equal
 } else {
-Not Equal
+Values Are Not Equal
 }";
 
         // Act
         var result = Sut.Render(template, _context);
 
         // Assert - Should be Equal with tolerance-based comparison
-        result.Should().Contain("Equal");
-        result.Should().NotContain("Not Equal");
+        result.Should().Contain("Values Are Equal");
+        result.Should().NotContain("Values Are Not Equal");
     }
 
     [Fact]
@@ -1240,17 +1240,17 @@ Not Equal
         _context.Set("Value2", 1.0001);  // Outside 1e-10 tolerance
         
         var template = @"@if (Context.Value1 == Context.Value2) {
-Equal
+Values Are Equal
 } else {
-Not Equal
+Values Are Not Equal
 }";
 
         // Act
         var result = Sut.Render(template, _context);
 
         // Assert - Should be Not Equal (outside tolerance)
-        result.Should().Contain("Not Equal");
-        result.Should().NotContain("Equal");
+        result.Should().Contain("Values Are Not Equal");
+        result.Should().NotContain("Values Are Equal");
     }
 
     #endregion
