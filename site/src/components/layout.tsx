@@ -22,6 +22,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   });
 
   const currentPage = navigation.find(item => item.href === location.pathname);
+  const isHomePage = location.pathname === "/";
 
   useEffect(() => {
     const root = document.documentElement;
@@ -41,9 +42,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="flex h-14 items-center px-4 gap-4">
           <Link to="/" className="flex items-center space-x-2">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">FT</span>
+              <span className="text-primary-foreground font-bold text-sm">LT</span>
             </div>
-            <span className="font-bold text-lg">FactoryTools</span>
+            <span className="font-bold text-lg">LT FactoryTools</span>
           </Link>
 
           {/* Breadcrumb */}
@@ -76,29 +77,34 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </header>
 
       <div className="flex">
-        {/* Left Sidebar */}
-        <aside className="sticky top-14 h-[calc(100vh-3.5rem)] w-64 border-r bg-sidebar overflow-y-auto">
-          <nav className="flex flex-col gap-1 p-4">
-            {navigation.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={cn(
-                  "px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                  location.pathname === item.href
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                )}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </nav>
-        </aside>
+        {/* Left Sidebar - Hidden on home page */}
+        {!isHomePage && (
+          <aside className="sticky top-14 h-[calc(100vh-3.5rem)] w-64 border-r bg-sidebar overflow-y-auto">
+            <nav className="flex flex-col gap-1 p-4">
+              {navigation.map((item) => (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className={cn(
+                    "px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                    location.pathname === item.href
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  )}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
+          </aside>
+        )}
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto">
-          <div className="container mx-auto px-4 py-6 max-w-5xl">
+          <div className={cn(
+            "container mx-auto px-4 py-6",
+            isHomePage ? "max-w-6xl" : "max-w-5xl"
+          )}>
             {children}
           </div>
         </main>
@@ -106,7 +112,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
       {/* Footer */}
       <footer className="border-t py-6 md:py-0">
-        <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 md:h-16 md:flex-row ml-64">
+        <div className={cn(
+          "container mx-auto flex flex-col items-center justify-between gap-4 px-4 md:h-16 md:flex-row",
+          !isHomePage && "ml-64"
+        )}>
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} LowlandTech. All rights reserved.
           </p>
