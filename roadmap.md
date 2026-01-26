@@ -227,6 +227,28 @@ To keep TinyTools **tiny**, we explicitly **won't** add:
 
 ---
 
+## Open Issues & Bug Tracker
+
+### Active Issues
+
+Track all open issues on GitHub: [View All Issues](https://github.com/lowlandtech/tinytools/issues)
+
+#### ?? Bugs
+- No open bugs currently tracked
+
+#### ? Enhancements
+- No open enhancement requests currently tracked
+
+#### ?? Documentation
+- No open documentation issues currently tracked
+
+#### ? Questions
+- No open questions currently tracked
+
+> **Note**: This section is manually updated. For the most current list, visit the [GitHub Issues page](https://github.com/lowlandtech/tinytools/issues).
+
+---
+
 ## Community Requests
 
 **Want to influence the roadmap?** We welcome:
