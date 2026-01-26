@@ -80,7 +80,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
         return CommentPattern().Replace(template, string.Empty);
     }
 
-    [GeneratedRegex(@"@if\s*\(([^)]+)\)\s*\{", RegexOptions.Compiled)]
+    [GeneratedRegex(@"@if\s*\((.+?)\)\s*\{", RegexOptions.Compiled)]
     private static partial Regex IfPattern();
 
     [GeneratedRegex(@"@foreach\s*\(\s*var\s+(\w+)\s+in\s+([^)]+)\)\s*\{", RegexOptions.Compiled)]
