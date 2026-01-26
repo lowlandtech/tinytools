@@ -60,7 +60,7 @@ var result = template.Interpolate(model);
     Hi {CustomerName},
 
     Thank you for your order #{OrderNumber}.
-    Your total is ${TotalAmount}.
+    Your total is ${"${TotalAmount}"}.
 
     We'll send a confirmation to {Email}.
     """;
