@@ -80,7 +80,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
         return CommentPattern().Replace(template, string.Empty);
     }
 
-    [GeneratedRegex(@"@if\s*\(([^)]+)\)\s*\{", RegexOptions.Compiled)]
+    [GeneratedRegex(@"@if\s*\((.+?)\)\s*\{", RegexOptions.Compiled)]
     private static partial Regex IfPattern();
 
     [GeneratedRegex(@"@foreach\s*\(\s*var\s+(\w+)\s+in\s+([^)]+)\)\s*\{", RegexOptions.Compiled)]
@@ -215,6 +215,13 @@ public partial class TinyTemplateEngine : ITemplateEngine
 
         // Iterate and render
         var result = new StringBuilder();
+        
+        // Don't iterate over strings as IEnumerable (would iterate chars)
+        if (collection is string)
+        {
+            throw new InvalidOperationException($"Cannot iterate over string value in @foreach. Collection expression: {collectionExpr}");
+        }
+        
         var items = collection as System.Collections.IEnumerable;
         if (items != null)
         {
@@ -303,7 +310,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
         {
             var parts = condition.Split(" >= ");
             var left = _resolver.ResolveExpression(parts[0].Trim(), context);
-            var right = ParseValue(parts[1].Trim());
+            var right = ResolveValueOrExpression(parts[1].Trim(), context);
             return Compare(left, right) >= 0;
         }
 
@@ -311,7 +318,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
         {
             var parts = condition.Split(" <= ");
             var left = _resolver.ResolveExpression(parts[0].Trim(), context);
-            var right = ParseValue(parts[1].Trim());
+            var right = ResolveValueOrExpression(parts[1].Trim(), context);
             return Compare(left, right) <= 0;
         }
 
@@ -319,7 +326,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
         {
             var parts = condition.Split(" > ");
             var left = _resolver.ResolveExpression(parts[0].Trim(), context);
-            var right = ParseValue(parts[1].Trim());
+            var right = ResolveValueOrExpression(parts[1].Trim(), context);
             return Compare(left, right) > 0;
         }
 
@@ -327,7 +334,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
         {
             var parts = condition.Split(" < ");
             var left = _resolver.ResolveExpression(parts[0].Trim(), context);
-            var right = ParseValue(parts[1].Trim());
+            var right = ResolveValueOrExpression(parts[1].Trim(), context);
             return Compare(left, right) < 0;
         }
 
@@ -335,7 +342,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
         {
             var parts = condition.Split(" == ");
             var left = _resolver.ResolveExpression(parts[0].Trim(), context);
-            var right = ParseValue(parts[1].Trim());
+            var right = ResolveValueOrExpression(parts[1].Trim(), context);
             return AreEqual(left, right);
         }
 
@@ -343,13 +350,24 @@ public partial class TinyTemplateEngine : ITemplateEngine
         {
             var parts = condition.Split(" != ");
             var left = _resolver.ResolveExpression(parts[0].Trim(), context);
-            var right = ParseValue(parts[1].Trim());
+            var right = ResolveValueOrExpression(parts[1].Trim(), context);
             return !AreEqual(left, right);
         }
 
         // Truthy check
         var value = _resolver.ResolveExpression(condition, context);
         return IsTruthy(value);
+    }
+
+    private object? ResolveValueOrExpression(string value, ExecutionContext context)
+    {
+        // If it looks like a context expression (contains 'Context.'), resolve it
+        if (value.Contains("Context."))
+        {
+            return _resolver.ResolveExpression(value, context);
+        }
+        // Otherwise, treat it as a literal value
+        return ParseValue(value);
     }
 
     private static object? ParseValue(string value)
@@ -382,7 +400,10 @@ public partial class TinyTemplateEngine : ITemplateEngine
         if (left == null || right == null) return false;
         if (IsNumeric(left) && IsNumeric(right))
         {
-            return Convert.ToDouble(left) == Convert.ToDouble(right);
+            // Use tolerance-based comparison for floating-point values
+            var leftValue = Convert.ToDouble(left);
+            var rightValue = Convert.ToDouble(right);
+            return Math.Abs(leftValue - rightValue) < 1e-10;
         }
         return string.Equals(left.ToString(), right.ToString(), StringComparison.OrdinalIgnoreCase);
     }

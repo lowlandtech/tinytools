@@ -1,6 +1,17 @@
-<h1 align="center">Welcome to LowlandTech.TinyTools 👋</h1>
-<p>
+<div align="center">
+  <img src="site/public/wrench.svg" alt="FactoryTools Logo" width="100" height="100" />
+  <h1><span style="color: #0ea5e9;">Factory</span>Tools</h1>
+  <p><em>Formerly LowlandTech.TinyTools - Rebranding to FactoryTools in 2026</em></p>
+</div>
+
+<p align="center">
   <img alt="Version" src="https://img.shields.io/badge/version-2026.1.0-blue.svg?cacheSeconds=2592000" />
+  <a href="https://github.com/lowlandtech/tinytools/actions/workflows/ci.yml" target="_blank">
+    <img alt="Build Status" src="https://github.com/lowlandtech/tinytools/actions/workflows/ci.yml/badge.svg" />
+  </a>
+  <a href="https://github.com/lowlandtech/tinytools/actions/workflows/deploy-docs.yml" target="_blank">
+    <img alt="Docs Status" src="https://github.com/lowlandtech/tinytools/actions/workflows/deploy-docs.yml/badge.svg" />
+  </a>
   <a href="https://tools.lowlandtech.com" target="_blank">
     <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
   </a>
@@ -17,6 +28,18 @@
 ### 🏠 [Homepage](https://tools.lowlandtech.com)
 
 ### ✨ [Demo](https://tools.lowlandtech.com)
+
+---
+
+## 🎨 Rebranding to FactoryTools
+
+**TinyTools** is becoming **<span style="color: #0ea5e9;">Factory</span>Tools** in 2026! 
+
+The new name better reflects the library's purpose: providing **factory tools** for code generation, scaffolding, and template-based workflows. The package will be renamed to `LowlandTech.FactoryTools` with full backward compatibility.
+
+📖 Visit our new documentation site: [tools.lowlandtech.com](https://tools.lowlandtech.com)
+
+---
 
 ## Why TinyTemplateEngine?
 
