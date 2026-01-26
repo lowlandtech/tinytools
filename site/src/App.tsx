@@ -7,6 +7,7 @@ import { VariableResolverPage } from "@/pages/variable-resolver";
 import { ExecutionContextPage } from "@/pages/execution-context";
 import { ApiReferencePage } from "@/pages/api-reference";
 import { ExamplesPage } from "@/pages/examples";
+import { CodeGenerationPage } from "@/pages/code-generation";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/variable-resolver" element={<VariableResolverPage />} />
           <Route path="/execution-context" element={<ExecutionContextPage />} />
           <Route path="/examples" element={<ExamplesPage />} />
+          <Route path="/code-generation" element={<CodeGenerationPage />} />
           <Route path="/api-reference" element={<ApiReferencePage />} />
         </Routes>
       </Layout>
