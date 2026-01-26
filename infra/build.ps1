@@ -16,28 +16,25 @@ $ErrorActionPreference = "Stop"
 
 # Paths - using script scope for functions to access
 $script:rootDir = Split-Path $PSScriptRoot -Parent
-$script:solutionPath = Join-Path $script:rootDir "tinytools.sln"
-$script:projectPath = Join-Path $script:rootDir "src\lowlandtech.tinytools\LowlandTech.TinyTools.csproj"
+$script:solutionPath = Join-Path $script:rootDir "tinytools.slnx"
+$script:projectPath = Join-Path $script:rootDir "src\lib\LowlandTech.TinyTools.csproj"
 $script:buildRFile = Join-Path $PSScriptRoot "BUILDR"
 $script:artifactsDir = Join-Path $script:rootDir "artifacts"
 $script:bagetUrl = "http://localhost:5000/v3/index.json"
 $script:bagetApiKey = "BAGET-SERVER-API-KEY"
-$buildRFile = Join-Path $PSScriptRoot "BUILDR"
-$artifactsDir = Join-Path $rootDir "artifacts"
-$bagetUrl = "http://localhost:5000/v3/index.json"
 
 function Get-BaseVersion {
-    [xml]$csproj = Get-Content $projectPath
+    [xml]$csproj = Get-Content $script:projectPath
     $version = $csproj.Project.PropertyGroup.Version
     if (-not $version) {
-        throw "No Version found in $projectPath"
+        throw "No Version found in $script:projectPath"
     }
     return $version
 }
 
 function Get-BuildNumber {
-    if (Test-Path $buildRFile) {
-        return [int](Get-Content $buildRFile -Raw).Trim()
+    if (Test-Path $script:buildRFile) {
+        return [int](Get-Content $script:buildRFile -Raw).Trim()
     }
     return 0
 }
@@ -45,7 +42,7 @@ function Get-BuildNumber {
 function Increment-BuildNumber {
     $buildNum = Get-BuildNumber
     $buildNum++
-    $buildNum | Set-Content $buildRFile -NoNewline
+    $buildNum | Set-Content $script:buildRFile -NoNewline
     return $buildNum
 }
 
@@ -65,11 +62,9 @@ function Get-DerivedVersion {
 function Clean {
     Write-Host "🧹 Cleaning..." -ForegroundColor Cyan
     
-    Remove-Item "$rootDir\src\**\bin" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item "$rootDir\src\**\obj" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item "$rootDir\test\**\bin" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item "$rootDir\test\**\obj" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item $artifactsDir -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item "$script:rootDir\src\**\bin" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item "$script:rootDir\src\**\obj" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item $script:artifactsDir -Recurse -Force -ErrorAction SilentlyContinue
     
     Write-Host "✅ Clean complete" -ForegroundColor Green
 }
@@ -77,10 +72,10 @@ function Clean {
 function Build {
     Write-Host "🔨 Building..." -ForegroundColor Cyan
     
-    dotnet restore $solutionPath
+    dotnet restore $script:solutionPath
     if ($LASTEXITCODE -ne 0) { throw "Restore failed" }
     
-    dotnet build $solutionPath --configuration $Configuration --no-restore /p:Version=$version
+    dotnet build $script:solutionPath --configuration $Configuration --no-restore /p:Version=$version
     if ($LASTEXITCODE -ne 0) { throw "Build failed" }
     
     Write-Host "✅ Build complete" -ForegroundColor Green
@@ -89,7 +84,7 @@ function Build {
 function Test {
     Write-Host "🧪 Testing..." -ForegroundColor Cyan
     
-    dotnet test $solutionPath --configuration $Configuration --no-build --verbosity normal
+    dotnet test $script:solutionPath --configuration $Configuration --no-build --verbosity normal
     if ($LASTEXITCODE -ne 0) { throw "Tests failed" }
     
     Write-Host "✅ Tests passed" -ForegroundColor Green
@@ -98,15 +93,15 @@ function Test {
 function Pack {
     Write-Host "📦 Packing..." -ForegroundColor Cyan
     
-    if (-not (Test-Path $artifactsDir)) {
-        New-Item -ItemType Directory -Path $artifactsDir | Out-Null
+    if (-not (Test-Path $script:artifactsDir)) {
+        New-Item -ItemType Directory -Path $script:artifactsDir | Out-Null
     }
     
     # Run dotnet pack and capture output to check for errors
-    $output = dotnet pack $projectPath `
+    $output = dotnet pack $script:projectPath `
         --configuration $Configuration `
         --no-build `
-        --output $artifactsDir `
+        --output $script:artifactsDir `
         /p:PackageVersion=$version 2>&1
     
     if ($LASTEXITCODE -ne 0) { 
@@ -114,7 +109,7 @@ function Pack {
         throw "Pack failed" 
     }
     
-    $packagePath = Join-Path $artifactsDir "LowlandTech.TinyTools.$version.nupkg"
+    $packagePath = Join-Path $script:artifactsDir "LowlandTech.TinyTools.$version.nupkg"
     
     if (-not (Test-Path $packagePath)) {
         throw "Package file was not created: $packagePath"

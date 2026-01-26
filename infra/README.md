@@ -23,7 +23,7 @@ cd infra
 ## How It Works
 
 1. **BUILDR file** - Stores incrementing build number (starts at 0)
-2. **Reads base version** from `LowlandTech.TinyTools.csproj` (e.g., `2026.1.0`)
+2. **Reads base version** from `src/lib/LowlandTech.TinyTools.csproj` (e.g., `2026.1.0`)
 3. **Derives final version** by replacing last segment: `2026.1.{BUILDR}`
    - Base: `2026.1.0` + BUILDR: `5` = **`2026.1.5`**
    - Next build: BUILDR becomes `6` = **`2026.1.6`**
@@ -62,7 +62,7 @@ echo 0 > BUILDR
 - **Final version**: `2026.1.{BUILDR}`
 
 To bump major/minor versions:
-1. Update `<Version>` in `LowlandTech.TinyTools.csproj`
+1. Update `<Version>` in `src/lib/LowlandTech.TinyTools.csproj`
 2. Reset BUILDR to 0: `echo 0 > BUILDR`
 
 ## Requirements

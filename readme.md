@@ -1,7 +1,7 @@
 <h1 align="center">Welcome to LowlandTech.TinyTools 👋</h1>
 <p>
   <img alt="Version" src="https://img.shields.io/badge/version-2026.1.0-blue.svg?cacheSeconds=2592000" />
-  <a href="https://components.lowlandtech.com/tinytools" target="_blank">
+  <a href="https://tools.lowlandtech.com" target="_blank">
     <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
   </a>
   <a href="#" target="_blank">
@@ -14,9 +14,9 @@
 
 > A lightweight template engine for .NET with minimal dependencies. Designed for data composition, not view rendering.
 
-### 🏠 [Homepage](https://components.lowlandtech.com/tinytools)
+### 🏠 [Homepage](https://tools.lowlandtech.com)
 
-### ✨ [Demo](https://components.lowlandtech.com/tinytools)
+### ✨ [Demo](https://tools.lowlandtech.com)
 
 ## Why TinyTemplateEngine?
 

@@ -298,15 +298,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
             return !EvaluateCondition(innerCondition, context);
         }
 
-        // Check for comparison operators
-        if (condition.Contains(" > "))
-        {
-            var parts = condition.Split(" > ");
-            var left = _resolver.ResolveExpression(parts[0].Trim(), context);
-            var right = ParseValue(parts[1].Trim());
-            return Compare(left, right) > 0;
-        }
-
+        // Check for comparison operators (longer operators first to avoid partial matches)
         if (condition.Contains(" >= "))
         {
             var parts = condition.Split(" >= ");
@@ -315,20 +307,28 @@ public partial class TinyTemplateEngine : ITemplateEngine
             return Compare(left, right) >= 0;
         }
 
-        if (condition.Contains(" < "))
-        {
-            var parts = condition.Split(" < ");
-            var left = _resolver.ResolveExpression(parts[0].Trim(), context);
-            var right = ParseValue(parts[1].Trim());
-            return Compare(left, right) < 0;
-        }
-
         if (condition.Contains(" <= "))
         {
             var parts = condition.Split(" <= ");
             var left = _resolver.ResolveExpression(parts[0].Trim(), context);
             var right = ParseValue(parts[1].Trim());
             return Compare(left, right) <= 0;
+        }
+
+        if (condition.Contains(" > "))
+        {
+            var parts = condition.Split(" > ");
+            var left = _resolver.ResolveExpression(parts[0].Trim(), context);
+            var right = ParseValue(parts[1].Trim());
+            return Compare(left, right) > 0;
+        }
+
+        if (condition.Contains(" < "))
+        {
+            var parts = condition.Split(" < ");
+            var left = _resolver.ResolveExpression(parts[0].Trim(), context);
+            var right = ParseValue(parts[1].Trim());
+            return Compare(left, right) < 0;
         }
 
         if (condition.Contains(" == "))

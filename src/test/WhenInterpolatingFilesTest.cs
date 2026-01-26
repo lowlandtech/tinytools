@@ -32,7 +32,8 @@ public class WhenInterpolatingFilesTest : WhenTestingFor<List<string>>
             { "folderName","src" },
         };
         Sut.Interpolate(replacements, true)
-           .Count(file => file.Contains("src"))
+           .Select(file => Path.GetRelativePath(_folder, file))
+           .Count(file => file.Split(Path.DirectorySeparatorChar).Contains("src"))
            .Should()
            .Be(1);
     }
