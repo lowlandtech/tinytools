@@ -1415,4 +1415,42 @@ Current Greater Or Equal
     }
 
     #endregion
+
+    #region Malformed Syntax Edge Cases (Code Coverage)
+
+    [Fact]
+    public void ItShouldHandleMalformedForeachStatement()
+    {
+        // Arrange - Tests line 199: @foreach that doesn't match the expected pattern
+        var template = @"@foreach {
+This is malformed
+}
+Normal text";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert - Should preserve the malformed line and continue
+        result.Should().Contain("@foreach {");
+        result.Should().Contain("Normal text");
+    }
+
+    [Fact]
+    public void ItShouldHandleMalformedIfStatement()
+    {
+        // Arrange - Tests line 93: @if that doesn't match the expected pattern
+        var template = @"@if {
+This is malformed
+}
+Normal text";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert - Should preserve the malformed line and continue
+        result.Should().Contain("@if {");
+        result.Should().Contain("Normal text");
+    }
+
+    #endregion
 }
