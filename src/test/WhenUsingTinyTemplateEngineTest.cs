@@ -1254,4 +1254,165 @@ Values Are Not Equal
     }
 
     #endregion
+
+    #region Negation with Parentheses Tests (Code Coverage)
+
+    [Fact]
+    public void ItShouldHandleNegationWithParentheses()
+    {
+        // Arrange - Tests the code path: !(Context.IsActive) with parentheses removal
+        _context.Set("IsActive", true);
+        var template = @"@if (!(Context.IsActive)) {
+Not Active
+} else {
+Active
+}";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert - IsActive is true, so !(IsActive) is false
+        result.Should().Contain("Active");
+        result.Should().NotContain("Not Active");
+    }
+
+    [Fact]
+    public void ItShouldHandleNestedNegationWithParentheses()
+    {
+        // Arrange
+        _context.Set("Flag", false);
+        var template = @"@if (!(Context.Flag)) {
+Flag Is False
+}";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert - Flag is false, so !(Flag) is true
+        result.Should().Contain("Flag Is False");
+    }
+
+    #endregion
+
+    #region Context Expression in Comparisons Tests (Code Coverage)
+
+    [Fact]
+    public void ItShouldCompareContextExpressionOnRightSide()
+    {
+        // Arrange - Tests ResolveValueOrExpression with Context.* on right side
+        _context.Set("A", 10);
+        _context.Set("B", 5);
+        var template = @"@if (Context.A > Context.B) {
+A Greater Than B
+}";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert
+        result.Should().Contain("A Greater Than B");
+    }
+
+    [Fact]
+    public void ItShouldCompareTwoContextExpressionsEquality()
+    {
+        // Arrange
+        _context.Set("X", "hello");
+        _context.Set("Y", "hello");
+        var template = @"@if (Context.X == Context.Y) {
+Same Value
+}";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert
+        result.Should().Contain("Same Value");
+    }
+
+    [Fact]
+    public void ItShouldCompareTwoContextExpressionsInequality()
+    {
+        // Arrange
+        _context.Set("X", "hello");
+        _context.Set("Y", "world");
+        var template = @"@if (Context.X != Context.Y) {
+Different Values
+}";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert
+        result.Should().Contain("Different Values");
+    }
+
+    [Fact]
+    public void ItShouldHandleLiteralOnRightSideInComparison()
+    {
+        // Arrange - Tests ResolveValueOrExpression with literal (no Context.) on right
+        _context.Set("Score", 95);
+        var template = @"@if (Context.Score >= 90) {
+Grade A
+}";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert
+        result.Should().Contain("Grade A");
+    }
+
+    [Fact]
+    public void ItShouldCompareTwoContextExpressionsLessThan()
+    {
+        // Arrange
+        _context.Set("Min", 1);
+        _context.Set("Max", 100);
+        var template = @"@if (Context.Min < Context.Max) {
+Min Less Than Max
+}";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert
+        result.Should().Contain("Min Less Than Max");
+    }
+
+    [Fact]
+    public void ItShouldCompareTwoContextExpressionsLessThanOrEqual()
+    {
+        // Arrange
+        _context.Set("Value1", 5);
+        _context.Set("Value2", 5);
+        var template = @"@if (Context.Value1 <= Context.Value2) {
+Less Or Equal
+}";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert
+        result.Should().Contain("Less Or Equal");
+    }
+
+    [Fact]
+    public void ItShouldCompareTwoContextExpressionsGreaterThanOrEqual()
+    {
+        // Arrange
+        _context.Set("Current", 10);
+        _context.Set("Previous", 8);
+        var template = @"@if (Context.Current >= Context.Previous) {
+Current Greater Or Equal
+}";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert
+        result.Should().Contain("Current Greater Or Equal");
+    }
+
+    #endregion
 }
