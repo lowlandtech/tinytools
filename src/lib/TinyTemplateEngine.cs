@@ -310,7 +310,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
         {
             var parts = condition.Split(" >= ");
             var left = _resolver.ResolveExpression(parts[0].Trim(), context);
-            var right = ParseValue(parts[1].Trim());
+            var right = ResolveValueOrExpression(parts[1].Trim(), context);
             return Compare(left, right) >= 0;
         }
 
@@ -318,7 +318,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
         {
             var parts = condition.Split(" <= ");
             var left = _resolver.ResolveExpression(parts[0].Trim(), context);
-            var right = ParseValue(parts[1].Trim());
+            var right = ResolveValueOrExpression(parts[1].Trim(), context);
             return Compare(left, right) <= 0;
         }
 
@@ -326,7 +326,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
         {
             var parts = condition.Split(" > ");
             var left = _resolver.ResolveExpression(parts[0].Trim(), context);
-            var right = ParseValue(parts[1].Trim());
+            var right = ResolveValueOrExpression(parts[1].Trim(), context);
             return Compare(left, right) > 0;
         }
 
@@ -334,7 +334,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
         {
             var parts = condition.Split(" < ");
             var left = _resolver.ResolveExpression(parts[0].Trim(), context);
-            var right = ParseValue(parts[1].Trim());
+            var right = ResolveValueOrExpression(parts[1].Trim(), context);
             return Compare(left, right) < 0;
         }
 
@@ -342,7 +342,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
         {
             var parts = condition.Split(" == ");
             var left = _resolver.ResolveExpression(parts[0].Trim(), context);
-            var right = ParseValue(parts[1].Trim());
+            var right = ResolveValueOrExpression(parts[1].Trim(), context);
             return AreEqual(left, right);
         }
 
@@ -350,13 +350,24 @@ public partial class TinyTemplateEngine : ITemplateEngine
         {
             var parts = condition.Split(" != ");
             var left = _resolver.ResolveExpression(parts[0].Trim(), context);
-            var right = ParseValue(parts[1].Trim());
+            var right = ResolveValueOrExpression(parts[1].Trim(), context);
             return !AreEqual(left, right);
         }
 
         // Truthy check
         var value = _resolver.ResolveExpression(condition, context);
         return IsTruthy(value);
+    }
+
+    private object? ResolveValueOrExpression(string value, ExecutionContext context)
+    {
+        // If it looks like a context expression (contains 'Context.'), resolve it
+        if (value.Contains("Context."))
+        {
+            return _resolver.ResolveExpression(value, context);
+        }
+        // Otherwise, treat it as a literal value
+        return ParseValue(value);
     }
 
     private static object? ParseValue(string value)
