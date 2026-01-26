@@ -1192,4 +1192,66 @@ Apple Before Banana
     }
 
     #endregion
+
+    #region Bug Fix Tests (GitHub Issues)
+
+    [Fact]
+    public void ItShouldThrowWhenForeachIteratesOverString_Issue11()
+    {
+        // Arrange - Issue #11: @foreach should not iterate over string characters
+        _context.Set("Name", "Hello");
+        var template = @"@foreach(var item in Context.Name) {
+Item: ${item}
+}";
+
+        // Act & Assert
+        var exception = Assert.Throws<InvalidOperationException>(() => Sut.Render(template, _context));
+        exception.Message.Should().Contain("Cannot iterate over string value in @foreach");
+        exception.Message.Should().Contain("Context.Name");
+    }
+
+    [Fact]
+    public void ItShouldHandleFloatingPointEqualityWithTolerance_Issue12()
+    {
+        // Arrange - Issue #12: Floating-point equality should use tolerance
+        // The classic 0.1 + 0.2 != 0.3 problem
+        _context.Set("Value1", 0.1 + 0.2);  // Results in 0.30000000000000004
+        _context.Set("Value2", 0.3);
+        
+        var template = @"@if (Context.Value1 == Context.Value2) {
+Equal
+} else {
+Not Equal
+}";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert - Should be Equal with tolerance-based comparison
+        result.Should().Contain("Equal");
+        result.Should().NotContain("Not Equal");
+    }
+
+    [Fact]
+    public void ItShouldHandleFloatingPointInequalityWithTolerance_Issue12()
+    {
+        // Arrange - Issue #12: Values outside tolerance should not be equal
+        _context.Set("Value1", 1.0);
+        _context.Set("Value2", 1.0001);  // Outside 1e-10 tolerance
+        
+        var template = @"@if (Context.Value1 == Context.Value2) {
+Equal
+} else {
+Not Equal
+}";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert - Should be Not Equal (outside tolerance)
+        result.Should().Contain("Not Equal");
+        result.Should().NotContain("Equal");
+    }
+
+    #endregion
 }
