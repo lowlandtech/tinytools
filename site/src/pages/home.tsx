@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CodeBlock } from "@/components/code-block";
-import { ArrowRight, Zap, Code2, Layers, Settings } from "lucide-react";
+import { ArrowRight, Zap, Code2, Layers, Settings, Wrench } from "lucide-react";
 
 const features = [
   {
