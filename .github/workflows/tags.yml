@@ -31,7 +31,7 @@ jobs:
       with:
         dotnet-version: |
           8.0.x
-          9.0.x
+          10.0.x
     
     - name: Install ImageMagick
       run: |
@@ -65,7 +65,7 @@ jobs:
       run: dotnet test --configuration Release --no-build --verbosity normal
     
     - name: Pack NuGet package
-      run: dotnet pack src/lowlandtech.tinytools/LowlandTech.TinyTools.csproj --configuration Release --no-build --output ./artifacts /p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+      run: dotnet pack src/lib/LowlandTech.TinyTools.csproj --configuration Release --no-build --output ./artifacts /p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
     
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
