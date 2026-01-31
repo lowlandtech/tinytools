@@ -160,7 +160,7 @@ export function HomePage() {
         <h2 className="text-2xl font-bold text-center">Installation</h2>
         <div className="max-w-2xl mx-auto">
           <CodeBlock
-            code="dotnet add package LowlandTech.FactoryTools"
+            code="dotnet add package LowlandTech.TinyTools"
             language="bash"
           />
         </div>

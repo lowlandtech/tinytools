@@ -1,6 +1,6 @@
 # SEO & Discoverability Optimization Guide
 
-This document contains recommendations for improving FactoryTools' discoverability across search engines, AI agents, and developer communities.
+This document contains recommendations for improving TinyTools' discoverability across search engines, AI agents, and developer communities.
 
 ## ? Completed Technical Optimizations
 
@@ -41,7 +41,7 @@ This document contains recommendations for improving FactoryTools' discoverabili
 
 4. **Social Preview Image**:
    - Create a 1200x630px image with:
-     - FactoryTools logo
+     - TinyTools logo
      - Tagline: "Lightweight .NET Template Engine"
      - Key features or code snippet
    - Upload to GitHub Social Preview
@@ -56,7 +56,7 @@ Add to the top of your README.md:
 ```markdown
 ## ?? Overview
 
-FactoryTools is a **lightweight .NET template engine** designed for **data composition** and **code generation**—not view rendering.
+TinyTools is a **lightweight .NET template engine** designed for **data composition** and **code generation**—not view rendering.
 
 **Perfect for:**
 - ?? Code generation & scaffolding
@@ -65,7 +65,7 @@ FactoryTools is a **lightweight .NET template engine** designed for **data compo
 - ?? AI prompt composition
 - ?? Data transformation & reporting
 
-**Why Choose FactoryTools?**
+**Why Choose TinyTools?**
 - ? **Simpler than Razor**: No compilation, no HTML bias
 - ? **Lightweight**: Zero dependencies beyond .NET BCL
 - ?? **Data-first**: Templates are projections, not views
@@ -82,7 +82,7 @@ Update your `.csproj` file with:
   <Version>2026.1.0</Version>
   <Authors>LowlandTech</Authors>
   <Company>LowlandTech</Company>
-  <Product>FactoryTools</Product>
+  <Product>TinyTools</Product>
   
   <!-- SEO Optimized Description -->
   <Description>
@@ -123,18 +123,18 @@ Create additional content to improve SEO:
 
 1. **Blog Posts** (on dev.to, Medium, or your blog):
    - "Why I Built a Razor Alternative for Code Generation"
-   - "Comparing .NET Template Engines: Razor vs T4 vs FactoryTools"
+   - "Comparing .NET Template Engines: Razor vs T4 vs TinyTools"
    - "5 Use Cases Where You Shouldn't Use Razor"
-   - "Building a Code Generator with FactoryTools"
+   - "Building a Code Generator with TinyTools"
 
 2. **Stack Overflow Participation**:
    - Answer questions about .NET templating
-   - Link to FactoryTools where appropriate
+   - Link to TinyTools where appropriate
    - Create a tag for `factorytools` or `tinytools`
 
 3. **Reddit/HackerNews**:
    - Share on r/dotnet, r/csharp
-   - Post to HackerNews with "Show HN: FactoryTools..."
+   - Post to HackerNews with "Show HN: TinyTools..."
 
 4. **YouTube/Video Content**:
    - Quick tutorial video
@@ -145,7 +145,7 @@ Create additional content to improve SEO:
 
 #### Add These Pages:
 1. **Comparison Page** (`/comparison`):
-   - Side-by-side: FactoryTools vs Razor vs T4 vs Scriban
+   - Side-by-side: TinyTools vs Razor vs T4 vs Scriban
    - Performance benchmarks
    - Use case fit matrix
 

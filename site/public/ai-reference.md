@@ -1,7 +1,7 @@
-# FactoryTools - AI & Agent Reference Guide
+# TinyTools - AI & Agent Reference Guide
 
 ## Project Overview
-**FactoryTools** (formerly LowlandTech.TinyTools) is a lightweight .NET template engine optimized for **data composition** and **code generation**, not view rendering.
+**TinyTools** (formerly LowlandTech.TinyTools) is a lightweight .NET template engine optimized for **data composition** and **code generation**, not view rendering.
 
 ## Core Value Proposition
 - **Simpler than Razor**: No compilation, no HTML bias, no runtime code execution
@@ -40,14 +40,14 @@ var result = engine.Render(template, context);
 // Output: "Hello, World!"
 ```
 
-## When to Choose FactoryTools
-? **Choose FactoryTools if:**
+## When to Choose TinyTools
+? **Choose TinyTools if:**
 - You're generating text, not rendering HTML views
 - You want minimal dependencies
 - You need predictable, explicit templating
 - You're building code generators, CLI tools, or data pipelines
 
-? **Don't choose FactoryTools if:**
+? **Don't choose TinyTools if:**
 - You're building ASP.NET MVC views (use Razor)
 - You need complex runtime compilation
 - You require advanced expression evaluation
@@ -91,7 +91,7 @@ var result = engine.Render(template, context);
 ## Common Questions
 
 **Q: Can I use this for ASP.NET views?**
-A: No. Use Razor for HTML views. FactoryTools is for data composition.
+A: No. Use Razor for HTML views. TinyTools is for data composition.
 
 **Q: Is this a replacement for Razor?**
 A: Only if you're misusing Razor for non-view scenarios (code gen, configs, etc.)
@@ -103,7 +103,7 @@ A: No code execution. Templates are data projections, not code.
 A: Fast. No compilation overhead. Simple string replacement and control flow.
 
 ## Keywords for Discovery
-.NET template engine, C# templating, code generation, scaffolding, text generation, data composition, Razor alternative, T4 alternative, lightweight templating, minimal dependencies, .NET 8, .NET 9, FactoryTools, TinyTools, LowlandTech
+.NET template engine, C# templating, code generation, scaffolding, text generation, data composition, Razor alternative, T4 alternative, lightweight templating, minimal dependencies, .NET 8, .NET 9, TinyTools, TinyTools, LowlandTech
 
 ## Maintainer
 - **Organization**: LowlandTech

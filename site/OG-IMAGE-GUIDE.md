@@ -12,7 +12,7 @@
 ```
 ???????????????????????????????????????????????????
 ?                                                 ?
-?  [Logo]  FactoryTools                          ?
+?  [Logo]  TinyTools                          ?
 ?                                                 ?
 ?  Lightweight .NET Template Engine               ?
 ?                                                 ?
@@ -31,7 +31,7 @@
 ### Design Elements
 1. **Background**: Clean gradient or solid color (#0ea5e9 brand blue)
 2. **Logo**: Your wrench.svg icon (large, left side)
-3. **Title**: "FactoryTools" in large, bold font
+3. **Title**: "TinyTools" in large, bold font
 4. **Subtitle**: "Lightweight .NET Template Engine"
 5. **Key Points**: 2-3 bullet points or icons
 6. **CTA/URL**: "tools.lowlandtech.com" at bottom
@@ -50,7 +50,7 @@
 3. Use this design:
    - Background: Gradient (#0ea5e9 to #0284c7)
    - Add your wrench icon
-   - Title: "FactoryTools" (72pt, Bold)
+   - Title: "TinyTools" (72pt, Bold)
    - Subtitle: "Lightweight .NET Template Engine" (36pt)
    - Bullet points: (24pt)
      - "? Simpler than Razor"

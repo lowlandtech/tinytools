@@ -6,7 +6,7 @@ return (
   <div className="max-w-4xl mx-auto space-y-8">
     <div className="space-y-4">
       <p className="text-lg text-muted-foreground">
-        Get up and running with FactoryTools in minutes.
+        Get up and running with TinyTools in minutes.
       </p>
     </div>
 
@@ -19,7 +19,7 @@ return (
         </CardHeader>
         <CardContent className="space-y-4">
           <CodeBlock
-            code="dotnet add package LowlandTech.FactoryTools"
+            code="dotnet add package LowlandTech.TinyTools"
             language="bash"
           />
         </CardContent>
@@ -29,12 +29,12 @@ return (
         <CardHeader>
           <CardTitle>Quick Start - Simple Interpolation</CardTitle>
           <CardDescription>
-            The simplest way to use FactoryTools - basic string replacement.
+            The simplest way to use TinyTools - basic string replacement.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <CodeBlock
-            code={`using LowlandTech.FactoryTools;
+            code={`using LowlandTech.TinyTools;
 
 // Simple property interpolation
 var template = "Hello {FirstName} {LastName}!";

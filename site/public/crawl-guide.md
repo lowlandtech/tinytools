@@ -1,4 +1,4 @@
-# FactoryTools Documentation - Crawl Guide
+# TinyTools Documentation - Crawl Guide
 
 This file helps search engines and AI agents understand the structure and content of this documentation site.
 
@@ -34,7 +34,7 @@ This file helps search engines and AI agents understand the structure and conten
 - AI prompt generation
 
 ## Keywords & Search Terms
-.NET template engine, C# code generation, template engine C#, data composition, text templating, .NET scaffolding, alternative to Razor, T4 templates alternative, FactoryTools, TinyTools, code generation tool, minimal template engine, lightweight templating, .NET 8 template engine, .NET 9 template engine
+.NET template engine, C# code generation, template engine C#, data composition, text templating, .NET scaffolding, alternative to Razor, T4 templates alternative, TinyTools, TinyTools, code generation tool, minimal template engine, lightweight templating, .NET 8 template engine, .NET 9 template engine
 
 ## Related Technologies
 - Alternative to: Razor, RazorLight, RazorEngine, T4 Templates, Scriban, Handlebars.NET

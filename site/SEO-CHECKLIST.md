@@ -40,7 +40,7 @@
 ## ?? Medium Priority
 
 ### Content Creation
-- [ ] Create /comparison page (FactoryTools vs Razor vs T4)
+- [ ] Create /comparison page (TinyTools vs Razor vs T4)
 - [ ] Create /use-cases page with examples
 - [ ] Create /faq page
 - [ ] Write first blog post about the project
