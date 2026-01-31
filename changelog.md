@@ -1,7 +1,7 @@
 # 2026.1.0
-## ?? Major Release - Template Services & Architecture Improvements
+## Major Release - Template Services & Architecture Improvements
 
-### ? New Features
+### New Features
 * **Template Services Architecture** - Extensible service registration system
   - Simple function-based services with string keys
   - Syntax: `${Context.Services('serviceName')(input)}`
@@ -14,20 +14,20 @@
   - Direct delegate invocation
   - Variable reference support in method calls
 
-### ?? Documentation
+### Documentation
 * Added comprehensive "Why TinyTemplateEngine?" section
 * Template Services examples with Humanizer and NCalc
 * Real-world usage examples (invoice generation, etc.)
 * Sample implementations and best practices
 
-### ??? Architecture
+### Architecture
 * Introduced `ITemplateService` marker interface
 * Added `TemplateServiceFunc` delegate type
 * Context service inheritance to child contexts
 * Error handling with clear "{service} not registered" messages
 
 
-### ?? Testing
+### Testing
 * **Comprehensive test coverage expansion** - 1,100 ? 1,293 tests (+193)
 * Complete test suite for template services
 * Multi-language pluralization tests
@@ -50,10 +50,10 @@
   - `Interpolate(ExecutionContext)` tests
   - `Interpolate(List<string>, ExecutionContext)` tests
 
-### ?? Bug Fixes
+### Bug Fixes
 * **Fixed delegate property resolution in VariableResolver** - `ExecutionContext.Get()` method was not being invoked for delegate properties, causing template services to fail silently
 
-### ?? Infrastructure
+### Infrastructure
 * Upgraded to .NET 8, 9, and 10 multi-targeting
 * Modern GitHub Actions CI/CD workflows
 * Cross-platform testing (Ubuntu, Windows, macOS)
@@ -61,7 +61,7 @@
 * Source Link support for better debugging
 * Professional NuGet package metadata
 
-### ?? Dependencies
+### Dependencies
 * Tests now include Humanizer.Core (2.14.1) for examples
 * Tests now include NCalc (1.0.0) for calculator examples
 * Added Microsoft.SourceLink.GitHub for source debugging
