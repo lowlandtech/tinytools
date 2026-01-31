@@ -1,4 +1,4 @@
-# 2026.1.2
+# 2026.1.3
 ## ITemplate System - Self-Validating Code Generation Templates
 
 ### New Features
