@@ -79,7 +79,7 @@ Update your `.csproj` file with:
 ```xml
 <PropertyGroup>
   <PackageId>LowlandTech.TinyTools</PackageId>
-  <Version>2026.1.0</Version>
+  <Version>2026.1.1</Version>
   <Authors>LowlandTech</Authors>
   <Company>LowlandTech</Company>
   <Product>TinyTools</Product>
