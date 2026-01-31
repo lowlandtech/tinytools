@@ -74,11 +74,11 @@ export function HomePage() {
         <div className="inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-medium">
           <Wrench className="h-4 w-4 text-primary" />
           <span className="ml-2 text-muted-foreground">
-            Factory tools for .NET code generation
+            Tiny tools for .NET code generation
           </span>
         </div>
         <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-          <span className="text-primary">Factory</span>Tools
+          <span className="text-primary">Tiny</span>Tools
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
           A lightweight, powerful template engine and toolset for .NET code generation.

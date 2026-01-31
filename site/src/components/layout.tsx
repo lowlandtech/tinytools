@@ -47,7 +47,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <span className="text-primary-foreground font-bold text-sm">LT</span>
             </div>
             <span className="font-bold text-lg">
-              <span className="text-primary">Factory</span>Tools
+              <span className="text-primary">Tiny</span>Tools
             </span>
           </Link>
 
