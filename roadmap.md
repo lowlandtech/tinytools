@@ -6,7 +6,7 @@ This document outlines the planned features, improvements, and direction for Low
 
 ---
 
-## Current Version: 2026.1.2
+## Current Version: 2026.1.3
 
 **Status**: ? Stable  
 **Released**: January 2026
@@ -214,7 +214,7 @@ To keep TinyTools **tiny**, we explicitly **won't** add:
 ## Breaking Changes Policy
 
 ### Semantic Versioning
-- **YEAR.MINOR.PATCH** format (e.g., 2026.1.2)
+- **YEAR.MINOR.PATCH** format (e.g., 2026.1.3)
 - **Breaking changes** only in YEAR increments
 - **MINOR versions** add features, maintain compatibility
 - **PATCH versions** fix bugs only

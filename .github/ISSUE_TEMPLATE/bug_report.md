@@ -30,7 +30,7 @@ var result = engine.Render(template, context);
 ```
 
 ## Environment
-- **TinyTemplateEngine Version:** [e.g., 2026.1.2]
+- **TinyTemplateEngine Version:** [e.g., 2026.1.3]
 - **.NET Version:** [e.g., .NET 8.0]
 - **OS:** [e.g., Windows 11, Ubuntu 22.04, macOS Sonoma]
 - **IDE:** [e.g., Visual Studio 2022, VS Code, Rider]
