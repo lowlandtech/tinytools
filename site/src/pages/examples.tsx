@@ -8,7 +8,7 @@ export function ExamplesPage() {
       <div className="space-y-4">
         <h1 className="text-3xl font-bold">Real-World Examples</h1>
         <p className="text-lg text-muted-foreground">
-          Practical examples demonstrating how to use FactoryTools in real scenarios.
+          Practical examples demonstrating how to use TinyTools in real scenarios.
         </p>
       </div>
 
@@ -151,7 +151,7 @@ var result = engine.Render(template, context);`}
         <CardHeader>
           <CardTitle>Template Services</CardTitle>
           <CardDescription>
-            Extend FactoryTools with custom services like Humanizer and NCalc.
+            Extend TinyTools with custom services like Humanizer and NCalc.
           </CardDescription>
         </CardHeader>
         <CardContent>

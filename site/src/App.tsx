@@ -8,6 +8,7 @@ import { ExecutionContextPage } from "@/pages/execution-context";
 import { ApiReferencePage } from "@/pages/api-reference";
 import { ExamplesPage } from "@/pages/examples";
 import { CodeGenerationPage } from "@/pages/code-generation";
+import { ITemplatePage } from "@/pages/itemplate";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/execution-context" element={<ExecutionContextPage />} />
           <Route path="/examples" element={<ExamplesPage />} />
           <Route path="/code-generation" element={<CodeGenerationPage />} />
+          <Route path="/template" element={<ITemplatePage />} />
           <Route path="/api-reference" element={<ApiReferencePage />} />
         </Routes>
       </Layout>

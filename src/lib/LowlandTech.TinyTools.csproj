@@ -8,14 +8,14 @@
 
     <!-- Package Information -->
     <PackageId>LowlandTech.TinyTools</PackageId>
-    <Version>2026.1.0</Version>
+    <Version>2026.1.2</Version>
     <Authors>wendellmva</Authors>
     <Company>LowlandTech</Company>
     <Product>TinyTemplateEngine</Product>
     <Description>A lightweight template engine for .NET with minimal dependencies. Designed for data composition, not view rendering. Supports variable interpolation, control flow, pipe helpers, and extensible template services.</Description>
     <Copyright>Copyright © 2023-2025 LowlandTech</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://components.lowlandtech.com/tinytools</PackageProjectUrl>
+    <PackageProjectUrl>https://tools.lowlandtech.com</PackageProjectUrl>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
     <PackageTags>template;templating;code-generation;text-generation;interpolation;razor-alternative;lightweight;zero-dependency</PackageTags>
@@ -39,11 +39,13 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <EmbedAllSources>true</EmbedAllSources>
+    <IncludeSource>true</IncludeSource>
+    <DebugSymbols>true</DebugSymbols>
     
     <!-- Source Link - Always enabled for local builds -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <DebugType>embedded</DebugType>
+    <DebugType>portable</DebugType>
     <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>

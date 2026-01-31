@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CodeBlock } from "@/components/code-block";
-import { ArrowRight, Zap, Code2, Layers, Settings, Wrench } from "lucide-react";
+import { ArrowRight, Zap, Code2, Layers, Settings, Wrench, FileCode } from "lucide-react";
 
 const features = [
   {
@@ -74,11 +74,11 @@ export function HomePage() {
         <div className="inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-medium">
           <Wrench className="h-4 w-4 text-primary" />
           <span className="ml-2 text-muted-foreground">
-            Factory tools for .NET code generation
+            Tiny tools for .NET code generation
           </span>
         </div>
         <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-          <span className="text-primary">Factory</span>Tools
+          <span className="text-primary">Tiny</span>Tools
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
           A lightweight, powerful template engine and toolset for .NET code generation.
@@ -160,7 +160,7 @@ export function HomePage() {
         <h2 className="text-2xl font-bold text-center">Installation</h2>
         <div className="max-w-2xl mx-auto">
           <CodeBlock
-            code="dotnet add package LowlandTech.FactoryTools"
+            code="dotnet add package LowlandTech.TinyTools"
             language="bash"
           />
         </div>

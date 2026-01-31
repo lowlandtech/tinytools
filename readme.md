@@ -1,13 +1,7 @@
-<div align="center">
-  <img src="site/public/wrench.svg" alt="FactoryTools Logo" width="100" height="100" />
-  <h1><span style="color: #0ea5e9;">Factory</span>Tools</h1>
-  <p><em>Formerly LowlandTech.TinyTools - Rebranding to FactoryTools in 2026</em></p>
-</div>
-
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-2026.1.0-blue.svg?cacheSeconds=2592000" />
-  <a href="https://github.com/lowlandtech/tinytools/actions/workflows/ci.yml" target="_blank">
-    <img alt="Build Status" src="https://github.com/lowlandtech/tinytools/actions/workflows/ci.yml/badge.svg" />
+  <img alt="Version" src="https://img.shields.io/badge/version-2026.1.2-blue.svg?cacheSeconds=2592000" />
+    <a href="https://github.com/lowlandtech/tinytools/actions/workflows/main.yml" target="_blank">
+        <img alt="Build Status" src="https://github.com/lowlandtech/tinytools/actions/workflows/main.yml/badge.svg?branch=develop" />
   </a>
   <a href="https://github.com/lowlandtech/tinytools/actions/workflows/deploy-docs.yml" target="_blank">
     <img alt="Docs Status" src="https://github.com/lowlandtech/tinytools/actions/workflows/deploy-docs.yml/badge.svg" />
@@ -27,18 +21,6 @@
 
 ### 🏠 [Homepage](https://tools.lowlandtech.com)
 
-### ✨ [Demo](https://tools.lowlandtech.com)
-
----
-
-## 🎨 Rebranding to FactoryTools
-
-**TinyTools** is becoming **<span style="color: #0ea5e9;">Factory</span>Tools** in 2026! 
-
-The new name better reflects the library's purpose: providing **factory tools** for code generation, scaffolding, and template-based workflows. The package will be renamed to `LowlandTech.FactoryTools` with full backward compatibility.
-
-📖 Visit our new documentation site: [tools.lowlandtech.com](https://tools.lowlandtech.com)
-
 ---
 
 ## Why TinyTemplateEngine?
@@ -49,7 +31,8 @@ Most .NET templating solutions—**RazorEngine**, **RazorLight**, and similar—
 
 That assumption becomes a liability once your problem is **data composition**, not **UI rendering**.
 
-### The Razor Problem
+<details>
+<summary><strong>The Razor Problem</strong></summary>
 
 Razor excels at MVC-style view rendering, but it introduces friction when used as a **general-purpose templating engine**:
 
@@ -69,13 +52,21 @@ Razor excels at MVC-style view rendering, but it introduces friction when used a
 After migrating from **RazorEngine** to **RazorLight**, the core issue remained:  
 **the templating model itself was working against the use case.**
 
-### A Different Assumption
+</details>
+
+<details>
+<summary><strong>A Different Assumption</strong></summary>
 
 **TinyTemplateEngine** starts from a different premise:
 
 > _A template is a projection of data — not a view, not a page, and not an application._
 
 That shift enables a simpler and more predictable model.
+
+</details>
+
+<details>
+<summary><strong>What TinyTemplateEngine Optimizes For</strong></summary>
 
 ### What TinyTemplateEngine Optimizes For
 
@@ -111,6 +102,9 @@ That shift enables a simpler and more predictable model.
 -   **Predictable behavior**  
     No hidden execution model, no side effects, no magic.
     
+
+
+</details>
 
 ### When to Use TinyTemplateEngine
 

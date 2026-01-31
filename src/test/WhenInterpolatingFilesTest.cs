@@ -51,7 +51,7 @@ public class WhenInterpolatingFilesTest : WhenTestingFor<List<string>>
             .Be(1);
     }
 
-    [Fact(Skip = "TODO: Fix test - expecting 1 .cs file but finding 8. May be workspace-sensitive.")]
+    [Fact]
     public void ItShouldInterpolateFileExtension()
     {
         var replacements = new Dictionary<string, string>()
@@ -59,7 +59,7 @@ public class WhenInterpolatingFilesTest : WhenTestingFor<List<string>>
             { "extension","cs" },
         };
         Sut.Interpolate(replacements, true)
-            .Count(file => file.Contains("cs"))
+            .Count(file => Path.GetExtension(file) == ".cs")
             .Should()
             .Be(1);
     }

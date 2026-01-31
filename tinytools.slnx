@@ -1,5 +1,12 @@
 <Solution>
-  <Folder Name="/files/" />
+  <Folder Name="/files/">
+    <File Path="changelog.md" />
+    <File Path="contributing.md" />
+    <File Path="license.md" />
+    <File Path="nuget.config" />
+    <File Path="readme.md" />
+    <File Path="roadmap.md" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/lib/LowlandTech.TinyTools.csproj" />
     <Project Path="src/test/LowlandTech.TinyTools.UnitTests.csproj" />

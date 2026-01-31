@@ -1,14 +1,14 @@
-# ?? TinyTemplateEngine v2026.1.0 - Complete Implementation Summary
+# ?? TinyTemplateEngine v2026.1.2 - Complete Implementation Summary
 
 ## Overview
-This document summarizes all the work completed for version 2026.1.0, including the Template Services architecture, comprehensive test coverage, and professional project setup.
+This document summarizes all the work completed for version 2026.1.2, including the Template Services architecture, comprehensive test coverage, and professional project setup.
 
 ---
 
-## ?? Version 2026.1.0 Release
+## ?? Version 2026.1.2 Release
 
 ### Version Scheme
-- **Base Version:** `2026.1.0` (in `.csproj`)
+- **Base Version:** `2026.1.2` (in `.csproj`)
 - **Build System:** `infra/build.ps1` with auto-incrementing build numbers
 - **BUILDR File:** Tracks build number, final version becomes `2026.1.X`
 
@@ -134,7 +134,7 @@ ${Context.Services('pluralize')('customer')}  // ? "customers"
    - Real-world examples
    - Migration guide from 2.0.x
 
-2. **CHANGELOG.md** - Version 2026.1.0 release notes:
+2. **CHANGELOG.md** - Version 2026.1.2 release notes:
    - Breaking changes
    - New features
    - Migration guide
@@ -271,7 +271,7 @@ tinytools/
 ??? icon.svg                            # Source icon
 ??? icon.png                            # Generated (in .gitignore)
 ??? readme.md                           # ? Updated
-??? changelog.md                        # ? v2026.1.0 notes
+??? changelog.md                        # ? v2026.1.2 notes
 ??? CONTRIBUTING.md                     # ? New
 ??? .gitignore                          # ? Updated
 ```
@@ -340,7 +340,7 @@ public class MyController : ControllerBase
 var template = "${Context.EntityName | pluralize}";
 ```
 
-**After (2026.1.0):**
+**After (2026.1.2):**
 ```csharp
 context.RegisterService("pluralize", input => input?.ToString()?.Pluralize());
 var template = "${Context.Services('pluralize')(Context.EntityName)}";
@@ -385,7 +385,7 @@ var template = "${Context.Services('pluralize')(Context.EntityName)}";
 - [x] All tests passing (100/100)
 - [x] Documentation complete
 - [x] CHANGELOG.md updated
-- [x] Version set to 2026.1.0
+- [x] Version set to 2026.1.2
 - [x] Icon generated (icon.png)
 - [x] Build script tested
 
@@ -397,7 +397,7 @@ dotnet test
 
 # 2. Commit all changes
 git add .
-git commit -m "chore: release v2026.1.0"
+git commit -m "chore: release v2026.1.2"
 git push origin develop
 
 # 3. Merge to main
@@ -406,8 +406,8 @@ git merge develop
 git push origin main
 
 # 4. Create and push tag
-git tag v2026.1.0
-git push origin v2026.1.0
+git tag v2026.1.2
+git push origin v2026.1.2
 
 # 5. GitHub Actions will automatically:
 #    - Build and test
@@ -426,7 +426,7 @@ git push origin v2026.1.0
 
 ## ?? Future Enhancements
 
-### Potential Features (Not in v2026.1.0)
+### Potential Features (Not in v2026.1.2)
 - Service discovery from assemblies
 - Template caching
 - Async template rendering
@@ -466,6 +466,6 @@ MIT License - See LICENSE file
 
 ---
 
-**Version 2026.1.0 is production-ready!** ??
+**Version 2026.1.2 is production-ready!** ??
 
 *Last Updated: 2025-01-XX*

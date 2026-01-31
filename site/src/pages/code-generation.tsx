@@ -7,7 +7,7 @@ export function CodeGenerationPage() {
       <div className="space-y-4">
         <h1 className="text-3xl font-bold">Code Generation</h1>
         <p className="text-lg text-muted-foreground">
-          Use FactoryTools to generate C# classes, DTOs, APIs, and other code artifacts dynamically.
+          Use TinyTools to generate C# classes, DTOs, APIs, and other code artifacts dynamically.
           Perfect for scaffolding tools and source generators.
         </p>
       </div>
@@ -226,7 +226,7 @@ var code = engine.Render(template, context);`}
         <CardHeader>
           <CardTitle>Source Generator Integration</CardTitle>
           <CardDescription>
-            Use FactoryTools in C# source generators for compile-time code generation.
+            Use TinyTools in C# source generators for compile-time code generation.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
