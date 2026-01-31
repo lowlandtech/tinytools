@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-2026.1.0-blue.svg?cacheSeconds=2592000" />
+  <img alt="Version" src="https://img.shields.io/badge/version-2026.1.1-blue.svg?cacheSeconds=2592000" />
     <a href="https://github.com/lowlandtech/tinytools/actions/workflows/main.yml" target="_blank">
         <img alt="Build Status" src="https://github.com/lowlandtech/tinytools/actions/workflows/main.yml/badge.svg?branch=develop" />
   </a>

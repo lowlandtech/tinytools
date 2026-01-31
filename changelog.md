@@ -1,4 +1,4 @@
-# 2026.1.0
+# 2026.1.1
 ## Major Release - Template Services & Architecture Improvements
 
 ### New Features
@@ -78,7 +78,7 @@
 var template = "${Context.EntityName | pluralize}";
 ```
 
-**After (2026.1.0):**
+**After (2026.1.1):**
 ```csharp
 // Register as a service
 context.RegisterService("pluralize", input => input?.ToString()?.Pluralize());
