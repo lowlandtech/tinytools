@@ -1,6 +1,6 @@
-# FactoryTools Documentation Site
+# TinyTools Documentation Site
 
-A documentation and showcase website for FactoryTools built with React, shadcn/ui, and Tailwind CSS.
+A documentation and showcase website for TinyTools built with React, shadcn/ui, and Tailwind CSS.
 
 ## Development
 

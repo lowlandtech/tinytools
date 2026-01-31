@@ -8,7 +8,7 @@ export function ApiReferencePage() {
       <div className="space-y-4">
         <h1 className="text-3xl font-bold">API Reference</h1>
         <p className="text-lg text-muted-foreground">
-          Complete API documentation for FactoryTools.
+          Complete API documentation for TinyTools.
         </p>
       </div>
 

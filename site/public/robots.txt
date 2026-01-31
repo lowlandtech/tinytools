@@ -1,0 +1,30 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://tools.lowlandtech.com/sitemap.xml
+
+# AI Crawlers - allow access to documentation
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+# Disallow node_modules and build artifacts
+User-agent: *
+Disallow: /node_modules/
+Disallow: /*.json$
