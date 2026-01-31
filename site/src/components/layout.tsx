@@ -12,6 +12,7 @@ const navigation = [
   { name: "Execution Context", href: "/execution-context" },
   { name: "Examples", href: "/examples" },
   { name: "Code Generation", href: "/code-generation" },
+  { name: "Template", href: "/template" },
   { name: "API Reference", href: "/api-reference" },
 ];
 
@@ -121,7 +122,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           !isHomePage && "ml-64"
         )}>
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} LowlandTech. All rights reserved.
+            Â© {new Date().getFullYear()} LowlandTech. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground">
             Built with React, shadcn/ui, and Tailwind CSS

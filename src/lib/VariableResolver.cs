@@ -28,6 +28,12 @@ public partial class VariableResolver
         {
             var expression = match.Groups[1].Value;
             
+            // Handle ternary operator (condition ? trueValue : falseValue)
+            if (IsTernaryExpression(expression))
+            {
+                return EvaluateTernary(expression, context);
+            }
+            
             // Handle null coalescing operator (??) - check before pipes
             if (expression.Contains("??") && !expression.Contains('|'))
             {
@@ -45,6 +51,217 @@ public partial class VariableResolver
             var result = ResolveExpressionWithPipes(expression, context);
             return result?.ToString() ?? string.Empty;
         });
+    }
+
+    /// <summary>
+    /// Checks if an expression is a ternary expression.
+    /// </summary>
+    private static bool IsTernaryExpression(string expression)
+    {
+        // Must contain ? and : but not be a method call or null coalescing
+        if (!expression.Contains('?') || !expression.Contains(':'))
+            return false;
+        if (expression.Contains("??"))
+            return false;
+            
+        // Find the ? that's not inside quotes
+        var questionIndex = FindOperatorOutsideQuotes(expression, '?');
+        if (questionIndex == -1) return false;
+        
+        // Find the : after the ?
+        var colonIndex = FindOperatorOutsideQuotes(expression[(questionIndex + 1)..], ':');
+        return colonIndex != -1;
+    }
+
+    /// <summary>
+    /// Finds an operator character that's not inside quotes.
+    /// </summary>
+    private static int FindOperatorOutsideQuotes(string expression, char op)
+    {
+        var inSingleQuote = false;
+        var inDoubleQuote = false;
+        var parenDepth = 0;
+        
+        for (int i = 0; i < expression.Length; i++)
+        {
+            var c = expression[i];
+            
+            if (c == '\'' && !inDoubleQuote) inSingleQuote = !inSingleQuote;
+            else if (c == '"' && !inSingleQuote) inDoubleQuote = !inDoubleQuote;
+            else if (c == '(' && !inSingleQuote && !inDoubleQuote) parenDepth++;
+            else if (c == ')' && !inSingleQuote && !inDoubleQuote) parenDepth--;
+            else if (c == op && !inSingleQuote && !inDoubleQuote && parenDepth == 0)
+                return i;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Evaluates a ternary expression: condition ? trueValue : falseValue
+    /// Supports conditions like: var != null, var == null, var == 'value', var (truthy check)
+    /// Supports string concatenation in values: 'prefix' + var + 'suffix'
+    /// </summary>
+    private string EvaluateTernary(string expression, ExecutionContext context)
+    {
+        var questionIndex = FindOperatorOutsideQuotes(expression, '?');
+        if (questionIndex == -1) return string.Empty;
+        
+        var condition = expression[..questionIndex].Trim();
+        var remainder = expression[(questionIndex + 1)..];
+        
+        var colonIndex = FindOperatorOutsideQuotes(remainder, ':');
+        if (colonIndex == -1) return string.Empty;
+        
+        var trueExpr = remainder[..colonIndex].Trim();
+        var falseExpr = remainder[(colonIndex + 1)..].Trim();
+        
+        var conditionResult = EvaluateTernaryCondition(condition, context);
+        var resultExpr = conditionResult ? trueExpr : falseExpr;
+        
+        return EvaluateTernaryValue(resultExpr, context);
+    }
+
+    /// <summary>
+    /// Evaluates a ternary condition.
+    /// Supports: var != null, var == null, var != 'value', var == 'value', var (truthy)
+    /// </summary>
+    private bool EvaluateTernaryCondition(string condition, ExecutionContext context)
+    {
+        condition = condition.Trim();
+        
+        // Check for != null
+        if (condition.Contains("!=") && condition.EndsWith("null", StringComparison.OrdinalIgnoreCase))
+        {
+            var varExpr = condition.Split("!=")[0].Trim();
+            var value = ResolveExpression(varExpr, context);
+            return value != null;
+        }
+        
+        // Check for == null
+        if (condition.Contains("==") && condition.EndsWith("null", StringComparison.OrdinalIgnoreCase))
+        {
+            var varExpr = condition.Split("==")[0].Trim();
+            var value = ResolveExpression(varExpr, context);
+            return value == null;
+        }
+        
+        // Check for != 'value' or != "value"
+        if (condition.Contains("!="))
+        {
+            var parts = condition.Split("!=", 2);
+            var leftValue = ResolveExpression(parts[0].Trim(), context);
+            var rightValue = parts[1].Trim().Trim('\'', '"');
+            return leftValue?.ToString() != rightValue;
+        }
+        
+        // Check for == 'value' or == "value"
+        if (condition.Contains("=="))
+        {
+            var parts = condition.Split("==", 2);
+            var leftValue = ResolveExpression(parts[0].Trim(), context);
+            var rightValue = parts[1].Trim().Trim('\'', '"');
+            return leftValue?.ToString() == rightValue;
+        }
+        
+        // Truthy check - variable exists and is not null/empty/false
+        var truthyValue = ResolveExpression(condition, context);
+        return IsTruthy(truthyValue);
+    }
+
+    /// <summary>
+    /// Checks if a value is "truthy".
+    /// </summary>
+    private static bool IsTruthy(object? value)
+    {
+        return value switch
+        {
+            null => false,
+            bool b => b,
+            string s => !string.IsNullOrEmpty(s),
+            int i => i != 0,
+            long l => l != 0,
+            double d => d != 0,
+            _ => true
+        };
+    }
+
+    /// <summary>
+    /// Evaluates a ternary value expression which may contain string concatenation.
+    /// Supports: 'literal', variable, 'prefix' + variable + 'suffix'
+    /// </summary>
+    private string EvaluateTernaryValue(string expr, ExecutionContext context)
+    {
+        expr = expr.Trim();
+        
+        // Check for string concatenation with +
+        if (expr.Contains('+'))
+        {
+            var parts = SplitByPlusOutsideQuotes(expr);
+            var result = new System.Text.StringBuilder();
+            
+            foreach (var part in parts)
+            {
+                var trimmed = part.Trim();
+                if (string.IsNullOrEmpty(trimmed)) continue;
+                
+                // Check if it's a quoted string
+                if ((trimmed.StartsWith('\'') && trimmed.EndsWith('\'')) ||
+                    (trimmed.StartsWith('"') && trimmed.EndsWith('"')))
+                {
+                    result.Append(trimmed[1..^1]);
+                }
+                else
+                {
+                    // It's a variable reference
+                    var value = ResolveExpression(trimmed, context);
+                    result.Append(value?.ToString() ?? string.Empty);
+                }
+            }
+            return result.ToString();
+        }
+        
+        // Single value - either quoted string or variable
+        if ((expr.StartsWith('\'') && expr.EndsWith('\'')) ||
+            (expr.StartsWith('"') && expr.EndsWith('"')))
+        {
+            return expr[1..^1];
+        }
+        
+        // Variable reference
+        var resolved = ResolveExpression(expr, context);
+        return resolved?.ToString() ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Splits an expression by + operator, respecting quotes.
+    /// </summary>
+    private static List<string> SplitByPlusOutsideQuotes(string expression)
+    {
+        var parts = new List<string>();
+        var current = new System.Text.StringBuilder();
+        var inSingleQuote = false;
+        var inDoubleQuote = false;
+        
+        foreach (var c in expression)
+        {
+            if (c == '\'' && !inDoubleQuote) inSingleQuote = !inSingleQuote;
+            else if (c == '"' && !inSingleQuote) inDoubleQuote = !inDoubleQuote;
+            
+            if (c == '+' && !inSingleQuote && !inDoubleQuote)
+            {
+                parts.Add(current.ToString());
+                current.Clear();
+            }
+            else
+            {
+                current.Append(c);
+            }
+        }
+        
+        if (current.Length > 0)
+            parts.Add(current.ToString());
+            
+        return parts;
     }
 
     /// <summary>

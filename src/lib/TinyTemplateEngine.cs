@@ -31,6 +31,9 @@ public partial class TinyTemplateEngine : ITemplateEngine
         // First, remove comments (@* ... *@)
         template = RemoveComments(template);
         
+        // Normalize line endings to \n for consistent processing
+        template = template.Replace("\r\n", "\n").Replace("\r", "\n");
+        
         var result = new StringBuilder();
         var lines = template.Split('\n');
         var lineIndex = 0;
@@ -234,6 +237,12 @@ public partial class TinyTemplateEngine : ITemplateEngine
                 var rendered = ProcessControlFlow(blockContent, childContext);
                 rendered = _resolver.ResolveString(rendered, childContext);
                 result.Append(rendered);
+                
+                // Each iteration's content should end with a newline to separate from next iteration
+                if (rendered.Length > 0 && !rendered.EndsWith('\n'))
+                {
+                    result.Append('\n');
+                }
             }
         }
 
@@ -289,9 +298,27 @@ public partial class TinyTemplateEngine : ITemplateEngine
     private bool EvaluateCondition(string condition, ExecutionContext context)
     {
         // Simple condition evaluation
-        // Supports: !expr (negation), expr > 0, expr == value, expr != value, expr (truthy check)
+        // Supports: && (and), || (or), !expr (negation), expr > 0, expr == value, expr != value, expr (truthy check)
 
         condition = condition.Trim();
+
+        // Handle logical OR (||) - lowest precedence, evaluate left to right
+        var orIndex = FindOperatorOutsideParentheses(condition, "||");
+        if (orIndex >= 0)
+        {
+            var left = condition[..orIndex].Trim();
+            var right = condition[(orIndex + 2)..].Trim();
+            return EvaluateCondition(left, context) || EvaluateCondition(right, context);
+        }
+
+        // Handle logical AND (&&) - higher precedence than OR
+        var andIndex = FindOperatorOutsideParentheses(condition, "&&");
+        if (andIndex >= 0)
+        {
+            var left = condition[..andIndex].Trim();
+            var right = condition[(andIndex + 2)..].Trim();
+            return EvaluateCondition(left, context) && EvaluateCondition(right, context);
+        }
 
         // Handle negation (! operator)
         if (condition.StartsWith('!'))
@@ -303,6 +330,12 @@ public partial class TinyTemplateEngine : ITemplateEngine
                 innerCondition = innerCondition[1..^1];
             }
             return !EvaluateCondition(innerCondition, context);
+        }
+
+        // Handle parenthesized expressions
+        if (condition.StartsWith('(') && condition.EndsWith(')'))
+        {
+            return EvaluateCondition(condition[1..^1], context);
         }
 
         // Check for comparison operators (longer operators first to avoid partial matches)
@@ -357,6 +390,25 @@ public partial class TinyTemplateEngine : ITemplateEngine
         // Truthy check
         var value = _resolver.ResolveExpression(condition, context);
         return IsTruthy(value);
+    }
+
+    /// <summary>
+    /// Finds a logical operator (&&, ||) that's not inside parentheses.
+    /// </summary>
+    private static int FindOperatorOutsideParentheses(string condition, string op)
+    {
+        var parenDepth = 0;
+        for (int i = 0; i <= condition.Length - op.Length; i++)
+        {
+            var c = condition[i];
+            if (c == '(') parenDepth++;
+            else if (c == ')') parenDepth--;
+            else if (parenDepth == 0 && condition.Substring(i, op.Length) == op)
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private object? ResolveValueOrExpression(string value, ExecutionContext context)
