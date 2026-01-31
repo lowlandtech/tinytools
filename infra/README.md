@@ -23,9 +23,9 @@ cd infra
 ## How It Works
 
 1. **BUILDR file** - Stores incrementing build number (starts at 0)
-2. **Reads base version** from `src/lib/LowlandTech.TinyTools.csproj` (e.g., `2026.1.1`)
+2. **Reads base version** from `src/lib/LowlandTech.TinyTools.csproj` (e.g., `2026.1.2`)
 3. **Derives final version** by replacing last segment: `2026.1.{BUILDR}`
-   - Base: `2026.1.1` + BUILDR: `5` = **`2026.1.5`**
+   - Base: `2026.1.2` + BUILDR: `5` = **`2026.1.5`**
    - Next build: BUILDR becomes `6` = **`2026.1.6`**
 
 ## Targets
@@ -57,7 +57,7 @@ echo 0 > BUILDR
 
 ## Version Strategy
 
-- **Base version in .csproj**: `2026.1.1` (major.minor.patch)
+- **Base version in .csproj**: `2026.1.2` (major.minor.patch)
 - **BUILDR**: Auto-incrementing build counter
 - **Final version**: `2026.1.{BUILDR}`
 

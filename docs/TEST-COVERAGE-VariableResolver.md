@@ -310,4 +310,4 @@ The `VariableResolver` class is comprehensively tested and production-ready! ??
 | String Helpers | 9 | ? 100% |
 | **TOTAL** | **147** | **? 100%** |
 
-**TinyTemplateEngine v2026.1.1 is fully tested and ready for production!** ??
+**TinyTemplateEngine v2026.1.2 is fully tested and ready for production!** ??
