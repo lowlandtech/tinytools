@@ -1,3 +1,70 @@
+# 2026.1.2
+## ITemplate System - Self-Validating Code Generation Templates
+
+### New Features
+
+* **ITemplate Interface** - Template-first approach to code generation
+  - Self-validating templates with embedded test cases
+  - Each template carries its own `TestDataJson` and `ExpectedContent`
+  - Automatic validation via `Validate()` and `ValidateDetailed()` methods
+  - Type-safe with `DataType` property for compile-time safety
+
+* **TemplateBase Abstract Class** - Base implementation for templates
+  - Handles data serialization/normalization automatically
+  - Template rendering via `TinyTemplateEngine`
+  - Detailed validation with diff reporting
+  - Cross-platform line ending normalization
+
+* **TemplateRegistry** - Centralized template management
+  - `Register()` / `Get()` for manual template registration
+  - `DiscoverFromAssembly()` - Auto-discover templates via reflection
+  - `DiscoverFromCallingAssembly()` - Discover from calling code
+  - `RenderBatch()` - Render multiple templates in one call
+  - `ValidateAll()` - Validate all registered templates at once
+
+* **TemplateResult Record** - Rich rendering output
+  - `Content` - The rendered template content
+  - `Path` - Dynamic output path (supports variable interpolation)
+  - `Namespace` - Generated namespace
+  - `Metadata` - Optional key-value metadata dictionary
+
+* **TinyTemplateEngine Enhancements**
+  - Logical AND operator (`&&`) in conditions
+  - Logical OR operator (`||`) in conditions  
+  - Ternary expressions: `${Context.Active ? 'Yes' : 'No'}`
+  - Short-circuit evaluation for logical operators
+  - Parenthesized logical expressions
+
+### Documentation
+
+* New `Self-Validating-Templates.md` comprehensive guide
+* Updated `ITemplate-QuickRef.md` with new syntax features
+* New ITemplate page on documentation website (`/itemplate`)
+* Template syntax reference cards
+
+### Testing
+
+* **Test count: 577 ? 633 tests (+56)**
+* Fixed skipped test `ItShouldInterpolateFileExtension`
+* `RenderBatch()` method tests (18 tests)
+* `DiscoverFromAssembly()` method tests (21 tests)
+* `ValidateAll()` edge case tests (10 tests)
+* Null deserialization handling tests (3 tests)
+* Exception handling in validation tests (4 tests)
+
+### Infrastructure
+
+* NCrunch configuration to exclude site folder
+* VS Code launch configuration for site development
+* Tasks configuration for npm dev server
+
+### Examples
+
+* `ComponentTemplate` - React component generator
+* `CSharpClassTemplate` - C# class with properties/methods generator
+
+---
+
 # 2026.1.1
 ## Major Release - Template Services & Architecture Improvements
 
