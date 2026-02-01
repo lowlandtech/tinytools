@@ -76,19 +76,34 @@ public class TemplateRegistry
 
     /// <summary>
     /// Auto-discovers and registers all ITemplate implementations in the specified assembly.
+    /// Supports both singleton pattern (static Instance field) and public constructors.
     /// </summary>
     public void DiscoverFromAssembly(Assembly assembly)
     {
         var templateTypes = assembly.GetTypes()
-            .Where(t => typeof(ITemplate).IsAssignableFrom(t) 
-                     && !t.IsInterface 
+            .Where(t => typeof(ITemplate).IsAssignableFrom(t)
+                     && !t.IsInterface
                      && !t.IsAbstract);
 
         foreach (var type in templateTypes)
         {
             try
             {
-                var instance = Activator.CreateInstance(type) as ITemplate;
+                ITemplate? instance = null;
+
+                // First, try to get static Instance field (singleton pattern)
+                var instanceField = type.GetField("Instance", BindingFlags.Public | BindingFlags.Static);
+                if (instanceField != null && typeof(ITemplate).IsAssignableFrom(instanceField.FieldType))
+                {
+                    instance = instanceField.GetValue(null) as ITemplate;
+                }
+
+                // Fallback: try to create instance with default constructor
+                if (instance == null)
+                {
+                    instance = Activator.CreateInstance(type) as ITemplate;
+                }
+
                 if (instance != null)
                 {
                     var name = type.Name.Replace("Template", "");
@@ -97,7 +112,7 @@ public class TemplateRegistry
             }
             catch
             {
-                // Skip types that can't be instantiated with default constructor
+                // Skip types that can't be instantiated
             }
         }
     }
