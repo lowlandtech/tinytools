@@ -10,9 +10,19 @@ import { ExamplesPage } from "@/pages/examples";
 import { CodeGenerationPage } from "@/pages/code-generation";
 import { ITemplatePage } from "@/pages/itemplate";
 
+// Detect basename dynamically for multi-mount support
+// Allows the app to work at both / and /tinytools (or any other path)
+const getBasename = (): string => {
+  const path = window.location.pathname;
+  // Check for known mount paths
+  if (path.startsWith('/tinytools')) return '/tinytools';
+  // Add more paths here as needed: if (path.startsWith('/other')) return '/other';
+  return '/';
+};
+
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={getBasename()}>
       <Layout>
         <Routes>
           <Route path="/" element={<HomePage />} />
