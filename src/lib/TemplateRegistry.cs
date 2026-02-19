@@ -11,9 +11,9 @@ public class TemplateRegistry
     private readonly Dictionary<string, ITemplate> _templates = new();
     private readonly ITemplateEngine _engine;
 
-    public TemplateRegistry(ITemplateEngine? engine = null)
+    public TemplateRegistry(ITemplateEngine? engine = null, ILoggerFactory? loggerFactory = null)
     {
-        _engine = engine ?? new TinyTemplateEngine();
+        _engine = engine ?? new TinyTemplateEngine(loggerFactory);
     }
 
     /// <summary>

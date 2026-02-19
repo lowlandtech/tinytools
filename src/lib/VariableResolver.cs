@@ -9,6 +9,14 @@ namespace LowlandTech.TinyTools;
 /// </summary>
 public partial class VariableResolver
 {
+    private readonly ILogger _logger;
+
+    public VariableResolver(ILoggerFactory? loggerFactory = null)
+    {
+        _logger = loggerFactory?.CreateLogger<VariableResolver>()
+                  ?? NullLogger<VariableResolver>.Instance;
+    }
+
     [GeneratedRegex(@"\$\{([^}]+)\}")]
     private static partial Regex VariablePattern();
 
@@ -41,15 +49,27 @@ public partial class VariableResolver
                 var value = ResolveExpressionWithPipes(parts[0].Trim(), context);
                 if (value == null || (value is string s && string.IsNullOrEmpty(s)))
                 {
-                    // Return the default value (trim quotes if present)
-                    var defaultValue = parts[1].Trim().Trim('"', '\'');
-                    return defaultValue;
+                    var defaultExpr = parts[1].Trim();
+                    _logger.LogDebug("Null coalescing: '{Expression}' was null/empty, using default '{Default}'",
+                        parts[0].Trim(), defaultExpr);
+                    // Quoted literal — return as-is
+                    if ((defaultExpr.StartsWith('"') && defaultExpr.EndsWith('"')) ||
+                        (defaultExpr.StartsWith('\'') && defaultExpr.EndsWith('\'')))
+                    {
+                        return defaultExpr.Trim('"', '\'');
+                    }
+                    // Otherwise resolve as expression
+                    var resolved = ResolveExpressionWithPipes(defaultExpr, context);
+                    return resolved?.ToString() ?? string.Empty;
                 }
                 return value.ToString() ?? string.Empty;
             }
-            
+
             var result = ResolveExpressionWithPipes(expression, context);
-            return result?.ToString() ?? string.Empty;
+            var resultStr = result?.ToString() ?? string.Empty;
+            _logger.LogDebug("${{{Expression}}} → \"{Result}\"", expression,
+                resultStr.Length > 100 ? resultStr[..100] + "..." : resultStr);
+            return resultStr;
         });
     }
 
@@ -117,7 +137,10 @@ public partial class VariableResolver
         
         var conditionResult = EvaluateTernaryCondition(condition, context);
         var resultExpr = conditionResult ? trueExpr : falseExpr;
-        
+
+        _logger.LogDebug("Ternary: '{Condition}' → {Result}, using {Branch}",
+            condition, conditionResult, conditionResult ? "true-branch" : "false-branch");
+
         return EvaluateTernaryValue(resultExpr, context);
     }
 
@@ -289,7 +312,11 @@ public partial class VariableResolver
         {
             var helperName = helperMatch.Groups[1].Value;
             var helperArg = helperMatch.Groups[2].Success ? helperMatch.Groups[2].Value : null;
+            if (!TemplateHelpers.Exists(helperName))
+                _logger.LogWarning("Unknown pipe helper '{Helper}', value unchanged", helperName);
+            var before = value;
             value = TemplateHelpers.Apply(value, helperName, helperArg);
+            _logger.LogDebug("Pipe helper '{Helper}': \"{Before}\" → \"{After}\"", helperName, before, value);
         }
 
         return value;
@@ -339,7 +366,11 @@ public partial class VariableResolver
 
         // First part is the context key
         var currentValue = context.Get(parts[0]);
-        if (currentValue == null) return null;
+        if (currentValue == null)
+        {
+            _logger.LogWarning("Context key '{Key}' not found, resolved to \"\"", parts[0]);
+            return null;
+        }
 
         // Navigate remaining path
         for (int i = 1; i < parts.Length; i++)

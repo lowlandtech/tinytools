@@ -10,9 +10,9 @@ public abstract class TemplateBase : ITemplate
 {
     private readonly ITemplateEngine _engine;
 
-    protected TemplateBase(ITemplateEngine? engine = null)
+    protected TemplateBase(ITemplateEngine? engine = null, ILoggerFactory? loggerFactory = null)
     {
-        _engine = engine ?? new TinyTemplateEngine();
+        _engine = engine ?? new TinyTemplateEngine(loggerFactory);
     }
 
     public abstract string TemplatePath { get; }

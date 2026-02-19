@@ -489,6 +489,105 @@ ${person.Name} is ${person.Age}
         result.Should().Contain("Jane is 25");
     }
 
+    [Fact]
+    public void ItShouldExposeIndexMetadataInForeach()
+    {
+        // Arrange
+        _context.Set("Items", new[] { "A", "B", "C" });
+        var template = @"@foreach(var item in Context.Items) {
+${_index}:${item}
+}";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert
+        result.Should().Contain("0:A");
+        result.Should().Contain("1:B");
+        result.Should().Contain("2:C");
+    }
+
+    [Fact]
+    public void ItShouldExposeFirstAndLastMetadataInForeach()
+    {
+        // Arrange
+        _context.Set("Items", new[] { "A", "B", "C" });
+        var template = @"@foreach(var item in Context.Items) {
+@if(_first) {
+First: ${item}
+} else if (_last) {
+Last: ${item}
+} else {
+Middle: ${item}
+}
+}";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert
+        result.Should().Contain("First: A");
+        result.Should().Contain("Middle: B");
+        result.Should().Contain("Last: C");
+    }
+
+    [Fact]
+    public void ItShouldExposeCountMetadataInForeach()
+    {
+        // Arrange
+        _context.Set("Items", new[] { "X", "Y" });
+        var template = @"@foreach(var item in Context.Items) {
+${item} (${_count} total)
+}";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert
+        result.Should().Contain("X (2 total)");
+        result.Should().Contain("Y (2 total)");
+    }
+
+    [Fact]
+    public void ItShouldExposeFirstLastForSingleItemCollection()
+    {
+        // Arrange
+        _context.Set("Items", new[] { "Only" });
+        var template = @"@foreach(var item in Context.Items) {
+@if(_first) {
+first
+}
+@if(_last) {
+last
+}
+}";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert — single item is both first and last
+        result.Should().Contain("first");
+        result.Should().Contain("last");
+    }
+
+    [Fact]
+    public void ItShouldExposeLoopMetadataWithEndSyntax()
+    {
+        // Arrange
+        _context.Set("Items", new[] { "A", "B", "C" });
+        var template = "@foreach(var item in Context.Items)\n@if(_first)\nGiven ${item}\n@end\n@if(!_first)\nAnd ${item}\n@end\n@end";
+
+        // Act
+        var result = Sut.Render(template, _context);
+
+        // Assert
+        result.Should().Contain("Given A");
+        result.Should().Contain("And B");
+        result.Should().Contain("And C");
+        result.Should().NotContain("Given B");
+        result.Should().NotContain("Given C");
+    }
+
     #endregion
 
     #region Nested Control Flow Tests

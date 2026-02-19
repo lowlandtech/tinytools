@@ -18,6 +18,9 @@ public static class TemplateHelpers
         ["capitalize"] = (value, _) => Capitalize(value?.ToString()),
         ["camelcase"] = (value, _) => ToCamelCase(value?.ToString()),
         ["pascalcase"] = (value, _) => ToPascalCase(value?.ToString()),
+        ["kebabcase"] = (value, _) => ToKebabCase(value?.ToString()),
+        ["snakecase"] = (value, _) => ToSnakeCase(value?.ToString()),
+        ["titlecase"] = (value, _) => ToTitleCase(value?.ToString()),
         ["truncate"] = (value, arg) => Truncate(value?.ToString(), arg),
         ["replace"] = (value, arg) => Replace(value?.ToString(), arg),
         ["padleft"] = (value, arg) => PadLeft(value?.ToString(), arg),
@@ -155,11 +158,35 @@ public static class TemplateHelpers
         return result;
     }
 
+    private static string? ToKebabCase(string? value)
+    {
+        if (string.IsNullOrEmpty(value)) return value;
+        var words = SplitIntoWords(value);
+        return string.Join("-", words.Select(w => w.ToLowerInvariant()));
+    }
+
+    private static string? ToSnakeCase(string? value)
+    {
+        if (string.IsNullOrEmpty(value)) return value;
+        var words = SplitIntoWords(value);
+        return string.Join("_", words.Select(w => w.ToLowerInvariant()));
+    }
+
+    private static string? ToTitleCase(string? value)
+    {
+        if (string.IsNullOrEmpty(value)) return value;
+        var words = SplitIntoWords(value);
+        return string.Join(" ", words.Select(w => Capitalize(w)));
+    }
+
     private static string[] SplitIntoWords(string value)
     {
-        // Handle various separators: spaces, underscores, hyphens, and camelCase boundaries
+        // Handle camelCase boundaries, then split on non-alphanumeric characters
         var normalized = System.Text.RegularExpressions.Regex.Replace(value, @"([a-z])([A-Z])", "$1 $2");
-        return normalized.Split([' ', '_', '-'], StringSplitOptions.RemoveEmptyEntries);
+        return System.Text.RegularExpressions.Regex
+            .Split(normalized, @"[^a-zA-Z0-9]+")
+            .Where(w => w.Length > 0)
+            .ToArray();
     }
 
     #endregion

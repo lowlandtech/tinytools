@@ -8,17 +8,30 @@ namespace LowlandTech.TinyTools;
 /// </summary>
 public partial class TinyTemplateEngine : ITemplateEngine
 {
-    private readonly VariableResolver _resolver = new();
+    private readonly VariableResolver _resolver;
+    private readonly ILogger _logger;
+
+    public TinyTemplateEngine(ILoggerFactory? loggerFactory = null)
+    {
+        _logger = loggerFactory?.CreateLogger<TinyTemplateEngine>()
+                  ?? NullLogger<TinyTemplateEngine>.Instance;
+        _resolver = new VariableResolver(loggerFactory);
+    }
 
     public string Render(string template, ExecutionContext context)
     {
         if (string.IsNullOrEmpty(template)) return template;
 
+        _logger.LogTrace("Render called, template length: {Length}", template.Length);
+
         // First, process control flow (@if, @foreach)
         var processed = ProcessControlFlow(template, context);
 
         // Then, resolve variables
-        return ResolveVariables(processed, context);
+        var result = ResolveVariables(processed, context);
+
+        _logger.LogTrace("Render complete, output length: {Length}", result.Length);
+        return result;
     }
 
     public string ResolveVariables(string input, ExecutionContext context)
@@ -86,26 +99,47 @@ public partial class TinyTemplateEngine : ITemplateEngine
     [GeneratedRegex(@"@if\s*\((.+?)\)\s*\{", RegexOptions.Compiled)]
     private static partial Regex IfPattern();
 
+    [GeneratedRegex(@"@if\s*\((.+?)\)\s*$", RegexOptions.Compiled)]
+    private static partial Regex IfEndPattern();
+
     [GeneratedRegex(@"@foreach\s*\(\s*var\s+(\w+)\s+in\s+([^)]+)\)\s*\{", RegexOptions.Compiled)]
     private static partial Regex ForeachPattern();
+
+    [GeneratedRegex(@"@foreach\s*\(\s*var\s+(\w+)\s+in\s+([^)]+?)\)\s*$", RegexOptions.Compiled)]
+    private static partial Regex ForeachEndPattern();
+
+    [GeneratedRegex(@"^@else\s+if\s*\((.+?)\)\s*$", RegexOptions.Compiled)]
+    private static partial Regex ElseIfEndPattern();
+
+    private static bool UsesEndSyntax(string line) => !line.TrimEnd().EndsWith('{');
 
     private (string content, int endIndex) ProcessIfBlock(string[] lines, int startIndex, ExecutionContext context)
     {
         var line = lines[startIndex];
-        var match = IfPattern().Match(line);
+
+        // Try @end style first (no opening brace), then brace style
+        var endMatch = IfEndPattern().Match(line.TrimStart());
+        var braceMatch = IfPattern().Match(line);
+
+        var match = endMatch.Success && UsesEndSyntax(line) ? endMatch : braceMatch;
         if (!match.Success)
         {
             return (line + "\n", startIndex + 1);
         }
 
+        var useEndSyntax = endMatch.Success && UsesEndSyntax(line);
         var condition = match.Groups[1].Value.Trim();
         var conditionResult = EvaluateCondition(condition, context);
 
-        // Find matching closing brace and potential else/else-if
-        var (blocks, endIndex) = ExtractIfElseIfBlocks(lines, startIndex);
+        _logger.LogDebug("@if ({Condition}) → {Result}", condition, conditionResult);
+
+        var (blocks, endIndex) = useEndSyntax
+            ? ExtractIfElseIfBlocksEnd(lines, startIndex)
+            : ExtractIfElseIfBlocks(lines, startIndex);
 
         if (conditionResult)
         {
+            _logger.LogDebug("@if: taking primary branch");
             return (ProcessControlFlow(blocks[0].Content, context), endIndex);
         }
 
@@ -115,16 +149,17 @@ public partial class TinyTemplateEngine : ITemplateEngine
             var block = blocks[i];
             if (block.Condition == null)
             {
-                // This is an else block
+                _logger.LogDebug("@if: taking @else branch (block {Index})", i);
                 return (ProcessControlFlow(block.Content, context), endIndex);
             }
             else if (EvaluateCondition(block.Condition, context))
             {
-                // This is an else-if block that matches
+                _logger.LogDebug("@if: taking @else if ({Condition}) branch (block {Index})", block.Condition, i);
                 return (ProcessControlFlow(block.Content, context), endIndex);
             }
         }
 
+        _logger.LogDebug("@if: no branch taken, emitting empty");
         return (string.Empty, endIndex);
     }
 
@@ -197,12 +232,18 @@ public partial class TinyTemplateEngine : ITemplateEngine
     private (string content, int endIndex) ProcessForeachBlock(string[] lines, int startIndex, ExecutionContext context)
     {
         var line = lines[startIndex];
-        var match = ForeachPattern().Match(line);
+
+        // Try @end style first (no opening brace), then brace style
+        var endMatch = ForeachEndPattern().Match(line.TrimStart());
+        var braceMatch = ForeachPattern().Match(line);
+
+        var match = endMatch.Success && UsesEndSyntax(line) ? endMatch : braceMatch;
         if (!match.Success)
         {
             return (line + "\n", startIndex + 1);
         }
 
+        var useEndSyntax = endMatch.Success && UsesEndSyntax(line);
         var itemVar = match.Groups[1].Value;
         var collectionExpr = match.Groups[2].Value.Trim();
 
@@ -210,11 +251,15 @@ public partial class TinyTemplateEngine : ITemplateEngine
         var collection = _resolver.ResolveExpression(collectionExpr, context);
         if (collection == null)
         {
-            return (string.Empty, FindClosingBrace(lines, startIndex));
+            _logger.LogWarning("@foreach var {Var} in {Collection} → null, skipping block", itemVar, collectionExpr);
+            var skipEnd = useEndSyntax ? FindEndMarker(lines, startIndex) : FindClosingBrace(lines, startIndex);
+            return (string.Empty, skipEnd);
         }
 
         // Extract block content
-        var (blockContent, endIndex) = ExtractBlock(lines, startIndex);
+        var (blockContent, endIndex) = useEndSyntax
+            ? ExtractBlockEnd(lines, startIndex)
+            : ExtractBlock(lines, startIndex);
 
         // Iterate and render
         var result = new StringBuilder();
@@ -228,16 +273,27 @@ public partial class TinyTemplateEngine : ITemplateEngine
         var items = collection as System.Collections.IEnumerable;
         if (items != null)
         {
+            // Materialize to a list so we can provide _index, _first, _last metadata
+            var itemList = new List<object?>();
             foreach (var item in items)
+                itemList.Add(item);
+
+            _logger.LogDebug("@foreach var {Var} in {Collection} → {Count} items", itemVar, collectionExpr, itemList.Count);
+
+            for (var i = 0; i < itemList.Count; i++)
             {
-                // Create child context with item variable
+                // Create child context with item variable and loop metadata
                 var childContext = context.CreateChild();
-                childContext.Set(itemVar, item);
+                childContext.Set(itemVar, itemList[i]);
+                childContext.Set("_index", i);
+                childContext.Set("_first", i == 0);
+                childContext.Set("_last", i == itemList.Count - 1);
+                childContext.Set("_count", itemList.Count);
 
                 var rendered = ProcessControlFlow(blockContent, childContext);
                 rendered = _resolver.ResolveString(rendered, childContext);
                 result.Append(rendered);
-                
+
                 // Each iteration's content should end with a newline to separate from next iteration
                 if (rendered.Length > 0 && !rendered.EndsWith('\n'))
                 {
@@ -291,6 +347,122 @@ public partial class TinyTemplateEngine : ITemplateEngine
                 else if (c == '}') braceCount--;
             }
             if (braceCount == 0 && i > startIndex) return i + 1;
+        }
+        return lines.Length;
+    }
+
+    /// <summary>
+    /// Extracts @if/@else if/@else blocks terminated by @end.
+    /// Handles nesting by tracking @if/@foreach depth.
+    /// </summary>
+    private (List<ConditionalBlock> blocks, int endIndex) ExtractIfElseIfBlocksEnd(string[] lines, int startIndex)
+    {
+        var blocks = new List<ConditionalBlock>();
+        var currentLines = new List<string>();
+        string? currentCondition = null;
+        var depth = 0;
+
+        for (var i = startIndex; i < lines.Length; i++)
+        {
+            var trimmed = lines[i].TrimStart();
+
+            // Skip the opening @if line
+            if (i == startIndex)
+            {
+                depth = 1;
+                continue;
+            }
+
+            // Track nesting depth
+            if (trimmed.StartsWith("@if") || trimmed.StartsWith("@foreach"))
+                depth++;
+
+            if (trimmed == "@end")
+            {
+                depth--;
+                if (depth == 0)
+                {
+                    blocks.Add(new ConditionalBlock(currentCondition, string.Join("\n", currentLines)));
+                    return (blocks, i + 1);
+                }
+            }
+
+            // At top level, check for @else if / @else
+            if (depth == 1)
+            {
+                var elseIfMatch = ElseIfEndPattern().Match(trimmed);
+                if (elseIfMatch.Success)
+                {
+                    blocks.Add(new ConditionalBlock(currentCondition, string.Join("\n", currentLines)));
+                    currentLines.Clear();
+                    currentCondition = elseIfMatch.Groups[1].Value.Trim();
+                    continue;
+                }
+
+                if (trimmed == "@else")
+                {
+                    blocks.Add(new ConditionalBlock(currentCondition, string.Join("\n", currentLines)));
+                    currentLines.Clear();
+                    currentCondition = null; // null indicates else block
+                    continue;
+                }
+            }
+
+            currentLines.Add(lines[i]);
+        }
+
+        blocks.Add(new ConditionalBlock(currentCondition, string.Join("\n", currentLines)));
+        return (blocks, lines.Length);
+    }
+
+    /// <summary>
+    /// Extracts block content for @foreach terminated by @end.
+    /// Handles nesting by tracking depth.
+    /// </summary>
+    private (string content, int endIndex) ExtractBlockEnd(string[] lines, int startIndex)
+    {
+        var blockLines = new List<string>();
+        var depth = 0;
+
+        for (var i = startIndex; i < lines.Length; i++)
+        {
+            var trimmed = lines[i].TrimStart();
+
+            if (i == startIndex)
+            {
+                depth = 1;
+                continue;
+            }
+
+            if (trimmed.StartsWith("@if") || trimmed.StartsWith("@foreach"))
+                depth++;
+
+            if (trimmed == "@end")
+            {
+                depth--;
+                if (depth == 0)
+                    return (string.Join("\n", blockLines), i + 1);
+            }
+
+            blockLines.Add(lines[i]);
+        }
+
+        return (string.Join("\n", blockLines), lines.Length);
+    }
+
+    private int FindEndMarker(string[] lines, int startIndex)
+    {
+        var depth = 0;
+        for (var i = startIndex; i < lines.Length; i++)
+        {
+            var trimmed = lines[i].TrimStart();
+            if (trimmed.StartsWith("@if") || trimmed.StartsWith("@foreach"))
+                depth++;
+            if (trimmed == "@end")
+            {
+                depth--;
+                if (depth == 0) return i + 1;
+            }
         }
         return lines.Length;
     }

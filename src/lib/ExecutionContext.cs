@@ -9,6 +9,19 @@ public class ExecutionContext
     private readonly Dictionary<string, object?> _variables = new(StringComparer.OrdinalIgnoreCase);
     private readonly Stack<CursorEntry> _cursorStack = new();
     private readonly Dictionary<string, TemplateServiceFunc> _services = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ILogger _logger;
+
+    public ExecutionContext(ILoggerFactory? loggerFactory = null)
+    {
+        _logger = loggerFactory?.CreateLogger<ExecutionContext>()
+                  ?? NullLogger<ExecutionContext>.Instance;
+    }
+
+    // Internal: used by CreateChild to propagate the same logger instance
+    private ExecutionContext(ILogger logger)
+    {
+        _logger = logger;
+    }
 
     /// <summary>
     /// Unique key for this context (used by ContextFactory).
@@ -67,6 +80,7 @@ public class ExecutionContext
         }
 
         // Service not found - return error function
+        _logger.LogWarning("Service '{Key}' not registered", key);
         return _ => $"{{{key} not registered}}";
     }
 
@@ -152,7 +166,9 @@ public class ExecutionContext
     /// </summary>
     public object? Get(string key)
     {
-        return _variables.TryGetValue(key, out var value) ? value : null;
+        var found = _variables.TryGetValue(key, out var value);
+        _logger.LogTrace("Get('{Key}') → {Status}", key, found ? "found" : "not found");
+        return found ? value : null;
     }
 
 
@@ -162,6 +178,14 @@ public class ExecutionContext
     public void Set(string key, object? value)
     {
         _variables[key] = value;
+        var display = value switch
+        {
+            null => "null",
+            string s => s.Length > 100 ? s[..100] + "..." : s,
+            System.Collections.ICollection c => $"[{c.Count} items]",
+            _ => value.GetType().Name
+        };
+        _logger.LogTrace("Set('{Key}', {Type}: '{Value}')", key, value?.GetType().Name ?? "null", display);
     }
 
     /// <summary>
@@ -183,7 +207,8 @@ public class ExecutionContext
     /// </summary>
     public ExecutionContext CreateChild(string? key = null)
     {
-        var child = new ExecutionContext
+        _logger.LogTrace("CreateChild('{Key}')", key);
+        var child = new ExecutionContext(_logger)
         {
             Key = key,
             Parent = this
