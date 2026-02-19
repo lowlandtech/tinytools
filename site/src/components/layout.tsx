@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Github, ChevronRight } from "lucide-react";
+import { Moon, Sun, Github, ChevronRight, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const navigation = [
@@ -23,9 +23,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
     if (saved) return saved === "dark";
     return true; // Default to dark mode
   });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const currentPage = navigation.find(item => item.href === location.pathname);
   const isHomePage = location.pathname === "/";
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -61,6 +67,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
           )}
 
           <div className="flex items-center ml-auto space-x-2">
+            {/* Mobile menu button - only show when not on home page */}
+            {!isHomePage && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -68,7 +85,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             >
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
-            <Button variant="ghost" size="icon" asChild>
+            <Button variant="ghost" size="icon" asChild className="hidden sm:flex">
               <a
                 href="https://github.com/lowlandtech/tinytools"
                 target="_blank"
@@ -82,32 +99,64 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </header>
 
       <div className="flex">
-        {/* Left Sidebar - Hidden on home page */}
+        {/* Left Sidebar - Hidden on home page, responsive on mobile */}
         {!isHomePage && (
-          <aside className="sticky top-14 h-[calc(100vh-3.5rem)] w-64 border-r bg-sidebar overflow-y-auto">
-            <nav className="flex flex-col gap-1 p-4">
-              {navigation.map((item) => (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  className={cn(
-                    "px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                    location.pathname === item.href
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                  )}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </nav>
-          </aside>
+          <>
+            {/* Desktop Sidebar */}
+            <aside className="hidden md:block sticky top-14 h-[calc(100vh-3.5rem)] w-64 border-r bg-sidebar overflow-y-auto">
+              <nav className="flex flex-col gap-1 p-4">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    className={cn(
+                      "px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                      location.pathname === item.href
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    )}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </nav>
+            </aside>
+
+            {/* Mobile Sidebar Overlay */}
+            {isMobileMenuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40 bg-black/50 md:hidden"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                />
+                <aside className="fixed left-0 top-14 z-50 h-[calc(100vh-3.5rem)] w-64 border-r bg-sidebar overflow-y-auto md:hidden">
+                  <nav className="flex flex-col gap-1 p-4">
+                    {navigation.map((item) => (
+                      <Link
+                        key={item.href}
+                        to={item.href}
+                        className={cn(
+                          "px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                          location.pathname === item.href
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                            : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                        )}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </nav>
+                </aside>
+              </>
+            )}
+          </>
         )}
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto min-w-0">
           <div className={cn(
-            "container mx-auto px-4 py-6",
+            "mx-auto px-4 py-6",
             isHomePage ? "max-w-6xl" : "max-w-5xl"
           )}>
             {children}
@@ -118,13 +167,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
       {/* Footer */}
       <footer className="border-t py-6 md:py-0">
         <div className={cn(
-          "container mx-auto flex flex-col items-center justify-between gap-4 px-4 md:h-16 md:flex-row",
-          !isHomePage && "ml-64"
+          "mx-auto flex flex-col items-center justify-between gap-4 px-4 md:h-16 md:flex-row",
+          isHomePage ? "max-w-6xl" : "max-w-5xl"
         )}>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground text-center md:text-left">
             © {new Date().getFullYear()} LowlandTech. All rights reserved.
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground text-center md:text-right">
             Built with React, shadcn/ui, and Tailwind CSS
           </p>
         </div>
