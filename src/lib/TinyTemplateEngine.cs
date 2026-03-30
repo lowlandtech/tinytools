@@ -565,7 +565,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
     }
 
     /// <summary>
-    /// Finds a logical operator (&&, ||) that's not inside parentheses.
+    /// Finds a logical operator (&amp;&amp;, ||) that's not inside parentheses.
     /// </summary>
     private static int FindOperatorOutsideParentheses(string condition, string op)
     {
