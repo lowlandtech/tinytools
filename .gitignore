@@ -453,3 +453,5 @@ $RECYCLE.BIN/
 /nuget.config
 
 *.ncrunchproject
+/output
+/src/lib/output/tmp-verify-tests

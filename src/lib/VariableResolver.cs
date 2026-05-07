@@ -52,15 +52,20 @@ public partial class VariableResolver
                     var defaultExpr = parts[1].Trim();
                     _logger.LogDebug("Null coalescing: '{Expression}' was null/empty, using default '{Default}'",
                         parts[0].Trim(), defaultExpr);
-                    // Quoted literal — return as-is
+                    // Quoted literal — strip quotes and return as-is
                     if ((defaultExpr.StartsWith('"') && defaultExpr.EndsWith('"')) ||
                         (defaultExpr.StartsWith('\'') && defaultExpr.EndsWith('\'')))
                     {
                         return defaultExpr.Trim('"', '\'');
                     }
-                    // Otherwise resolve as expression
-                    var resolved = ResolveExpressionWithPipes(defaultExpr, context);
-                    return resolved?.ToString() ?? string.Empty;
+                    // Dotted path — resolve as expression
+                    if (defaultExpr.Contains('.'))
+                    {
+                        var resolved = ResolveExpressionWithPipes(defaultExpr, context);
+                        return resolved?.ToString() ?? string.Empty;
+                    }
+                    // Unquoted bare word — treat as literal string
+                    return defaultExpr;
                 }
                 return value.ToString() ?? string.Empty;
             }
