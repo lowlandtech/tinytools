@@ -78,17 +78,9 @@ jobs:
             --output ./artifacts \
             -p:PackageVersion=${{ steps.ver.outputs.VERSION }}
 
-      - name: Add Gitea NuGet source
-        run: |
-          dotnet nuget add source \
-            --name gitea \
-            --username foundry-admin \
-            --password "${{ secrets.NUGET_TOKEN }}" \
-            --store-password-in-clear-text \
-            https://git.lowlandtech.com/api/packages/tinytools/nuget/index.json
-
       - name: Publish to Gitea NuGet
         run: |
           dotnet nuget push ./artifacts/*.nupkg \
-            --source gitea \
+            --source https://git.lowlandtech.com/api/packages/tinytools/nuget/index.json \
+            --api-key "${{ secrets.NUGET_TOKEN }}" \
             --skip-duplicate
