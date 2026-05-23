@@ -21,10 +21,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET 10
+      - name: Setup .NET SDKs (8, 9, 10)
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
 
       - name: Restore
         run: dotnet restore
@@ -39,22 +42,23 @@ jobs:
     name: Pack & Publish to Gitea NuGet
     runs-on: ubuntu-latest
     needs: build-test
-    # Only publish on push to develop or main (not PRs)
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET 10
+      - name: Setup .NET SDKs (8, 9, 10)
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
 
       - name: Calculate CalVer
         id: ver
         run: |
-          # Format: YYYY.MMDD.run_number  →  e.g. 2026.0523.42
           VERSION=$(date +'%Y.%m%d').${{ github.run_number }}
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "Package version: $VERSION"
