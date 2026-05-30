@@ -17,7 +17,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "test";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "padleft", "10");
+        var result = Helpers.TemplateHelpers.Apply(value, "padleft", "10");
 
         // Assert
         result.Should().Be("      test");
@@ -30,7 +30,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "42";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "padleft", "5,0");
+        var result = Helpers.TemplateHelpers.Apply(value, "padleft", "5,0");
 
         // Assert
         result.Should().Be("00042");
@@ -43,7 +43,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "hello world";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "padleft", "5");
+        var result = Helpers.TemplateHelpers.Apply(value, "padleft", "5");
 
         // Assert
         result.Should().Be("hello world");
@@ -56,7 +56,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "test";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "padleft", "abc");
+        var result = Helpers.TemplateHelpers.Apply(value, "padleft", "abc");
 
         // Assert
         result.Should().Be("test");
@@ -69,7 +69,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "test";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "padleft", null);
+        var result = Helpers.TemplateHelpers.Apply(value, "padleft", null);
 
         // Assert
         result.Should().Be("test");
@@ -79,7 +79,7 @@ public class WhenUsingTemplateHelpersTest
     public void PadLeftShouldReturnNullIfValueIsNull()
     {
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(null, "padleft", "10");
+        var result = Helpers.TemplateHelpers.Apply(null, "padleft", "10");
 
         // Assert
         result.Should().BeNull();
@@ -92,7 +92,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "padleft", "5");
+        var result = Helpers.TemplateHelpers.Apply(value, "padleft", "5");
 
         // Assert
         result.Should().Be("");
@@ -105,7 +105,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "hello";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "padleft", "5");
+        var result = Helpers.TemplateHelpers.Apply(value, "padleft", "5");
 
         // Assert
         result.Should().Be("hello");
@@ -122,7 +122,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "test";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "padright", "10");
+        var result = Helpers.TemplateHelpers.Apply(value, "padright", "10");
 
         // Assert
         result.Should().Be("test      ");
@@ -135,7 +135,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "42";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "padright", "5,-");
+        var result = Helpers.TemplateHelpers.Apply(value, "padright", "5,-");
 
         // Assert
         result.Should().Be("42---");
@@ -148,7 +148,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "hello world";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "padright", "5");
+        var result = Helpers.TemplateHelpers.Apply(value, "padright", "5");
 
         // Assert
         result.Should().Be("hello world");
@@ -161,7 +161,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "test";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "padright", "abc");
+        var result = Helpers.TemplateHelpers.Apply(value, "padright", "abc");
 
         // Assert
         result.Should().Be("test");
@@ -174,7 +174,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "test";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "padright", null);
+        var result = Helpers.TemplateHelpers.Apply(value, "padright", null);
 
         // Assert
         result.Should().Be("test");
@@ -184,7 +184,7 @@ public class WhenUsingTemplateHelpersTest
     public void PadRightShouldReturnNullIfValueIsNull()
     {
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(null, "padright", "10");
+        var result = Helpers.TemplateHelpers.Apply(null, "padright", "10");
 
         // Assert
         result.Should().BeNull();
@@ -197,7 +197,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "padright", "5");
+        var result = Helpers.TemplateHelpers.Apply(value, "padright", "5");
 
         // Assert
         result.Should().Be("");
@@ -210,7 +210,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "hello";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "padright", "5");
+        var result = Helpers.TemplateHelpers.Apply(value, "padright", "5");
 
         // Assert
         result.Should().Be("hello");
@@ -307,20 +307,20 @@ public class WhenUsingTemplateHelpersTest
     [Fact]
     public void ExistsShouldReturnTrueForPadLeft()
     {
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Exists("padleft").Should().BeTrue();
+        Helpers.TemplateHelpers.Exists("padleft").Should().BeTrue();
     }
 
     [Fact]
     public void ExistsShouldReturnTrueForPadRight()
     {
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Exists("padright").Should().BeTrue();
+        Helpers.TemplateHelpers.Exists("padright").Should().BeTrue();
     }
 
     [Fact]
     public void ExistsShouldBeCaseInsensitive()
     {
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Exists("PADLEFT").Should().BeTrue();
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Exists("PadRight").Should().BeTrue();
+        Helpers.TemplateHelpers.Exists("PADLEFT").Should().BeTrue();
+        Helpers.TemplateHelpers.Exists("PadRight").Should().BeTrue();
     }
 
     #endregion
@@ -334,7 +334,7 @@ public class WhenUsingTemplateHelpersTest
         var value = 3.14159;
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "round", "2");
+        var result = Helpers.TemplateHelpers.Apply(value, "round", "2");
 
         // Assert
         result.Should().Be(3.14);
@@ -347,7 +347,7 @@ public class WhenUsingTemplateHelpersTest
         var value = 3.14159m;
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "round", "2");
+        var result = Helpers.TemplateHelpers.Apply(value, "round", "2");
 
         // Assert
         result.Should().Be(3.14m);
@@ -360,7 +360,7 @@ public class WhenUsingTemplateHelpersTest
         var value = 3.14159f;
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "round", "2");
+        var result = Helpers.TemplateHelpers.Apply(value, "round", "2");
 
         // Assert
         ((double)result!).Should().BeApproximately(3.14, 0.01);
@@ -373,7 +373,7 @@ public class WhenUsingTemplateHelpersTest
         var value = 3.7;
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "round", null);
+        var result = Helpers.TemplateHelpers.Apply(value, "round", null);
 
         // Assert
         result.Should().Be(4.0);
@@ -383,7 +383,7 @@ public class WhenUsingTemplateHelpersTest
     public void RoundShouldReturnNullForNullValue()
     {
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(null, "round", "2");
+        var result = Helpers.TemplateHelpers.Apply(null, "round", "2");
 
         // Assert
         result.Should().BeNull();
@@ -396,7 +396,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "not a number";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "round", "2");
+        var result = Helpers.TemplateHelpers.Apply(value, "round", "2");
 
         // Assert
         result.Should().Be("not a number");
@@ -409,7 +409,7 @@ public class WhenUsingTemplateHelpersTest
         var value = 5.999m;
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "round", "0");
+        var result = Helpers.TemplateHelpers.Apply(value, "round", "0");
 
         // Assert
         result.Should().Be(6m);
@@ -422,7 +422,7 @@ public class WhenUsingTemplateHelpersTest
         var value = 2.5f;
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "round", "0");
+        var result = Helpers.TemplateHelpers.Apply(value, "round", "0");
 
         // Assert
         // Math.Round uses banker's rounding by default, so 2.5 rounds to 2
@@ -453,7 +453,7 @@ public class WhenUsingTemplateHelpersTest
     public void DefaultShouldReturnDefaultValueWhenNull()
     {
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(null, "default", "fallback");
+        var result = Helpers.TemplateHelpers.Apply(null, "default", "fallback");
 
         // Assert
         result.Should().Be("fallback");
@@ -466,7 +466,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "default", "fallback");
+        var result = Helpers.TemplateHelpers.Apply(value, "default", "fallback");
 
         // Assert
         result.Should().Be("fallback");
@@ -479,7 +479,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "hello";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "default", "fallback");
+        var result = Helpers.TemplateHelpers.Apply(value, "default", "fallback");
 
         // Assert
         result.Should().Be("hello");
@@ -492,7 +492,7 @@ public class WhenUsingTemplateHelpersTest
         var value = new List<string>();
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "default", "empty list");
+        var result = Helpers.TemplateHelpers.Apply(value, "default", "empty list");
 
         // Assert
         result.Should().Be("empty list");
@@ -505,7 +505,7 @@ public class WhenUsingTemplateHelpersTest
         var value = new List<string> { "item1", "item2" };
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "default", "empty list");
+        var result = Helpers.TemplateHelpers.Apply(value, "default", "empty list");
 
         // Assert
         result.Should().BeEquivalentTo(value);
@@ -518,7 +518,7 @@ public class WhenUsingTemplateHelpersTest
         var value = "content";
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "default", "default value");
+        var result = Helpers.TemplateHelpers.Apply(value, "default", "default value");
 
         // Assert
         result.Should().Be("content");
@@ -559,7 +559,7 @@ public class WhenUsingTemplateHelpersTest
     public void IfEmptyShouldBehaveTheSameAsDefault()
     {
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(null, "ifempty", "fallback");
+        var result = Helpers.TemplateHelpers.Apply(null, "ifempty", "fallback");
 
         // Assert
         result.Should().Be("fallback");
@@ -568,19 +568,19 @@ public class WhenUsingTemplateHelpersTest
     [Fact]
     public void ExistsShouldReturnTrueForDefault()
     {
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Exists("default").Should().BeTrue();
+        Helpers.TemplateHelpers.Exists("default").Should().BeTrue();
     }
 
     [Fact]
     public void ExistsShouldReturnTrueForIfEmpty()
     {
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Exists("ifempty").Should().BeTrue();
+        Helpers.TemplateHelpers.Exists("ifempty").Should().BeTrue();
     }
 
     [Fact]
     public void ExistsShouldReturnTrueForRound()
     {
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Exists("round").Should().BeTrue();
+        Helpers.TemplateHelpers.Exists("round").Should().BeTrue();
     }
 
     #endregion
@@ -590,35 +590,35 @@ public class WhenUsingTemplateHelpersTest
     [Fact]
     public void FloorShouldFloorDouble()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(3.7, "floor", null);
+        var result = Helpers.TemplateHelpers.Apply(3.7, "floor", null);
         result.Should().Be(3.0);
     }
 
     [Fact]
     public void FloorShouldFloorDecimal()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(3.7m, "floor", null);
+        var result = Helpers.TemplateHelpers.Apply(3.7m, "floor", null);
         result.Should().Be(3m);
     }
 
     [Fact]
     public void FloorShouldFloorFloat()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(3.7f, "floor", null);
+        var result = Helpers.TemplateHelpers.Apply(3.7f, "floor", null);
         ((double)result!).Should().BeApproximately(3.0, 0.01);
     }
 
     [Fact]
     public void FloorShouldReturnOriginalForNonNumeric()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("text", "floor", null);
+        var result = Helpers.TemplateHelpers.Apply("text", "floor", null);
         result.Should().Be("text");
     }
 
     [Fact]
     public void FloorShouldHandleNegativeDouble()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(-3.2, "floor", null);
+        var result = Helpers.TemplateHelpers.Apply(-3.2, "floor", null);
         result.Should().Be(-4.0);
     }
 
@@ -629,35 +629,35 @@ public class WhenUsingTemplateHelpersTest
     [Fact]
     public void CeilingShouldCeilingDouble()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(3.2, "ceiling", null);
+        var result = Helpers.TemplateHelpers.Apply(3.2, "ceiling", null);
         result.Should().Be(4.0);
     }
 
     [Fact]
     public void CeilingShouldCeilingDecimal()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(3.2m, "ceiling", null);
+        var result = Helpers.TemplateHelpers.Apply(3.2m, "ceiling", null);
         result.Should().Be(4m);
     }
 
     [Fact]
     public void CeilingShouldCeilingFloat()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(3.2f, "ceiling", null);
+        var result = Helpers.TemplateHelpers.Apply(3.2f, "ceiling", null);
         ((double)result!).Should().BeApproximately(4.0, 0.01);
     }
 
     [Fact]
     public void CeilingShouldReturnOriginalForNonNumeric()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("text", "ceiling", null);
+        var result = Helpers.TemplateHelpers.Apply("text", "ceiling", null);
         result.Should().Be("text");
     }
 
     [Fact]
     public void CeilingShouldHandleNegativeDouble()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(-3.7, "ceiling", null);
+        var result = Helpers.TemplateHelpers.Apply(-3.7, "ceiling", null);
         result.Should().Be(-3.0);
     }
 
@@ -668,21 +668,21 @@ public class WhenUsingTemplateHelpersTest
     [Fact]
     public void CountShouldReturnZeroForNull()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(null, "count", null);
+        var result = Helpers.TemplateHelpers.Apply(null, "count", null);
         result.Should().Be(0);
     }
 
     [Fact]
     public void CountShouldReturnStringLength()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("hello", "count", null);
+        var result = Helpers.TemplateHelpers.Apply("hello", "count", null);
         result.Should().Be(5);
     }
 
     [Fact]
     public void CountShouldReturnCollectionCount()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(new List<int> { 1, 2, 3 }, "count", null);
+        var result = Helpers.TemplateHelpers.Apply(new List<int> { 1, 2, 3 }, "count", null);
         result.Should().Be(3);
     }
 
@@ -690,21 +690,21 @@ public class WhenUsingTemplateHelpersTest
     public void CountShouldReturnEnumerableCount()
     {
         var enumerable = Enumerable.Range(1, 5);
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(enumerable, "count", null);
+        var result = Helpers.TemplateHelpers.Apply(enumerable, "count", null);
         result.Should().Be(5);
     }
 
     [Fact]
     public void CountShouldReturnOneForNonCollectionValue()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(42, "count", null);
+        var result = Helpers.TemplateHelpers.Apply(42, "count", null);
         result.Should().Be(1);
     }
 
     [Fact]
     public void CountShouldReturnArrayLength()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(new[] { "a", "b", "c", "d" }, "count", null);
+        var result = Helpers.TemplateHelpers.Apply(new[] { "a", "b", "c", "d" }, "count", null);
         result.Should().Be(4);
     }
 
@@ -715,49 +715,49 @@ public class WhenUsingTemplateHelpersTest
     [Fact]
     public void FirstShouldReturnNullForNull()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(null, "first", null);
+        var result = Helpers.TemplateHelpers.Apply(null, "first", null);
         result.Should().BeNull();
     }
 
     [Fact]
     public void FirstShouldReturnFirstCharOfString()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("hello", "first", null);
+        var result = Helpers.TemplateHelpers.Apply("hello", "first", null);
         result.Should().Be("h");
     }
 
     [Fact]
     public void FirstShouldReturnNullForEmptyString()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("", "first", null);
+        var result = Helpers.TemplateHelpers.Apply("", "first", null);
         result.Should().BeNull();
     }
 
     [Fact]
     public void FirstShouldReturnFirstElementOfCollection()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(new List<string> { "apple", "banana", "cherry" }, "first", null);
+        var result = Helpers.TemplateHelpers.Apply(new List<string> { "apple", "banana", "cherry" }, "first", null);
         result.Should().Be("apple");
     }
 
     [Fact]
     public void FirstShouldReturnNullForEmptyCollection()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(new List<string>(), "first", null);
+        var result = Helpers.TemplateHelpers.Apply(new List<string>(), "first", null);
         result.Should().BeNull();
     }
 
     [Fact]
     public void FirstShouldReturnOriginalForNonCollectionValue()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(42, "first", null);
+        var result = Helpers.TemplateHelpers.Apply(42, "first", null);
         result.Should().Be(42);
     }
 
     [Fact]
     public void FirstShouldReturnFirstElementOfArray()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(new[] { 10, 20, 30 }, "first", null);
+        var result = Helpers.TemplateHelpers.Apply(new[] { 10, 20, 30 }, "first", null);
         result.Should().Be(10);
     }
 
@@ -768,49 +768,49 @@ public class WhenUsingTemplateHelpersTest
     [Fact]
     public void LastShouldReturnNullForNull()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(null, "last", null);
+        var result = Helpers.TemplateHelpers.Apply(null, "last", null);
         result.Should().BeNull();
     }
 
     [Fact]
     public void LastShouldReturnLastCharOfString()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("hello", "last", null);
+        var result = Helpers.TemplateHelpers.Apply("hello", "last", null);
         result.Should().Be("o");
     }
 
     [Fact]
     public void LastShouldReturnNullForEmptyString()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("", "last", null);
+        var result = Helpers.TemplateHelpers.Apply("", "last", null);
         result.Should().BeNull();
     }
 
     [Fact]
     public void LastShouldReturnLastElementOfCollection()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(new List<string> { "apple", "banana", "cherry" }, "last", null);
+        var result = Helpers.TemplateHelpers.Apply(new List<string> { "apple", "banana", "cherry" }, "last", null);
         result.Should().Be("cherry");
     }
 
     [Fact]
     public void LastShouldReturnNullForEmptyCollection()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(new List<string>(), "last", null);
+        var result = Helpers.TemplateHelpers.Apply(new List<string>(), "last", null);
         result.Should().BeNull();
     }
 
     [Fact]
     public void LastShouldReturnOriginalForNonCollectionValue()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(42, "last", null);
+        var result = Helpers.TemplateHelpers.Apply(42, "last", null);
         result.Should().Be(42);
     }
 
     [Fact]
     public void LastShouldReturnLastElementOfArray()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(new[] { 10, 20, 30 }, "last", null);
+        var result = Helpers.TemplateHelpers.Apply(new[] { 10, 20, 30 }, "last", null);
         result.Should().Be(30);
     }
 
@@ -821,49 +821,49 @@ public class WhenUsingTemplateHelpersTest
     [Fact]
     public void ReverseShouldReturnNullForNull()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(null, "reverse", null);
+        var result = Helpers.TemplateHelpers.Apply(null, "reverse", null);
         result.Should().BeNull();
     }
 
     [Fact]
     public void ReverseShouldReverseString()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("hello", "reverse", null);
+        var result = Helpers.TemplateHelpers.Apply("hello", "reverse", null);
         result.Should().Be("olleh");
     }
 
     [Fact]
     public void ReverseShouldReverseCollection()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(new List<int> { 1, 2, 3 }, "reverse", null);
+        var result = Helpers.TemplateHelpers.Apply(new List<int> { 1, 2, 3 }, "reverse", null);
         result.Should().BeEquivalentTo(new List<int> { 3, 2, 1 });
     }
 
     [Fact]
     public void ReverseShouldReturnOriginalForNonCollectionValue()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(42, "reverse", null);
+        var result = Helpers.TemplateHelpers.Apply(42, "reverse", null);
         result.Should().Be(42);
     }
 
     [Fact]
     public void ReverseShouldReverseArray()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(new[] { "a", "b", "c" }, "reverse", null);
+        var result = Helpers.TemplateHelpers.Apply(new[] { "a", "b", "c" }, "reverse", null);
         result.Should().BeEquivalentTo(new List<string> { "c", "b", "a" });
     }
 
     [Fact]
     public void ReverseShouldHandleEmptyString()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("", "reverse", null);
+        var result = Helpers.TemplateHelpers.Apply("", "reverse", null);
         result.Should().Be("");
     }
 
     [Fact]
     public void ReverseShouldHandleSingleCharString()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("x", "reverse", null);
+        var result = Helpers.TemplateHelpers.Apply("x", "reverse", null);
         result.Should().Be("x");
     }
 
@@ -878,7 +878,7 @@ public class WhenUsingTemplateHelpersTest
         var date = new DateTime(2024, 3, 15, 10, 30, 0);
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(date, "format", "yyyy-MM-dd");
+        var result = Helpers.TemplateHelpers.Apply(date, "format", "yyyy-MM-dd");
 
         // Assert
         result.Should().Be("2024-03-15");
@@ -891,7 +891,7 @@ public class WhenUsingTemplateHelpersTest
         var date = new DateTime(2024, 3, 15, 10, 30, 45);
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(date, "format", "HH:mm:ss");
+        var result = Helpers.TemplateHelpers.Apply(date, "format", "HH:mm:ss");
 
         // Assert
         result.Should().Be("10:30:45");
@@ -904,7 +904,7 @@ public class WhenUsingTemplateHelpersTest
         var date = new DateTimeOffset(2024, 3, 15, 10, 30, 0, TimeSpan.Zero);
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(date, "format", "yyyy-MM-dd");
+        var result = Helpers.TemplateHelpers.Apply(date, "format", "yyyy-MM-dd");
 
         // Assert
         result.Should().Be("2024-03-15");
@@ -917,7 +917,7 @@ public class WhenUsingTemplateHelpersTest
         var date = new DateOnly(2024, 3, 15);
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(date, "format", "yyyy-MM-dd");
+        var result = Helpers.TemplateHelpers.Apply(date, "format", "yyyy-MM-dd");
 
         // Assert
         result.Should().Be("2024-03-15");
@@ -930,7 +930,7 @@ public class WhenUsingTemplateHelpersTest
         var time = new TimeOnly(10, 30, 45);
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(time, "format", "HH:mm:ss");
+        var result = Helpers.TemplateHelpers.Apply(time, "format", "HH:mm:ss");
 
         // Assert
         result.Should().Be("10:30:45");
@@ -943,7 +943,7 @@ public class WhenUsingTemplateHelpersTest
         var value = 1234.567;
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "format", "F2");
+        var result = Helpers.TemplateHelpers.Apply(value, "format", "F2");
 
         // Assert
         result.Should().Be("1234.57");
@@ -956,7 +956,7 @@ public class WhenUsingTemplateHelpersTest
         var value = 1234.5678m;
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "format", "C2");
+        var result = Helpers.TemplateHelpers.Apply(value, "format", "C2");
 
         // Assert - currency symbol varies by culture, just verify it's not null
         result.Should().NotBeNull();
@@ -970,7 +970,7 @@ public class WhenUsingTemplateHelpersTest
         var value = new { Name = "Test" };
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "format", "any");
+        var result = Helpers.TemplateHelpers.Apply(value, "format", "any");
 
         // Assert
         result!.ToString().Should().Contain("Name");
@@ -983,7 +983,7 @@ public class WhenUsingTemplateHelpersTest
         var date = new DateTime(2024, 3, 15);
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(date, "format", null);
+        var result = Helpers.TemplateHelpers.Apply(date, "format", null);
 
         // Assert
         result.Should().NotBeNull();
@@ -997,7 +997,7 @@ public class WhenUsingTemplateHelpersTest
         var date = new DateTime(2024, 3, 15);
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(date, "format", "");
+        var result = Helpers.TemplateHelpers.Apply(date, "format", "");
 
         // Assert
         result.Should().NotBeNull();
@@ -1008,7 +1008,7 @@ public class WhenUsingTemplateHelpersTest
     public void FormatShouldReturnNullToStringForNullValue()
     {
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(null, "format", "yyyy-MM-dd");
+        var result = Helpers.TemplateHelpers.Apply(null, "format", "yyyy-MM-dd");
 
         // Assert
         result.Should().BeNull();
@@ -1021,7 +1021,7 @@ public class WhenUsingTemplateHelpersTest
         var value = 42;
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(value, "format", "D5");
+        var result = Helpers.TemplateHelpers.Apply(value, "format", "D5");
 
         // Assert
         result.Should().Be("00042");
@@ -1034,7 +1034,7 @@ public class WhenUsingTemplateHelpersTest
         var date = new DateTime(2024, 3, 15, 14, 30, 0);
 
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(date, "format", "MMMM dd, yyyy");
+        var result = Helpers.TemplateHelpers.Apply(date, "format", "MMMM dd, yyyy");
 
         // Assert
         result.Should().Be("March 15, 2024");
@@ -1051,8 +1051,8 @@ public class WhenUsingTemplateHelpersTest
         var helperName = "testhelper_" + Guid.NewGuid().ToString("N")[..8];
         
         // Act
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Register(helperName, (value, arg) => $"transformed:{value}");
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("input", helperName, null);
+        Helpers.TemplateHelpers.Register(helperName, (value, arg) => $"transformed:{value}");
+        var result = Helpers.TemplateHelpers.Apply("input", helperName, null);
 
         // Assert
         result.Should().Be("transformed:input");
@@ -1063,11 +1063,11 @@ public class WhenUsingTemplateHelpersTest
     {
         // Arrange
         var helperName = "testoverride_" + Guid.NewGuid().ToString("N")[..8];
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Register(helperName, (value, _) => "first");
+        Helpers.TemplateHelpers.Register(helperName, (value, _) => "first");
         
         // Act
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Register(helperName, (value, _) => "second");
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("input", helperName, null);
+        Helpers.TemplateHelpers.Register(helperName, (value, _) => "second");
+        var result = Helpers.TemplateHelpers.Apply("input", helperName, null);
 
         // Assert
         result.Should().Be("second");
@@ -1078,10 +1078,10 @@ public class WhenUsingTemplateHelpersTest
     {
         // Arrange
         var helperName = "testwitharg_" + Guid.NewGuid().ToString("N")[..8];
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Register(helperName, (value, arg) => $"{value}:{arg}");
+        Helpers.TemplateHelpers.Register(helperName, (value, arg) => $"{value}:{arg}");
         
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("hello", helperName, "world");
+        var result = Helpers.TemplateHelpers.Apply("hello", helperName, "world");
 
         // Assert
         result.Should().Be("hello:world");
@@ -1094,10 +1094,10 @@ public class WhenUsingTemplateHelpersTest
         var helperName = "testexists_" + Guid.NewGuid().ToString("N")[..8];
         
         // Act
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Register(helperName, (value, _) => value);
+        Helpers.TemplateHelpers.Register(helperName, (value, _) => value);
 
         // Assert
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Exists(helperName).Should().BeTrue();
+        Helpers.TemplateHelpers.Exists(helperName).Should().BeTrue();
     }
 
     [Fact]
@@ -1105,7 +1105,7 @@ public class WhenUsingTemplateHelpersTest
     {
         // Arrange
         var helperName = "testpipe_" + Guid.NewGuid().ToString("N")[..8];
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Register(helperName, (value, _) => value?.ToString()?.ToUpperInvariant() + "!");
+        Helpers.TemplateHelpers.Register(helperName, (value, _) => value?.ToString()?.ToUpperInvariant() + "!");
         
         var template = $"${{Context.Name | {helperName}}}";
         var context = new ToolContext();
@@ -1124,10 +1124,10 @@ public class WhenUsingTemplateHelpersTest
     {
         // Arrange
         var helperName = "testnull_" + Guid.NewGuid().ToString("N")[..8];
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Register(helperName, (value, _) => value == null ? "was null" : "not null");
+        Helpers.TemplateHelpers.Register(helperName, (value, _) => value == null ? "was null" : "not null");
         
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(null, helperName, null);
+        var result = Helpers.TemplateHelpers.Apply(null, helperName, null);
 
         // Assert
         result.Should().Be("was null");
@@ -1138,10 +1138,10 @@ public class WhenUsingTemplateHelpersTest
     {
         // Arrange
         var helperName = "testreturnnull_" + Guid.NewGuid().ToString("N")[..8];
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Register(helperName, (_, _) => null);
+        Helpers.TemplateHelpers.Register(helperName, (_, _) => null);
         
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("input", helperName, null);
+        var result = Helpers.TemplateHelpers.Apply("input", helperName, null);
 
         // Assert
         result.Should().BeNull();
@@ -1152,11 +1152,11 @@ public class WhenUsingTemplateHelpersTest
     {
         // Arrange
         var helperName = "testtype_" + Guid.NewGuid().ToString("N")[..8];
-        global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Register(helperName, (value, _) => 
+        Helpers.TemplateHelpers.Register(helperName, (value, _) => 
             int.TryParse(value?.ToString(), out var num) ? num * 2 : 0);
         
         // Act
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("21", helperName, null);
+        var result = Helpers.TemplateHelpers.Apply("21", helperName, null);
 
         // Assert
         result.Should().Be(42);
@@ -1169,98 +1169,98 @@ public class WhenUsingTemplateHelpersTest
     [Fact]
     public void YesNoShouldReturnNoForNull()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(null, "yesno", null);
+        var result = Helpers.TemplateHelpers.Apply(null, "yesno", null);
         result.Should().Be("No");
     }
 
     [Fact]
     public void YesNoShouldReturnYesForTrue()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(true, "yesno", null);
+        var result = Helpers.TemplateHelpers.Apply(true, "yesno", null);
         result.Should().Be("Yes");
     }
 
     [Fact]
     public void YesNoShouldReturnNoForFalse()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(false, "yesno", null);
+        var result = Helpers.TemplateHelpers.Apply(false, "yesno", null);
         result.Should().Be("No");
     }
 
     [Fact]
     public void YesNoShouldReturnYesForNonZeroInt()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(42, "yesno", null);
+        var result = Helpers.TemplateHelpers.Apply(42, "yesno", null);
         result.Should().Be("Yes");
     }
 
     [Fact]
     public void YesNoShouldReturnNoForZero()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(0, "yesno", null);
+        var result = Helpers.TemplateHelpers.Apply(0, "yesno", null);
         result.Should().Be("No");
     }
 
     [Fact]
     public void YesNoShouldReturnYesForNonEmptyString()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("hello", "yesno", null);
+        var result = Helpers.TemplateHelpers.Apply("hello", "yesno", null);
         result.Should().Be("Yes");
     }
 
     [Fact]
     public void YesNoShouldReturnNoForEmptyString()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("", "yesno", null);
+        var result = Helpers.TemplateHelpers.Apply("", "yesno", null);
         result.Should().Be("No");
     }
 
     [Fact]
     public void YesNoShouldReturnNoForFalseString()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("false", "yesno", null);
+        var result = Helpers.TemplateHelpers.Apply("false", "yesno", null);
         result.Should().Be("No");
     }
 
     [Fact]
     public void YesNoShouldReturnNoForFalseStringCaseInsensitive()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("FALSE", "yesno", null);
+        var result = Helpers.TemplateHelpers.Apply("FALSE", "yesno", null);
         result.Should().Be("No");
     }
 
     [Fact]
     public void YesNoShouldReturnYesForOtherObjects()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(new { Name = "test" }, "yesno", null);
+        var result = Helpers.TemplateHelpers.Apply(new { Name = "test" }, "yesno", null);
         result.Should().Be("Yes");
     }
 
     [Fact]
     public void YesNoShouldUseCustomLabels()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(true, "yesno", "Active,Inactive");
+        var result = Helpers.TemplateHelpers.Apply(true, "yesno", "Active,Inactive");
         result.Should().Be("Active");
     }
 
     [Fact]
     public void YesNoShouldUseCustomNoLabel()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(false, "yesno", "On,Off");
+        var result = Helpers.TemplateHelpers.Apply(false, "yesno", "On,Off");
         result.Should().Be("Off");
     }
 
     [Fact]
     public void YesNoShouldDefaultNoLabelIfOnlyYesProvided()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(false, "yesno", "Active");
+        var result = Helpers.TemplateHelpers.Apply(false, "yesno", "Active");
         result.Should().Be("No");
     }
 
     [Fact]
     public void YesNoShouldReturnYesForNegativeInt()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(-1, "yesno", null);
+        var result = Helpers.TemplateHelpers.Apply(-1, "yesno", null);
         result.Should().Be("Yes");
     }
 
@@ -1271,28 +1271,28 @@ public class WhenUsingTemplateHelpersTest
     [Fact]
     public void IsEmptyShouldReturnTrueForNull()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(null, "ifempty", "empty");
+        var result = Helpers.TemplateHelpers.Apply(null, "ifempty", "empty");
         result.Should().Be("empty");
     }
 
     [Fact]
     public void IsEmptyShouldReturnTrueForEmptyString()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("", "ifempty", "empty");
+        var result = Helpers.TemplateHelpers.Apply("", "ifempty", "empty");
         result.Should().Be("empty");
     }
 
     [Fact]
     public void IsEmptyShouldReturnFalseForNonEmptyString()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply("hello", "ifempty", "empty");
+        var result = Helpers.TemplateHelpers.Apply("hello", "ifempty", "empty");
         result.Should().Be("hello");
     }
 
     [Fact]
     public void IsEmptyShouldReturnTrueForEmptyCollection()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(new List<int>(), "ifempty", "empty");
+        var result = Helpers.TemplateHelpers.Apply(new List<int>(), "ifempty", "empty");
         result.Should().Be("empty");
     }
 
@@ -1300,7 +1300,7 @@ public class WhenUsingTemplateHelpersTest
     public void IsEmptyShouldReturnFalseForNonEmptyCollection()
     {
         var list = new List<int> { 1, 2, 3 };
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(list, "ifempty", "empty");
+        var result = Helpers.TemplateHelpers.Apply(list, "ifempty", "empty");
         result.Should().BeEquivalentTo(list);
     }
 
@@ -1308,7 +1308,7 @@ public class WhenUsingTemplateHelpersTest
     public void IsEmptyShouldReturnTrueForEmptyEnumerable()
     {
         var enumerable = Enumerable.Empty<int>();
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(enumerable, "ifempty", "empty");
+        var result = Helpers.TemplateHelpers.Apply(enumerable, "ifempty", "empty");
         result.Should().Be("empty");
     }
 
@@ -1316,14 +1316,14 @@ public class WhenUsingTemplateHelpersTest
     public void IsEmptyShouldReturnFalseForNonEmptyEnumerable()
     {
         var enumerable = Enumerable.Range(1, 5);
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(enumerable, "ifempty", "empty");
+        var result = Helpers.TemplateHelpers.Apply(enumerable, "ifempty", "empty");
         result.Should().BeEquivalentTo(enumerable);
     }
 
     [Fact]
     public void IsEmptyShouldReturnFalseForNonCollectionObject()
     {
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(42, "ifempty", "empty");
+        var result = Helpers.TemplateHelpers.Apply(42, "ifempty", "empty");
         result.Should().Be(42);
     }
 
@@ -1331,7 +1331,7 @@ public class WhenUsingTemplateHelpersTest
     public void IsEmptyShouldReturnFalseForDateTimeObject()
     {
         var date = DateTime.Now;
-        var result = global::LowlandTech.TinyTools.Helpers.TemplateHelpers.Apply(date, "ifempty", "empty");
+        var result = Helpers.TemplateHelpers.Apply(date, "ifempty", "empty");
         result.Should().Be(date);
     }
 

@@ -10,7 +10,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US04.ServicesAndRe
 [Trait(Spec.SPEC, "3303")]
 [Trait(Spec.SC, "01")]
 [UserStory("04", "Template services inject custom logic")]
-public class WhenUsingTemplateServicesTest : WhenTestingFor<TinyTemplateEngine>
+public class WhenUsingTemplateServicesTest : TinyToolsScenario<TinyTemplateEngine>
 {
     private ToolContext _context = null!;
     private string? _result;
@@ -20,21 +20,27 @@ public class WhenUsingTemplateServicesTest : WhenTestingFor<TinyTemplateEngine>
         return new TinyTemplateEngine();
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         _context = new ToolContext();
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         // When is handled in each test
     }
 
     #region Pluralization/Singularization Tests
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Pluralize Using Humanizer Service")]
     [Fact]
     public void ItShouldPluralizeUsingHumanizerService()
     {
+        ArrangeAndAct();
         // Arrange
         _context.RegisterService("pluralize", input => input?.ToString()?.Pluralize() ?? "");
         _context.Set("EntityName", "customer");
@@ -47,9 +53,12 @@ public class WhenUsingTemplateServicesTest : WhenTestingFor<TinyTemplateEngine>
         _result.Should().Contain("Entities: customers");
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Singularize Using Humanizer Service")]
     [Fact]
     public void ItShouldSingularizeUsingHumanizerService()
     {
+        ArrangeAndAct();
         // Arrange
         _context.RegisterService("singularize", input => input?.ToString()?.Singularize() ?? "");
         _context.Set("CollectionName", "categories");
@@ -62,9 +71,12 @@ public class WhenUsingTemplateServicesTest : WhenTestingFor<TinyTemplateEngine>
         _result.Should().Contain("Entity: category");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Handle Irregular Plurals")]
     [Fact]
     public void ItShouldHandleIrregularPlurals()
     {
+        ArrangeAndAct();
         // Arrange
         _context.RegisterService("pluralize", input => input?.ToString()?.Pluralize() ?? "");
         var template = "${Context.Services('pluralize')('person')}, ${Context.Services('pluralize')('child')}, ${Context.Services('pluralize')('goose')}";
@@ -82,9 +94,12 @@ public class WhenUsingTemplateServicesTest : WhenTestingFor<TinyTemplateEngine>
 
     #region Service Not Found Tests
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Return Error Message When Service Not Found")]
     [Fact]
     public void ItShouldReturnErrorMessageWhenServiceNotFound()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "${Context.Services('nonexistent')('test')}";
 
@@ -99,9 +114,12 @@ public class WhenUsingTemplateServicesTest : WhenTestingFor<TinyTemplateEngine>
 
     #region Calculator Service Tests (using NCalc)
 
+    [Trait(Spec.UAC, "05")]
+    [Then("it Should Calculate Simple Expression")]
     [Fact]
     public void ItShouldCalculateSimpleExpression()
     {
+        ArrangeAndAct();
         // Arrange
         _context.RegisterService("calc", input =>
         {
@@ -117,9 +135,12 @@ public class WhenUsingTemplateServicesTest : WhenTestingFor<TinyTemplateEngine>
         _result.Should().Contain("Result: 4");
     }
 
+    [Trait(Spec.UAC, "06")]
+    [Then("it Should Calculate Tax Example")]
     [Fact]
     public void ItShouldCalculateTaxExample()
     {
+        ArrangeAndAct();
         // Arrange
         _context.RegisterService("calc", input =>
         {
@@ -139,9 +160,12 @@ public class WhenUsingTemplateServicesTest : WhenTestingFor<TinyTemplateEngine>
 
     #region Multiple Services
 
+    [Trait(Spec.UAC, "07")]
+    [Then("it Should Use Multiple Services In Same Template")]
     [Fact]
     public void ItShouldUseMultipleServicesInSameTemplate()
     {
+        ArrangeAndAct();
         // Arrange
         _context.RegisterService("pluralize", input => input?.ToString()?.Pluralize() ?? "");
         _context.RegisterService("calc", input =>
@@ -163,9 +187,12 @@ public class WhenUsingTemplateServicesTest : WhenTestingFor<TinyTemplateEngine>
 
     #region Real-World Example
 
+    [Trait(Spec.UAC, "08")]
+    [Then("it Should Generate Invoice With Services")]
     [Fact]
     public void ItShouldGenerateInvoiceWithServices()
     {
+        ArrangeAndAct();
         // Arrange
         _context.RegisterService("pluralize", input => input?.ToString()?.Pluralize() ?? "");
         _context.RegisterService("calc", input =>

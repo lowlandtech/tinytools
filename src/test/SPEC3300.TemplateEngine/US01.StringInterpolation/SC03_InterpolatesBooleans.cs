@@ -3,7 +3,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "03")]
 [UserStory("01", "String interpolation handles boolean values")]
-public class WhenInterpolatingBooleansTest : WhenTestingFor<string>
+public class WhenInterpolatingBooleansTest : TinyToolsScenario<string>
 {
     private Person _person = null!;
     private string? _result;
@@ -13,6 +13,7 @@ public class WhenInterpolatingBooleansTest : WhenTestingFor<string>
         return "Hello world, married: ${IsMarried}";
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         _person = new Person
@@ -21,14 +22,19 @@ public class WhenInterpolatingBooleansTest : WhenTestingFor<string>
         };
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _result = Sut.Interpolate(_person);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Interpolate Is Married")]
     [Fact]
     public void ItShouldInterpolateIsMarried()
     {
+        ArrangeAndAct();
         _result.Should().Be("Hello world, married: True");
     }
 }

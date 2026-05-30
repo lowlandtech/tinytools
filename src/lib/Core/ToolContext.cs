@@ -1,6 +1,4 @@
-﻿using LowlandTech.TinyTools.Registry;
-
-namespace LowlandTech.TinyTools.Core;
+﻿namespace LowlandTech.TinyTools.Core;
 
 /// <summary>
 /// Runtime context for pipeline execution.

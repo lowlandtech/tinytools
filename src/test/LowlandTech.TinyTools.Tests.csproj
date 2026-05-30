@@ -22,6 +22,7 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<ProjectReference Include="..\lib\LowlandTech.TinyTools.csproj" />
+		<ProjectReference Include="..\infrastructure\LowlandTech.TinyTools.Tests.Infrastructure.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

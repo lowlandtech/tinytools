@@ -3,7 +3,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "05")]
 [UserStory("03", "Real-world scenarios generate practical output")]
-public class WhenRenderingNewsletterTest : WhenTestingFor<TinyTemplateEngine>
+public class WhenRenderingNewsletterTest : TinyToolsScenario<TinyTemplateEngine>
 {
     private ToolContext _context = null!;
     private string _template = null!;
@@ -14,6 +14,7 @@ public class WhenRenderingNewsletterTest : WhenTestingFor<TinyTemplateEngine>
         return new TinyTemplateEngine();
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         _context = new ToolContext();
@@ -55,42 +56,59 @@ public class WhenRenderingNewsletterTest : WhenTestingFor<TinyTemplateEngine>
             """;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _result = Sut.Render(_template, _context);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Render Newsletter Header")]
     [Fact]
     public void ItShouldRenderNewsletterHeader()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Tech Weekly Digest - Issue #42");
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Render Subscriber Greeting")]
     [Fact]
     public void ItShouldRenderSubscriberGreeting()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Hello Alex!");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Render All Articles")]
     [Fact]
     public void ItShouldRenderAllArticles()
     {
+        ArrangeAndAct();
         _result.Should().Contain("AI Breakthroughs in 2024");
         _result.Should().Contain("Cloud Computing Trends");
         _result.Should().Contain("Cybersecurity Best Practices");
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Render Article Authors")]
     [Fact]
     public void ItShouldRenderArticleAuthors()
     {
+        ArrangeAndAct();
         _result.Should().Contain("By: Dr. Smith");
         _result.Should().Contain("By: Jane Miller");
         _result.Should().Contain("By: Bob Wilson");
     }
 
+    [Trait(Spec.UAC, "05")]
+    [Then("it Should Include Special Offer")]
     [Fact]
     public void ItShouldIncludeSpecialOffer()
     {
+        ArrangeAndAct();
         _result.Should().Contain("? SPECIAL OFFER ?");
         _result.Should().Contain("Get 50% off our annual subscription!");
     }

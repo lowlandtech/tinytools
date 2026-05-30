@@ -6,7 +6,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3302.Validation.US01.Validation;
 [Trait(Spec.SPEC, "3302")]
 [Trait(Spec.SC, "03")]
 [UserStory("01", "Template validation checks all templates in registry")]
-public class WhenCreatingValidationResults : WhenTestingFor<TemplateResult>
+public class WhenCreatingValidationResults : TinyToolsScenario<TemplateResult>
 {
     private TemplateResult? _templateResult;
 
@@ -20,14 +20,18 @@ public class WhenCreatingValidationResults : WhenTestingFor<TemplateResult>
         };
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         _templateResult = Sut;
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Create Success Result")]
     [Fact]
     public void ItShouldCreateSuccessResult()
     {
+        ArrangeAndAct();
         var result = TemplateValidationResult.Success(_templateResult!);
         
         result.IsValid.Should().BeTrue();
@@ -36,9 +40,12 @@ public class WhenCreatingValidationResults : WhenTestingFor<TemplateResult>
         result.Differences.Should().BeNullOrEmpty();
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Create Failure Result")]
     [Fact]
     public void ItShouldCreateFailureResult()
     {
+        ArrangeAndAct();
         var result = TemplateValidationResult.Failure("Test error");
         
         result.IsValid.Should().BeFalse();
@@ -46,9 +53,12 @@ public class WhenCreatingValidationResults : WhenTestingFor<TemplateResult>
         result.ActualResult.Should().BeNull();
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Create Failure Result With Actual")]
     [Fact]
     public void ItShouldCreateFailureResultWithActual()
     {
+        ArrangeAndAct();
         var result = TemplateValidationResult.Failure("Test error", _templateResult);
         
         result.IsValid.Should().BeFalse();
@@ -56,9 +66,12 @@ public class WhenCreatingValidationResults : WhenTestingFor<TemplateResult>
         result.ActualResult.Should().BeSameAs(_templateResult);
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Create Mismatch Result")]
     [Fact]
     public void ItShouldCreateMismatchResult()
     {
+        ArrangeAndAct();
         var differences = new Dictionary<string, (string Expected, string Actual)>
         {
             ["Content"] = ("Expected", "Actual"),

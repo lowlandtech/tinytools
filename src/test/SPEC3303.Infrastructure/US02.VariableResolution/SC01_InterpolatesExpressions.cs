@@ -7,7 +7,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US02.VariableResol
 [Trait(Spec.SPEC, "3303")]
 [Trait(Spec.SC, "01")]
 [UserStory("02", "Variable resolver interpolates template expressions")]
-public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
+public class WhenUsingVariableResolverTest : TinyToolsScenario<VariableResolver>
 {
     private ToolContext _context = null!;
 
@@ -16,21 +16,27 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         return new VariableResolver();
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         _context = new ToolContext();
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         // When is handled in each test
     }
 
     #region ResolveString Tests
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Resolve Simple Variable")]
     [Fact]
     public void ItShouldResolveSimpleVariable()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "John");
         var input = "Hello, ${Context.Name}!";
@@ -42,9 +48,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("Hello, John!");
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Handle Null Input")]
     [Fact]
     public void ItShouldHandleNullInput()
     {
+        ArrangeAndAct();
         // Arrange
         string? input = null;
 
@@ -55,9 +64,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().BeNull();
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Handle Empty Input")]
     [Fact]
     public void ItShouldHandleEmptyInput()
     {
+        ArrangeAndAct();
         // Arrange
         var input = "";
 
@@ -68,9 +80,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("");
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Resolve Multiple Variables")]
     [Fact]
     public void ItShouldResolveMultipleVariables()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("FirstName", "John");
         _context.Set("LastName", "Doe");
@@ -83,9 +98,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("John Doe");
     }
 
+    [Trait(Spec.UAC, "05")]
+    [Then("it Should Resolve Nested Properties")]
     [Fact]
     public void ItShouldResolveNestedProperties()
     {
+        ArrangeAndAct();
         // Arrange
         var person = new { Name = "John", Address = new { City = "Seattle" } };
         _context.Set("Person", person);
@@ -102,9 +120,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
 
     #region Null Coalescing Tests
 
+    [Trait(Spec.UAC, "06")]
+    [Then("it Should Handle Null Coalescing With Null Value")]
     [Fact]
     public void ItShouldHandleNullCoalescingWithNullValue()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", null);
         var input = "${Context.Name ?? \"Default\"}";
@@ -116,9 +137,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("Default");
     }
 
+    [Trait(Spec.UAC, "07")]
+    [Then("it Should Handle Null Coalescing With Empty String")]
     [Fact]
     public void ItShouldHandleNullCoalescingWithEmptyString()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "");
         var input = "${Context.Name ?? \"Default\"}";
@@ -130,9 +154,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("Default");
     }
 
+    [Trait(Spec.UAC, "08")]
+    [Then("it Should Handle Null Coalescing With Value")]
     [Fact]
     public void ItShouldHandleNullCoalescingWithValue()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "John");
         var input = "${Context.Name ?? \"Default\"}";
@@ -144,9 +171,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("John");
     }
 
+    [Trait(Spec.UAC, "09")]
+    [Then("it Should Handle Null Coalescing With Single Quotes")]
     [Fact]
     public void ItShouldHandleNullCoalescingWithSingleQuotes()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", null);
         var input = "${Context.Name ?? 'Default'}";
@@ -158,9 +188,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("Default");
     }
 
+    [Trait(Spec.UAC, "10")]
+    [Then("it Should Handle Null Coalescing Without Quotes")]
     [Fact]
     public void ItShouldHandleNullCoalescingWithoutQuotes()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", null);
         var input = "${Context.Name ?? Default}";
@@ -176,9 +209,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
 
     #region Pipe Helper Tests
 
+    [Trait(Spec.UAC, "11")]
+    [Then("it Should Apply Single Pipe Helper")]
     [Fact]
     public void ItShouldApplySinglePipeHelper()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "john");
         var input = "${Context.Name | upper}";
@@ -190,9 +226,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("JOHN");
     }
 
+    [Trait(Spec.UAC, "12")]
+    [Then("it Should Apply Multiple Pipe Helpers")]
     [Fact]
     public void ItShouldApplyMultiplePipeHelpers()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Text", "  hello world  ");
         var input = "${Context.Text | trim | upper}";
@@ -204,9 +243,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("HELLO WORLD");
     }
 
+    [Trait(Spec.UAC, "13")]
+    [Then("it Should Apply Pipe Helper With Argument")]
     [Fact]
     public void ItShouldApplyPipeHelperWithArgument()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Text", "Hello World");
         var input = "${Context.Text | truncate:5}";
@@ -222,9 +264,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
 
     #region Context.Get() Syntax Tests
 
+    [Trait(Spec.UAC, "14")]
+    [Then("it Should Resolve Context Get With Double Quotes")]
     [Fact]
     public void ItShouldResolveContextGetWithDoubleQuotes()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("UserName", "John");
         var input = "${Context.Get(\"UserName\")}";
@@ -236,9 +281,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("John");
     }
 
+    [Trait(Spec.UAC, "15")]
+    [Then("it Should Resolve Context Get With Single Quotes")]
     [Fact]
     public void ItShouldResolveContextGetWithSingleQuotes()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("UserName", "Jane");
         var input = "${Context.Get('UserName')}";
@@ -254,9 +302,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
 
     #region Dictionary Property Access Tests
 
+    [Trait(Spec.UAC, "16")]
+    [Then("it Should Access String Dictionary Property")]
     [Fact]
     public void ItShouldAccessStringDictionaryProperty()
     {
+        ArrangeAndAct();
         // Arrange
         var dict = new Dictionary<string, object?> { ["Name"] = "John", ["Age"] = 30 };
         _context.Set("Data", dict);
@@ -269,9 +320,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("John");
     }
 
+    [Trait(Spec.UAC, "17")]
+    [Then("it Should Access Object Dictionary Property")]
     [Fact]
     public void ItShouldAccessObjectDictionaryProperty()
     {
+        ArrangeAndAct();
         // Arrange
         var dict = new Dictionary<object, object?> { ["City"] = "Seattle" };
         _context.Set("Data", dict);
@@ -288,9 +342,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
 
     #region ResolveExpression Tests
 
+    [Trait(Spec.UAC, "18")]
+    [Then("it Should Resolve Expression With Context Prefix")]
     [Fact]
     public void ItShouldResolveExpressionWithContextPrefix()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "John");
 
@@ -301,9 +358,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("John");
     }
 
+    [Trait(Spec.UAC, "19")]
+    [Then("it Should Resolve Expression Without Context Prefix")]
     [Fact]
     public void ItShouldResolveExpressionWithoutContextPrefix()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "Jane");
 
@@ -314,9 +374,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("Jane");
     }
 
+    [Trait(Spec.UAC, "20")]
+    [Then("it Should Resolve Nested Property Expression")]
     [Fact]
     public void ItShouldResolveNestedPropertyExpression()
     {
+        ArrangeAndAct();
         // Arrange
         var person = new { Name = "John", Details = new { Age = 30 } };
         _context.Set("Person", person);
@@ -328,9 +391,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be(30);
     }
 
+    [Trait(Spec.UAC, "21")]
+    [Then("it Should Return Null For Non Existent Expression")]
     [Fact]
     public void ItShouldReturnNullForNonExistentExpression()
     {
+        ArrangeAndAct();
         // Arrange
         // No variable set
 
@@ -341,9 +407,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().BeNull();
     }
 
+    [Trait(Spec.UAC, "22")]
+    [Then("it Should Resolve Complex Object")]
     [Fact]
     public void ItShouldResolveComplexObject()
     {
+        ArrangeAndAct();
         // Arrange
         var customer = new 
         { 
@@ -363,9 +432,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
 
     #region ResolveInputs Tests
 
+    [Trait(Spec.UAC, "23")]
+    [Then("it Should Resolve Inputs Dictionary")]
     [Fact]
     public void ItShouldResolveInputsDictionary()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "John");
         _context.Set("Age", 30);
@@ -384,9 +456,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result["Info"].Should().Be("Age: 30");
     }
 
+    [Trait(Spec.UAC, "24")]
+    [Then("it Should Resolve Empty Inputs Dictionary")]
     [Fact]
     public void ItShouldResolveEmptyInputsDictionary()
     {
+        ArrangeAndAct();
         // Arrange
         var inputs = new Dictionary<string, object?>();
 
@@ -397,9 +472,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().BeEmpty();
     }
 
+    [Trait(Spec.UAC, "25")]
+    [Then("it Should Handle Mixed Input Types")]
     [Fact]
     public void ItShouldHandleMixedInputTypes()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "John");
         
@@ -423,9 +501,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
 
     #region ResolveValue Tests
 
+    [Trait(Spec.UAC, "26")]
+    [Then("it Should Resolve Null Value")]
     [Fact]
     public void ItShouldResolveNullValue()
     {
+        ArrangeAndAct();
         // Arrange
         object? value = null;
 
@@ -436,9 +517,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().BeNull();
     }
 
+    [Trait(Spec.UAC, "27")]
+    [Then("it Should Resolve String With Variable")]
     [Fact]
     public void ItShouldResolveStringWithVariable()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "John");
         var value = "Hello, ${Context.Name}!";
@@ -450,9 +534,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("Hello, John!");
     }
 
+    [Trait(Spec.UAC, "28")]
+    [Then("it Should Resolve String With Single Expression")]
     [Fact]
     public void ItShouldResolveStringWithSingleExpression()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "John");
         var value = "${Context.Name}";
@@ -464,9 +551,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("John");
     }
 
+    [Trait(Spec.UAC, "29")]
+    [Then("it Should Resolve Plain String")]
     [Fact]
     public void ItShouldResolvePlainString()
     {
+        ArrangeAndAct();
         // Arrange
         var value = "Plain text";
 
@@ -477,9 +567,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("Plain text");
     }
 
+    [Trait(Spec.UAC, "30")]
+    [Then("it Should Resolve List Of Values")]
     [Fact]
     public void ItShouldResolveListOfValues()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Prefix", "Mr.");
         var list = new List<object> 
@@ -500,9 +593,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result[2].Should().Be(42);
     }
 
+    [Trait(Spec.UAC, "31")]
+    [Then("it Should Resolve Nested Dictionary")]
     [Fact]
     public void ItShouldResolveNestedDictionary()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "John");
         var dict = new Dictionary<string, object?>
@@ -518,9 +614,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result!["Greeting"].Should().Be("John");
     }
 
+    [Trait(Spec.UAC, "32")]
+    [Then("it Should Resolve Object Dictionary")]
     [Fact]
     public void ItShouldResolveObjectDictionary()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Value", "Test");
         var dict = new Dictionary<object, object?>
@@ -536,9 +635,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result!["Key"].Should().Be("Test");
     }
 
+    [Trait(Spec.UAC, "33")]
+    [Then("it Should Pass Through Other Types")]
     [Fact]
     public void ItShouldPassThroughOtherTypes()
     {
+        ArrangeAndAct();
         // Arrange
         var value = 42;
 
@@ -553,9 +655,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
 
     #region Edge Cases and Error Handling
 
+    [Trait(Spec.UAC, "34")]
+    [Then("it Should Handle Null Property Access")]
     [Fact]
     public void ItShouldHandleNullPropertyAccess()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Object", null);
         var input = "${Context.Object.Property}";
@@ -567,9 +672,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("");
     }
 
+    [Trait(Spec.UAC, "35")]
+    [Then("it Should Handle Missing Property")]
     [Fact]
     public void ItShouldHandleMissingProperty()
     {
+        ArrangeAndAct();
         // Arrange
         var obj = new { Name = "John" };
         _context.Set("Object", obj);
@@ -582,9 +690,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("");
     }
 
+    [Trait(Spec.UAC, "36")]
+    [Then("it Should Not Replace Empty Expression")]
     [Fact]
     public void ItShouldNotReplaceEmptyExpression()
     {
+        ArrangeAndAct();
         // Arrange
         var input = "${}";
 
@@ -595,9 +706,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("${}");
     }
 
+    [Trait(Spec.UAC, "37")]
+    [Then("it Should Handle Case Insensitive Property Access")]
     [Fact]
     public void ItShouldHandleCaseInsensitivePropertyAccess()
     {
+        ArrangeAndAct();
         // Arrange
         var obj = new { Name = "John" };
         _context.Set("Object", obj);
@@ -610,9 +724,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("John");
     }
 
+    [Trait(Spec.UAC, "38")]
+    [Then("it Should Handle Field Access")]
     [Fact]
     public void ItShouldHandleFieldAccess()
     {
+        ArrangeAndAct();
         // Arrange
         var obj = new TestClassWithField { PublicField = "FieldValue" };
         _context.Set("Object", obj);
@@ -625,9 +742,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("FieldValue");
     }
 
+    [Trait(Spec.UAC, "39")]
+    [Then("it Should Handle Complex Nested Path")]
     [Fact]
     public void ItShouldHandleComplexNestedPath()
     {
+        ArrangeAndAct();
         // Arrange
         var root = new 
         { 
@@ -652,9 +772,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("DeepValue");
     }
 
+    [Trait(Spec.UAC, "40")]
+    [Then("it Should Handle Numeric Values")]
     [Fact]
     public void ItShouldHandleNumericValues()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Count", 42);
         _context.Set("Price", 19.99);
@@ -669,9 +792,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Contain("19");
     }
 
+    [Trait(Spec.UAC, "41")]
+    [Then("it Should Handle Boolean Values")]
     [Fact]
     public void ItShouldHandleBooleanValues()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IsActive", true);
         _context.Set("IsDeleted", false);
@@ -688,9 +814,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
 
     #region Integration Tests
 
+    [Trait(Spec.UAC, "42")]
+    [Then("it Should Handle Complex Scenario With All Features")]
     [Fact]
     public void ItShouldHandleComplexScenarioWithAllFeatures()
     {
+        ArrangeAndAct();
         // Arrange
         var customer = new 
         { 
@@ -719,9 +848,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
 
     #region Additional Edge Cases
 
+    [Trait(Spec.UAC, "43")]
+    [Then("it Should Handle Null Coalescing Combined With Pipe Helpers")]
     [Fact]
     public void ItShouldHandleNullCoalescingCombinedWithPipeHelpers()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", null);
         // When ?? and | are both present, pipes take precedence
@@ -734,9 +866,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("");
     }
 
+    [Trait(Spec.UAC, "44")]
+    [Then("it Should Handle Delegate Invocation Failure Gracefully")]
     [Fact]
     public void ItShouldHandleDelegateInvocationFailureGracefully()
     {
+        ArrangeAndAct();
         // Arrange
         // Register a service that will throw when invoked with wrong type
         _context.RegisterService("test", input => 
@@ -754,9 +889,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("");
     }
 
+    [Trait(Spec.UAC, "45")]
+    [Then("it Should Handle Multiple Properties After Method Call")]
     [Fact]
     public void ItShouldHandleMultiplePropertiesAfterMethodCall()
     {
+        ArrangeAndAct();
         // Arrange
         var service = new TestServiceReturningNestedObject();
         _context.RegisterService("getNested", input => service.GetNestedObject());
@@ -772,9 +910,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("DeepValue");
     }
 
+    [Trait(Spec.UAC, "46")]
+    [Then("it Should Invoke Delegate Property When Method Not Found")]
     [Fact]
     public void ItShouldInvokeDelegatePropertyWhenMethodNotFound()
     {
+        ArrangeAndAct();
         // Arrange
         var obj = new TestClassWithDelegateProperty();
         _context.Set("Object", obj);
@@ -790,9 +931,12 @@ public class WhenUsingVariableResolverTest : WhenTestingFor<VariableResolver>
         result.Should().Be("Delegate called with: test");
     }
 
+    [Trait(Spec.UAC, "47")]
+    [Then("it Should Access Property Value Through Reflection")]
     [Fact]
     public void ItShouldAccessPropertyValueThroughReflection()
     {
+        ArrangeAndAct();
         // Arrange
         var obj = new TestClassWithProperties 
         { 

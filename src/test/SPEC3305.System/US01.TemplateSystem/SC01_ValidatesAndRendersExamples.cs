@@ -1,6 +1,5 @@
 using Xunit;
 using LowlandTech.TinyTools;
-using LowlandTech.TinyTools.Tests.Shared.Examples;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3305.System.US01.TemplateSystem;
 

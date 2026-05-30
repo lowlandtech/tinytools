@@ -1,5 +1,3 @@
-using LowlandTech.TinyTools.Tests.Shared.Examples;
-
 namespace LowlandTech.TinyTools.Tests.SPEC3301.Registry.US03.BatchRendering;
 
 /// <summary>
@@ -8,7 +6,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3301.Registry.US03.BatchRendering;
 [Trait(Spec.SPEC, "3301")]
 [Trait(Spec.SC, "01")]
 [UserStory("03", "Template registry renders batches of templates")]
-public class WhenRenderingBatchOfTemplates : WhenTestingFor<TemplateRegistry>
+public class WhenRenderingBatchOfTemplates : TinyToolsScenario<TemplateRegistry>
 {
     private Dictionary<string, TemplateResult>? _results;
 
@@ -20,8 +18,10 @@ public class WhenRenderingBatchOfTemplates : WhenTestingFor<TemplateRegistry>
         return registry;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         var batch = new Dictionary<string, object>
         {
             ["component"] = new ComponentData 
@@ -44,45 +44,66 @@ public class WhenRenderingBatchOfTemplates : WhenTestingFor<TemplateRegistry>
         _results = Sut.RenderBatch(batch);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Return Results For All Templates")]
     [Fact]
     public void ItShouldReturnResultsForAllTemplates()
     {
+        ArrangeAndAct();
         _results.Should().HaveCount(2);
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Contain Component Result")]
     [Fact]
     public void ItShouldContainComponentResult()
     {
+        ArrangeAndAct();
         _results.Should().ContainKey("component");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Contain Class Result")]
     [Fact]
     public void ItShouldContainClassResult()
     {
+        ArrangeAndAct();
         _results.Should().ContainKey("class");
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Render Component Content")]
     [Fact]
     public void ItShouldRenderComponentContent()
     {
+        ArrangeAndAct();
         _results!["component"].Content.Should().Contain("Button");
     }
 
+    [Trait(Spec.UAC, "05")]
+    [Then("it Should Render Class Content")]
     [Fact]
     public void ItShouldRenderClassContent()
     {
+        ArrangeAndAct();
         _results!["class"].Content.Should().Contain("User");
     }
 
+    [Trait(Spec.UAC, "06")]
+    [Then("it Should Generate Component Path")]
     [Fact]
     public void ItShouldGenerateComponentPath()
     {
+        ArrangeAndAct();
         _results!["component"].Path.Should().Contain("Button");
     }
 
+    [Trait(Spec.UAC, "07")]
+    [Then("it Should Generate Class Path")]
     [Fact]
     public void ItShouldGenerateClassPath()
     {
+        ArrangeAndAct();
         _results!["class"].Path.Should().Contain("User");
     }
 }
@@ -93,7 +114,7 @@ public class WhenRenderingBatchOfTemplates : WhenTestingFor<TemplateRegistry>
 [Trait(Spec.SPEC, "3301")]
 [Trait(Spec.SC, "01")]
 [UserStory("03", "Template registry renders batches of templates")]
-public class WhenRenderingBatchWithMissingTemplates : WhenTestingFor<TemplateRegistry>
+public class WhenRenderingBatchWithMissingTemplates : TinyToolsScenario<TemplateRegistry>
 {
     private Dictionary<string, TemplateResult>? _results;
 
@@ -105,8 +126,10 @@ public class WhenRenderingBatchWithMissingTemplates : WhenTestingFor<TemplateReg
         return registry;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         var batch = new Dictionary<string, object>
         {
             ["component"] = new ComponentData 
@@ -121,27 +144,39 @@ public class WhenRenderingBatchWithMissingTemplates : WhenTestingFor<TemplateReg
         _results = Sut.RenderBatch(batch);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Only Return Results For Registered Templates")]
     [Fact]
     public void ItShouldOnlyReturnResultsForRegisteredTemplates()
     {
+        ArrangeAndAct();
         _results.Should().HaveCount(1);
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Contain Result For Existing Template")]
     [Fact]
     public void ItShouldContainResultForExistingTemplate()
     {
+        ArrangeAndAct();
         _results.Should().ContainKey("component");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Not Contain Result For Missing Template")]
     [Fact]
     public void ItShouldNotContainResultForMissingTemplate()
     {
+        ArrangeAndAct();
         _results.Should().NotContainKey("missing");
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Render Existing Template Correctly")]
     [Fact]
     public void ItShouldRenderExistingTemplateCorrectly()
     {
+        ArrangeAndAct();
         _results!["component"].Content.Should().Contain("Card");
     }
 }
@@ -152,7 +187,7 @@ public class WhenRenderingBatchWithMissingTemplates : WhenTestingFor<TemplateReg
 [Trait(Spec.SPEC, "3301")]
 [Trait(Spec.SC, "01")]
 [UserStory("03", "Template registry renders batches of templates")]
-public class WhenRenderingEmptyBatch : WhenTestingFor<TemplateRegistry>
+public class WhenRenderingEmptyBatch : TinyToolsScenario<TemplateRegistry>
 {
     private Dictionary<string, TemplateResult>? _results;
 
@@ -163,21 +198,29 @@ public class WhenRenderingEmptyBatch : WhenTestingFor<TemplateRegistry>
         return registry;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         var batch = new Dictionary<string, object>();
         _results = Sut.RenderBatch(batch);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Return Empty Results")]
     [Fact]
     public void ItShouldReturnEmptyResults()
     {
+        ArrangeAndAct();
         _results.Should().BeEmpty();
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Not Be Null")]
     [Fact]
     public void ItShouldNotBeNull()
     {
+        ArrangeAndAct();
         _results.Should().NotBeNull();
     }
 }
@@ -188,7 +231,7 @@ public class WhenRenderingEmptyBatch : WhenTestingFor<TemplateRegistry>
 [Trait(Spec.SPEC, "3301")]
 [Trait(Spec.SC, "01")]
 [UserStory("03", "Template registry renders batches of templates")]
-public class WhenRenderingSingleTemplateBatch : WhenTestingFor<TemplateRegistry>
+public class WhenRenderingSingleTemplateBatch : TinyToolsScenario<TemplateRegistry>
 {
     private Dictionary<string, TemplateResult>? _results;
 
@@ -199,8 +242,10 @@ public class WhenRenderingSingleTemplateBatch : WhenTestingFor<TemplateRegistry>
         return registry;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         var batch = new Dictionary<string, object>
         {
             ["class"] = new ClassData
@@ -218,22 +263,31 @@ public class WhenRenderingSingleTemplateBatch : WhenTestingFor<TemplateRegistry>
         _results = Sut.RenderBatch(batch);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Return Single Result")]
     [Fact]
     public void ItShouldReturnSingleResult()
     {
+        ArrangeAndAct();
         _results.Should().HaveCount(1);
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Render Class With Properties")]
     [Fact]
     public void ItShouldRenderClassWithProperties()
     {
+        ArrangeAndAct();
         _results!["class"].Content.Should().Contain("OrderService");
         _results!["class"].Content.Should().Contain("int Id");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Have Correct Namespace")]
     [Fact]
     public void ItShouldHaveCorrectNamespace()
     {
+        ArrangeAndAct();
         _results!["class"].Namespace.Should().Be("MyApp.Services");
     }
 }
@@ -244,7 +298,7 @@ public class WhenRenderingSingleTemplateBatch : WhenTestingFor<TemplateRegistry>
 [Trait(Spec.SPEC, "3301")]
 [Trait(Spec.SC, "01")]
 [UserStory("03", "Template registry renders batches of templates")]
-public class WhenRenderingMultipleInstancesOfSameTemplate : WhenTestingFor<TemplateRegistry>
+public class WhenRenderingMultipleInstancesOfSameTemplate : TinyToolsScenario<TemplateRegistry>
 {
     private Dictionary<string, TemplateResult>? _results;
 
@@ -255,8 +309,10 @@ public class WhenRenderingMultipleInstancesOfSameTemplate : WhenTestingFor<Templ
         return registry;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         // RenderBatch uses template names as keys, so we can only have one result per template name
         var batch = new Dictionary<string, object>
         {
@@ -271,15 +327,21 @@ public class WhenRenderingMultipleInstancesOfSameTemplate : WhenTestingFor<Templ
         _results = Sut.RenderBatch(batch);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Render The Template")]
     [Fact]
     public void ItShouldRenderTheTemplate()
     {
+        ArrangeAndAct();
         _results.Should().HaveCount(1);
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Contain Correct Content")]
     [Fact]
     public void ItShouldContainCorrectContent()
     {
+        ArrangeAndAct();
         _results!["component"].Content.Should().Contain("LastButton");
     }
 }

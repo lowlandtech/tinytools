@@ -6,7 +6,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "10")]
 [UserStory("01", "String interpolation uses execution context")]
-public class WhenInterpolatingWithContextTest : WhenTestingFor<string>
+public class WhenInterpolatingWithContextTest : TinyToolsScenario<string>
 {
     private ToolContext _context = null!;
     private string? _result;
@@ -16,6 +16,7 @@ public class WhenInterpolatingWithContextTest : WhenTestingFor<string>
         return "Hello world, I'm ${Context.FirstName} ${Context.LastName}";
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         _context = new ToolContext();
@@ -23,20 +24,28 @@ public class WhenInterpolatingWithContextTest : WhenTestingFor<string>
         _context.Set("LastName", "Smith");
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _result = Sut.Interpolate(_context);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Interpolate First And Last Name")]
     [Fact]
     public void ItShouldInterpolateFirstAndLastName()
     {
+        ArrangeAndAct();
         _result.Should().Be("Hello world, I'm John Smith");
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Interpolate With Custom Engine")]
     [Fact]
     public void ItShouldInterpolateWithCustomEngine()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "Hello ${Context.Name}";
         var context = new ToolContext();
@@ -50,9 +59,12 @@ public class WhenInterpolatingWithContextTest : WhenTestingFor<string>
         result.Should().Be("Hello Jane");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Interpolate Model From Context")]
     [Fact]
     public void ItShouldInterpolateModelFromContext()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "Hello ${Context.Model.FirstName}";
         var context = new ToolContext { Model = new Person { FirstName = "John" } };
@@ -64,9 +76,12 @@ public class WhenInterpolatingWithContextTest : WhenTestingFor<string>
         result.Should().Be("Hello John");
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Interpolate Nested Context Values")]
     [Fact]
     public void ItShouldInterpolateNestedContextValues()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "City: ${Context.Address.City}";
         var context = new ToolContext();
@@ -79,9 +94,12 @@ public class WhenInterpolatingWithContextTest : WhenTestingFor<string>
         result.Should().Be("City: Seattle");
     }
 
+    [Trait(Spec.UAC, "05")]
+    [Then("it Should Support If Control Flow")]
     [Fact]
     public void ItShouldSupportIfControlFlow()
     {
+        ArrangeAndAct();
         // Arrange
         var template = @"@if (Context.IsActive) {
 Active User
@@ -96,9 +114,12 @@ Active User
         result.Should().Contain("Active User");
     }
 
+    [Trait(Spec.UAC, "06")]
+    [Then("it Should Support Foreach Control Flow")]
     [Fact]
     public void ItShouldSupportForeachControlFlow()
     {
+        ArrangeAndAct();
         // Arrange
         var template = @"@foreach (var item in Context.Items) {
 - ${item}
@@ -115,9 +136,12 @@ Active User
         result.Should().Contain("Cherry");
     }
 
+    [Trait(Spec.UAC, "07")]
+    [Then("it Should Throw On Null Template")]
     [Fact]
     public void ItShouldThrowOnNullTemplate()
     {
+        ArrangeAndAct();
         // Arrange
         string template = null!;
 
@@ -128,9 +152,12 @@ Active User
         act.Should().Throw<ArgumentException>();
     }
 
+    [Trait(Spec.UAC, "08")]
+    [Then("it Should Throw On Empty Template")]
     [Fact]
     public void ItShouldThrowOnEmptyTemplate()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "";
 
@@ -141,9 +168,12 @@ Active User
         act.Should().Throw<ArgumentException>();
     }
 
+    [Trait(Spec.UAC, "09")]
+    [Then("it Should Throw On Null Context")]
     [Fact]
     public void ItShouldThrowOnNullContext()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "Hello ${Context.Name}";
         ToolContext context = null!;
@@ -155,9 +185,12 @@ Active User
         act.Should().Throw<ArgumentNullException>();
     }
 
+    [Trait(Spec.UAC, "10")]
+    [Then("it Should Handle Multiple Variables")]
     [Fact]
     public void ItShouldHandleMultipleVariables()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "${Context.A} + ${Context.B} = ${Context.C}";
         var context = new ToolContext();
@@ -172,9 +205,12 @@ Active User
         result.Should().Be("1 + 2 = 3");
     }
 
+    [Trait(Spec.UAC, "11")]
+    [Then("it Should Handle Integer Values")]
     [Fact]
     public void ItShouldHandleIntegerValues()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "Count: ${Context.Count}";
         var context = new ToolContext();
@@ -187,9 +223,12 @@ Active User
         result.Should().Be("Count: 42");
     }
 
+    [Trait(Spec.UAC, "12")]
+    [Then("it Should Preserve Non Interpolated Text")]
     [Fact]
     public void ItShouldPreserveNonInterpolatedText()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "Hello world! ${Context.Name} says hi.";
         var context = new ToolContext();
@@ -202,9 +241,12 @@ Active User
         result.Should().Be("Hello world! John says hi.");
     }
 
+    [Trait(Spec.UAC, "13")]
+    [Then("it Should Handle Template With No Variables")]
     [Fact]
     public void ItShouldHandleTemplateWithNoVariables()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "Hello world!";
 
@@ -215,9 +257,12 @@ Active User
         result.Should().Be("Hello world!");
     }
 
+    [Trait(Spec.UAC, "14")]
+    [Then("it Should Support Null Coalescing")]
     [Fact]
     public void ItShouldSupportNullCoalescing()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "${Context.Missing ?? \"default\"}";
         var context = new ToolContext();
@@ -229,9 +274,12 @@ Active User
         result.Should().Be("default");
     }
 
+    [Trait(Spec.UAC, "15")]
+    [Then("it Should Support Child Context")]
     [Fact]
     public void ItShouldSupportChildContext()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "${Context.ParentValue} - ${Context.ChildValue}";
         var parentContext = new ToolContext();

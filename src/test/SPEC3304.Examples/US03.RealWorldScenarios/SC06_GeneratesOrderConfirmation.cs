@@ -3,7 +3,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "06")]
 [UserStory("03", "Real-world scenarios generate practical output")]
-public class WhenRenderingOrderConfirmationEmailTest : WhenTestingFor<TinyTemplateEngine>
+public class WhenRenderingOrderConfirmationEmailTest : TinyToolsScenario<TinyTemplateEngine>
 {
     private ToolContext _context = null!;
     private string _template = null!;
@@ -14,6 +14,7 @@ public class WhenRenderingOrderConfirmationEmailTest : WhenTestingFor<TinyTempla
         return new TinyTemplateEngine();
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         var customer = new Customer
@@ -62,33 +63,47 @@ public class WhenRenderingOrderConfirmationEmailTest : WhenTestingFor<TinyTempla
             """;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _result = Sut.Render(_template, _context);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Render Customer Name")]
     [Fact]
     public void ItShouldRenderCustomerName()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Hi Jane,");
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Render Order Number")]
     [Fact]
     public void ItShouldRenderOrderNumber()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Order #ORD-2024-001");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Render All Order Items")]
     [Fact]
     public void ItShouldRenderAllOrderItems()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Wireless Mouse (Qty: 2)");
         _result.Should().Contain("USB-C Hub (Qty: 1)");
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Render Order Total")]
     [Fact]
     public void ItShouldRenderOrderTotal()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Total: $149.97");
     }
 }

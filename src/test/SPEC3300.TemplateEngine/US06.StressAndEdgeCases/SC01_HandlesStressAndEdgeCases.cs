@@ -6,7 +6,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US06.StressAndEdge
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "01")]
 [UserStory("06", "Template engine handles stress and edge cases")]
-public class WhenStressingTinyTemplateEngine : WhenTestingFor<TinyTemplateEngine>
+public class WhenStressingTinyTemplateEngine : TinyToolsScenario<TinyTemplateEngine>
 {
     private ToolContext _context = null!;
 
@@ -15,6 +15,7 @@ public class WhenStressingTinyTemplateEngine : WhenTestingFor<TinyTemplateEngine
         return new TinyTemplateEngine();
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         _context = new ToolContext();
@@ -22,9 +23,12 @@ public class WhenStressingTinyTemplateEngine : WhenTestingFor<TinyTemplateEngine
 
     #region Nested Control Flow Tests
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Handle Nested Foreach Inside If")]
     [Fact]
     public void ItShouldHandleNestedForeachInsideIf()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("ShowList", true);
         _context.Set("Items", new[] { "A", "B", "C" });
@@ -49,6 +53,7 @@ List:
     [Fact]
     public void ItShouldHandleNestedIfInsideForeach()
     {
+        ArrangeAndAct();
         // Arrange
         var items = new[]
         {
@@ -76,6 +81,7 @@ Active: ${item.Name}
     [Fact]
     public void ItShouldHandleDeepNestedControlFlow()
     {
+        ArrangeAndAct();
         // Arrange
         var categories = new[]
         {
@@ -117,6 +123,7 @@ Category: ${cat.Name}
     [Fact]
     public void ItShouldHandleEmptyCollection()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Items", Array.Empty<string>());
 
@@ -137,6 +144,7 @@ After";
     [Fact]
     public void ItShouldHandleNullCollectionGracefully()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Items", null);
 
@@ -157,6 +165,7 @@ After";
     [Fact]
     public void ItShouldHandleNullValueInCondition()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Value", null);
 
@@ -174,6 +183,7 @@ Value is null
     [Fact]
     public void ItShouldHandleMissingContextValue()
     {
+        ArrangeAndAct();
         // Arrange - don't set any value
 
         var template = @"Value: ${Context.MissingValue ?? 'default'}";
@@ -192,6 +202,7 @@ Value is null
     [Fact]
     public void ItShouldHandleTernaryWithNullCheck()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "John");
 
@@ -207,6 +218,7 @@ Value is null
     [Fact]
     public void ItShouldHandleTernaryWithNullValue()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", null);
 
@@ -222,6 +234,7 @@ Value is null
     [Fact]
     public void ItShouldHandleTernaryWithStringConcatenation()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("FirstName", "John");
         _context.Set("HasLastName", true);
@@ -239,6 +252,7 @@ Value is null
     [Fact]
     public void ItShouldHandleNestedTernaryLikePattern()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Status", "active");
 
@@ -258,6 +272,7 @@ Value is null
     [Fact]
     public void ItShouldHandleDeeplyNestedProperties()
     {
+        ArrangeAndAct();
         // Arrange
         var data = new
         {
@@ -283,6 +298,7 @@ Value is null
     [Fact]
     public void ItShouldHandlePropertyAccessOnCollectionItems()
     {
+        ArrangeAndAct();
         // Arrange
         var users = new[]
         {
@@ -310,6 +326,7 @@ ${user.Profile.Name}: ${user.Profile.Age}
     [Fact]
     public void ItShouldHandleMultiplePipeHelpers()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "  john doe  ");
 
@@ -325,6 +342,7 @@ ${user.Profile.Name}: ${user.Profile.Age}
     [Fact]
     public void ItShouldHandlePipeHelpersInForeach()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Names", new[] { "alice", "bob", "carol" });
 
@@ -344,6 +362,7 @@ ${name | capitalize}
     [Fact]
     public void ItShouldHandlePipeWithArguments()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Text", "This is a very long text that should be truncated");
 
@@ -363,6 +382,7 @@ ${name | capitalize}
     [Fact]
     public void ItShouldHandleSpecialCharactersInContent()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Code", "if (x > 0 && y < 10) { return true; }");
 
@@ -378,6 +398,7 @@ ${name | capitalize}
     [Fact]
     public void ItShouldHandleBracesInStringValues()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Json", "{ \"key\": \"value\" }");
 
@@ -393,6 +414,7 @@ ${name | capitalize}
     [Fact]
     public void ItShouldHandleDollarSignInValues()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Price", "$99.99");
 
@@ -412,6 +434,7 @@ ${name | capitalize}
     [Fact]
     public void ItShouldRemoveComments()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "World");
 
@@ -429,6 +452,7 @@ ${name | capitalize}
     [Fact]
     public void ItShouldRemoveMultiLineComments()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Value", "Test");
 
@@ -454,6 +478,7 @@ After: ${Context.Value}";
     [Fact]
     public void ItShouldHandleElseIfChain()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Score", 75);
 
@@ -480,6 +505,7 @@ Grade: F
     [Fact]
     public void ItShouldHandleElseBlock()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IsLoggedIn", false);
 
@@ -504,6 +530,7 @@ Please log in.
     [Fact]
     public void ItShouldHandleGreaterThanComparison()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Count", 10);
 
@@ -521,6 +548,7 @@ More than 5
     [Fact]
     public void ItShouldHandleLessThanOrEqualComparison()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Count", 5);
 
@@ -538,6 +566,7 @@ More than 5
     [Fact]
     public void ItShouldHandleStringEquality()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Status", "active");
 
@@ -555,6 +584,7 @@ Is Active
     [Fact]
     public void ItShouldHandleStringInequality()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Status", "inactive");
 
@@ -576,6 +606,7 @@ Not Active
     [Fact]
     public void ItShouldHandleNegation()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IsHidden", false);
 
@@ -593,6 +624,7 @@ Visible
     [Fact]
     public void ItShouldHandleNegationWithParentheses()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IsAdmin", true);
 
@@ -617,6 +649,7 @@ Admin User
     [Fact]
     public void ItShouldHandleLogicalAndBothTrue()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IsLoggedIn", true);
         _context.Set("IsAdmin", true);
@@ -635,6 +668,7 @@ Admin Panel
     [Fact]
     public void ItShouldHandleLogicalAndOneFalse()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IsLoggedIn", true);
         _context.Set("IsAdmin", false);
@@ -656,6 +690,7 @@ Access Denied
     [Fact]
     public void ItShouldHandleLogicalOrOneTrue()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("HasItems", false);
         _context.Set("ShowEmpty", true);
@@ -674,6 +709,7 @@ Show Container
     [Fact]
     public void ItShouldHandleLogicalOrBothFalse()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("HasItems", false);
         _context.Set("ShowEmpty", false);
@@ -695,6 +731,7 @@ Hidden
     [Fact]
     public void ItShouldHandleMixedLogicalOperators()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IsAdmin", true);
         _context.Set("IsModerator", false);
@@ -715,6 +752,7 @@ Has Access
     [Fact]
     public void ItShouldHandleLogicalOperatorsWithComparisons()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Age", 25);
         _context.Set("HasLicense", true);
@@ -733,6 +771,7 @@ Can Drive
     [Fact]
     public void ItShouldHandleLogicalOperatorsWithNegation()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IsBlocked", false);
         _context.Set("IsVerified", true);
@@ -751,6 +790,7 @@ Account Active
     [Fact]
     public void ItShouldHandleParenthesizedLogicalExpressions()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("A", true);
         _context.Set("B", false);
@@ -771,6 +811,7 @@ Result True
     [Fact]
     public void ItShouldHandleMultipleOrConditions()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Status", "pending");
 
@@ -788,6 +829,7 @@ In Progress
     [Fact]
     public void ItShouldShortCircuitLogicalAnd()
     {
+        ArrangeAndAct();
         // Arrange - Only set first value, second would cause error if evaluated
         _context.Set("HasValue", false);
         // Don't set "Value" - if && doesn't short-circuit, accessing Value.Length would fail
@@ -808,6 +850,7 @@ No Value
     [Fact]
     public void ItShouldShortCircuitLogicalOr()
     {
+        ArrangeAndAct();
         // Arrange - Only set first value, second would cause error if evaluated
         _context.Set("HasDefault", true);
         // Don't set "ComputedValue" - if || doesn't short-circuit, it would try to access it
@@ -830,6 +873,7 @@ Has Something
     [Fact]
     public void ItShouldPreserveIndentation()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("ShowCode", true);
 
@@ -850,6 +894,7 @@ Has Something
     [Fact]
     public void ItShouldHandleEmptyLines()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "Test");
 
@@ -875,6 +920,7 @@ Line 5";
     [Fact]
     public void ItShouldHandleMultipleVariablesOnSameLine()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("First", "Hello");
         _context.Set("Second", "World");
@@ -892,6 +938,7 @@ Line 5";
     [Fact]
     public void ItShouldHandleAdjacentVariables()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Prefix", "pre");
         _context.Set("Suffix", "fix");
@@ -912,6 +959,7 @@ Line 5";
     [Fact]
     public void ItShouldHandleBooleanTrue()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Flag", true);
 
@@ -929,6 +977,7 @@ Flag is true
     [Fact]
     public void ItShouldHandleBooleanFalse()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Flag", false);
 
@@ -952,6 +1001,7 @@ Always appears";
     [Fact]
     public void ItShouldHandleCollectionCountCheck()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Items", new[] { "A", "B", "C" });
 
@@ -969,6 +1019,7 @@ Has items
     [Fact]
     public void ItShouldHandleEmptyCollectionAsFalsy()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Items", Array.Empty<string>());
 

@@ -1,4 +1,4 @@
-namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US01.ToolContext;
+namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US01.ExecutionContext;
 
 /// <summary>
 /// Comprehensive tests for ToolContext features.
@@ -7,30 +7,36 @@ namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US01.ToolContext;
 [Trait(Spec.SPEC, "3303")]
 [Trait(Spec.SC, "01")]
 [UserStory("01", "Tool context manages variables and state")]
-public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
+public class WhenUsingToolContextTest : TinyToolsScenario<ToolContext>
 {
-    protected override Core.ToolContext For()
+    protected override ToolContext For()
     {
-        return new Core.ToolContext();
+        return new ToolContext();
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         // Base setup
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         // When is handled in each test
     }
 
     #region Key and Parent Tests
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Allow Setting Key")]
     [Fact]
     public void ItShouldAllowSettingKey()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
 
         // Act
         context.Key = "test-context";
@@ -39,31 +45,40 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         context.Key.Should().Be("test-context");
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Have Null Key By Default")]
     [Fact]
     public void ItShouldHaveNullKeyByDefault()
     {
+        ArrangeAndAct();
         // Arrange & Act
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
 
         // Assert
         context.Key.Should().BeNull();
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Have Null Parent By Default")]
     [Fact]
     public void ItShouldHaveNullParentByDefault()
     {
+        ArrangeAndAct();
         // Arrange & Act
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
 
         // Assert
         context.Parent.Should().BeNull();
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Set Parent When Creating Child")]
     [Fact]
     public void ItShouldSetParentWhenCreatingChild()
     {
+        ArrangeAndAct();
         // Arrange
-        var parent = new Core.ToolContext { Key = "parent" };
+        var parent = new ToolContext { Key = "parent" };
 
         // Act
         var child = parent.CreateChild("child");
@@ -77,11 +92,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
 
     #region Model Property Tests
 
+    [Trait(Spec.UAC, "05")]
+    [Then("it Should Set And Get Model")]
     [Fact]
     public void ItShouldSetAndGetModel()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
         var model = new { Name = "Test", Value = 42 };
 
         // Act
@@ -92,11 +110,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         context.Get("Model").Should().BeSameAs(model);
     }
 
+    [Trait(Spec.UAC, "06")]
+    [Then("it Should Return Null For Model By Default")]
     [Fact]
     public void ItShouldReturnNullForModelByDefault()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
 
         // Act & Assert
         context.Model.Should().BeNull();
@@ -106,11 +127,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
 
     #region OutputPath Property Tests
 
+    [Trait(Spec.UAC, "07")]
+    [Then("it Should Set And Get Output Path")]
     [Fact]
     public void ItShouldSetAndGetOutputPath()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
 
         // Act
         context.OutputPath = @"C:\output\path";
@@ -120,11 +144,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         context.Get("OutputPath").Should().Be(@"C:\output\path");
     }
 
+    [Trait(Spec.UAC, "08")]
+    [Then("it Should Return Null For Output Path By Default")]
     [Fact]
     public void ItShouldReturnNullForOutputPathByDefault()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
 
         // Act & Assert
         context.OutputPath.Should().BeNull();
@@ -134,11 +161,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
 
     #region Cursor Stack Tests
 
+    [Trait(Spec.UAC, "09")]
+    [Then("it Should Push And Pop Cursor")]
     [Fact]
     public void ItShouldPushAndPopCursor()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
         var item = new { Name = "Test" };
 
         // Act
@@ -160,11 +190,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         context.CursorDepth.Should().Be(0);
     }
 
+    [Trait(Spec.UAC, "10")]
+    [Then("it Should Handle Multiple Cursor Pushes")]
     [Fact]
     public void ItShouldHandleMultipleCursorPushes()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
         var item1 = new { Name = "First" };
         var item2 = new { Name = "Second" };
         var item3 = new { Name = "Third" };
@@ -192,11 +225,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         context.Current.Should().BeNull();
     }
 
+    [Trait(Spec.UAC, "11")]
+    [Then("it Should Handle Pop Cursor On Empty Stack")]
     [Fact]
     public void ItShouldHandlePopCursorOnEmptyStack()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
 
         // Act - Pop on empty stack should not throw
         context.PopCursor();
@@ -206,11 +242,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         context.Current.Should().BeNull();
     }
 
+    [Trait(Spec.UAC, "12")]
+    [Then("it Should Update Variables When Cursor Changes")]
     [Fact]
     public void ItShouldUpdateVariablesWhenCursorChanges()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
         var item = new { Value = 100 };
 
         // Act
@@ -222,11 +261,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         context.Get("CurrentKey").Should().Be("mykey");
     }
 
+    [Trait(Spec.UAC, "13")]
+    [Then("it Should Return Negative One For Current Index When No Cursor")]
     [Fact]
     public void ItShouldReturnNegativeOneForCurrentIndexWhenNoCursor()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
 
         // Act & Assert
         context.CurrentIndex.Should().Be(-1);
@@ -236,11 +278,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
 
     #region Variable Tests
 
+    [Trait(Spec.UAC, "14")]
+    [Then("it Should Check If Variable Exists")]
     [Fact]
     public void ItShouldCheckIfVariableExists()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
         context.Set("Existing", "value");
 
         // Act & Assert
@@ -248,11 +293,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         context.Has("NonExisting").Should().BeFalse();
     }
 
+    [Trait(Spec.UAC, "15")]
+    [Then("it Should Return All Variable Keys")]
     [Fact]
     public void ItShouldReturnAllVariableKeys()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
         context.Set("Key1", "Value1");
         context.Set("Key2", "Value2");
         context.Set("Key3", "Value3");
@@ -267,11 +315,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         keys.Should().Contain("Key3");
     }
 
+    [Trait(Spec.UAC, "16")]
+    [Then("it Should Be Case Insensitive For Variable Keys")]
     [Fact]
     public void ItShouldBeCaseInsensitiveForVariableKeys()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
         context.Set("TestKey", "value");
 
         // Act & Assert
@@ -285,11 +336,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
 
     #region CreateChild Tests
 
+    [Trait(Spec.UAC, "17")]
+    [Then("it Should Inherit Variables In Child Context")]
     [Fact]
     public void ItShouldInheritVariablesInChildContext()
     {
+        ArrangeAndAct();
         // Arrange
-        var parent = new Core.ToolContext();
+        var parent = new ToolContext();
         parent.Set("Name", "Parent");
         parent.Set("Value", 42);
 
@@ -301,11 +355,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         child.Get("Value").Should().Be(42);
     }
 
+    [Trait(Spec.UAC, "18")]
+    [Then("it Should Inherit Services In Child Context")]
     [Fact]
     public void ItShouldInheritServicesInChildContext()
     {
+        ArrangeAndAct();
         // Arrange
-        var parent = new Core.ToolContext();
+        var parent = new ToolContext();
         parent.RegisterService("upper", input => input?.ToString()?.ToUpper());
 
         // Act
@@ -316,11 +373,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         result.Should().Be("HELLO");
     }
 
+    [Trait(Spec.UAC, "19")]
+    [Then("it Should Not Affect Parent When Modifying Child Variables")]
     [Fact]
     public void ItShouldNotAffectParentWhenModifyingChildVariables()
     {
+        ArrangeAndAct();
         // Arrange
-        var parent = new Core.ToolContext();
+        var parent = new ToolContext();
         parent.Set("Name", "Parent");
 
         var child = parent.CreateChild();
@@ -340,15 +400,18 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
 
     #region Merge Tests
 
+    [Trait(Spec.UAC, "20")]
+    [Then("it Should Merge Specified Keys From Other Context")]
     [Fact]
     public void ItShouldMergeSpecifiedKeysFromOtherContext()
     {
+        ArrangeAndAct();
         // Arrange
-        var context1 = new Core.ToolContext();
+        var context1 = new ToolContext();
         context1.Set("Key1", "Value1");
         context1.Set("Key2", "Value2");
 
-        var context2 = new Core.ToolContext();
+        var context2 = new ToolContext();
         context2.Set("Key2", "UpdatedValue2");
         context2.Set("Key3", "Value3");
 
@@ -361,12 +424,15 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         context1.Get("Key3").Should().Be("Value3"); // Merged
     }
 
+    [Trait(Spec.UAC, "21")]
+    [Then("it Should Ignore Non Existent Keys When Merging")]
     [Fact]
     public void ItShouldIgnoreNonExistentKeysWhenMerging()
     {
+        ArrangeAndAct();
         // Arrange
-        var context1 = new Core.ToolContext();
-        var context2 = new Core.ToolContext();
+        var context1 = new ToolContext();
+        var context2 = new ToolContext();
         context2.Set("ExistingKey", "value");
 
         // Act - Should not throw
@@ -377,14 +443,17 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         context1.Has("NonExistentKey").Should().BeFalse();
     }
 
+    [Trait(Spec.UAC, "22")]
+    [Then("it Should Handle Empty Merge Keys List")]
     [Fact]
     public void ItShouldHandleEmptyMergeKeysList()
     {
+        ArrangeAndAct();
         // Arrange
-        var context1 = new Core.ToolContext();
+        var context1 = new ToolContext();
         context1.Set("Key1", "Value1");
 
-        var context2 = new Core.ToolContext();
+        var context2 = new ToolContext();
         context2.Set("Key2", "Value2");
 
         // Act
@@ -399,11 +468,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
 
     #region Service Registration Tests
 
+    [Trait(Spec.UAC, "23")]
+    [Then("it Should Register Service By Key")]
     [Fact]
     public void ItShouldRegisterServiceByKey()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
 
         // Act
         context.RegisterService("test", input => $"Processed: {input}");
@@ -413,11 +485,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         result.Should().Be("Processed: data");
     }
 
+    [Trait(Spec.UAC, "24")]
+    [Then("it Should Register I Template Service")]
     [Fact]
     public void ItShouldRegisterITemplateService()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
         var service = new TestService();
 
         // Act
@@ -428,11 +503,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         result.Should().Be("TEST:input");
     }
 
+    [Trait(Spec.UAC, "25")]
+    [Then("it Should Register Multiple Services")]
     [Fact]
     public void ItShouldRegisterMultipleServices()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
         var services = new List<ITemplateService>
         {
             new TestService(),
@@ -447,11 +525,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         context.Services("another")("b").Should().Be("ANOTHER:b");
     }
 
+    [Trait(Spec.UAC, "26")]
+    [Then("it Should Return Error Function For Non Existent Service")]
     [Fact]
     public void ItShouldReturnErrorFunctionForNonExistentService()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
 
         // Act
         var result = context.Services("nonexistent")("test");
@@ -460,11 +541,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         result.Should().Be("{nonexistent not registered}");
     }
 
+    [Trait(Spec.UAC, "27")]
+    [Then("it Should Be Case Insensitive For Service Keys")]
     [Fact]
     public void ItShouldBeCaseInsensitiveForServiceKeys()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
         context.RegisterService("MyService", input => "result");
 
         // Act & Assert
@@ -473,11 +557,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
         context.Services("MyService")("test").Should().Be("result");
     }
 
+    [Trait(Spec.UAC, "28")]
+    [Then("it Should Overwrite Service With Same Key")]
     [Fact]
     public void ItShouldOverwriteServiceWithSameKey()
     {
+        ArrangeAndAct();
         // Arrange
-        var context = new Core.ToolContext();
+        var context = new ToolContext();
         context.RegisterService("test", input => "first");
 
         // Act
@@ -492,11 +579,14 @@ public class WhenUsingToolContextTest : WhenTestingFor<Core.ToolContext>
 
     #region Integration Tests
 
+    [Trait(Spec.UAC, "29")]
+    [Then("it Should Work With Complex Scenario")]
     [Fact]
     public void ItShouldWorkWithComplexScenario()
     {
+        ArrangeAndAct();
         // Arrange - Create parent context with services and variables
-        var parent = new Core.ToolContext();
+        var parent = new ToolContext();
         parent.Key = "parent-context";
         parent.Model = new { Name = "TestModel", Version = "1.0" };
         parent.OutputPath = @"C:\output";

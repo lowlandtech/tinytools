@@ -6,7 +6,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US04.ServicesAndRe
 [Trait(Spec.SPEC, "3303")]
 [Trait(Spec.SC, "03")]
 [UserStory("04", "Template services support custom engines")]
-public class WhenUsingTemplateWithCustomEngine : WhenTestingFor<CustomEngineTemplate>
+public class WhenUsingTemplateWithCustomEngine : TinyToolsScenario<CustomEngineTemplate>
 {
     private TemplateResult? _result;
 
@@ -16,14 +16,19 @@ public class WhenUsingTemplateWithCustomEngine : WhenTestingFor<CustomEngineTemp
         return new CustomEngineTemplate(customEngine);
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _result = Sut.Render(new SimpleData { Name = "Custom" });
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Render With Custom Engine")]
     [Fact]
     public void ItShouldRenderWithCustomEngine()
     {
+        ArrangeAndAct();
         _result.Should().NotBeNull();
         _result!.Content.Should().Contain("Custom");
     }

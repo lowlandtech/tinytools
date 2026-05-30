@@ -7,7 +7,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US02.ControlFlow;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "01")]
 [UserStory("02", "Template engine renders control flow and variables")]
-public class WhenUsingTinyTemplateEngineTest : WhenTestingFor<TinyTemplateEngine>
+public class WhenUsingTinyTemplateEngineTest : TinyToolsScenario<TinyTemplateEngine>
 {
     private ToolContext _context = null!;
 
@@ -16,21 +16,27 @@ public class WhenUsingTinyTemplateEngineTest : WhenTestingFor<TinyTemplateEngine
         return new TinyTemplateEngine();
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         _context = new ToolContext();
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         // When is handled in each test
     }
 
     #region Basic Rendering Tests
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Render Empty Template")]
     [Fact]
     public void ItShouldRenderEmptyTemplate()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "";
 
@@ -41,9 +47,12 @@ public class WhenUsingTinyTemplateEngineTest : WhenTestingFor<TinyTemplateEngine
         result.Should().Be("");
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Render Null Template")]
     [Fact]
     public void ItShouldRenderNullTemplate()
     {
+        ArrangeAndAct();
         // Arrange
         string? template = null;
 
@@ -54,9 +63,12 @@ public class WhenUsingTinyTemplateEngineTest : WhenTestingFor<TinyTemplateEngine
         result.Should().BeNull();
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Render Template Without Variables")]
     [Fact]
     public void ItShouldRenderTemplateWithoutVariables()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "Hello, World!";
 
@@ -67,9 +79,12 @@ public class WhenUsingTinyTemplateEngineTest : WhenTestingFor<TinyTemplateEngine
         result.Should().Be("Hello, World!");
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Render Template With Simple Variable")]
     [Fact]
     public void ItShouldRenderTemplateWithSimpleVariable()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "John");
         var template = "Hello, ${Context.Name}!";
@@ -81,9 +96,12 @@ public class WhenUsingTinyTemplateEngineTest : WhenTestingFor<TinyTemplateEngine
         result.Should().Be("Hello, John!");
     }
 
+    [Trait(Spec.UAC, "05")]
+    [Then("it Should Render Template With Multiple Variables")]
     [Fact]
     public void ItShouldRenderTemplateWithMultipleVariables()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("FirstName", "John");
         _context.Set("LastName", "Doe");
@@ -101,9 +119,12 @@ public class WhenUsingTinyTemplateEngineTest : WhenTestingFor<TinyTemplateEngine
 
     #region Comment Removal Tests
 
+    [Trait(Spec.UAC, "06")]
+    [Then("it Should Remove Single Line Comment")]
     [Fact]
     public void ItShouldRemoveSingleLineComment()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "Before @* comment *@ After";
 
@@ -114,9 +135,12 @@ public class WhenUsingTinyTemplateEngineTest : WhenTestingFor<TinyTemplateEngine
         result.Should().Be("Before  After");
     }
 
+    [Trait(Spec.UAC, "07")]
+    [Then("it Should Remove Multi Line Comment")]
     [Fact]
     public void ItShouldRemoveMultiLineComment()
     {
+        ArrangeAndAct();
         // Arrange
         var template = @"Before
 @* 
@@ -134,9 +158,12 @@ After";
         result.Should().NotContain("multi-line comment");
     }
 
+    [Trait(Spec.UAC, "08")]
+    [Then("it Should Remove Multiple Comments")]
     [Fact]
     public void ItShouldRemoveMultipleComments()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "A @* comment1 *@ B @* comment2 *@ C";
 
@@ -151,9 +178,12 @@ After";
 
     #region If Statement Tests
 
+    [Trait(Spec.UAC, "09")]
+    [Then("it Should Render If Block When Condition Is True")]
     [Fact]
     public void ItShouldRenderIfBlockWhenConditionIsTrue()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IsActive", true);
         var template = @"@if(Context.IsActive) {
@@ -167,9 +197,12 @@ Active
         result.Should().Contain("Active");
     }
 
+    [Trait(Spec.UAC, "10")]
+    [Then("it Should Not Render If Block When Condition Is False")]
     [Fact]
     public void ItShouldNotRenderIfBlockWhenConditionIsFalse()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IsActive", false);
         var template = @"@if(Context.IsActive) {
@@ -183,9 +216,12 @@ Active
         result.Should().NotContain("Active");
     }
 
+    [Trait(Spec.UAC, "11")]
+    [Then("it Should Render Else Block When Condition Is False")]
     [Fact]
     public void ItShouldRenderElseBlockWhenConditionIsFalse()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IsActive", false);
         var template = @"@if(Context.IsActive) {
@@ -202,9 +238,12 @@ Inactive
         result.Should().NotContain("Active");
     }
 
+    [Trait(Spec.UAC, "12")]
+    [Then("it Should Render Else If Block When Condition Matches")]
     [Fact]
     public void ItShouldRenderElseIfBlockWhenConditionMatches()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Status", "pending");
         var template = @"@if(Context.Status == ""active"") {
@@ -224,9 +263,12 @@ Unknown
         result.Should().NotContain("Unknown");
     }
 
+    [Trait(Spec.UAC, "13")]
+    [Then("it Should Handle Negation Operator")]
     [Fact]
     public void ItShouldHandleNegationOperator()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IsActive", false);
         var template = @"@if(!Context.IsActive) {
@@ -240,9 +282,12 @@ Not Active
         result.Should().Contain("Not Active");
     }
 
+    [Trait(Spec.UAC, "14")]
+    [Then("it Should Handle Greater Than Comparison")]
     [Fact]
     public void ItShouldHandleGreaterThanComparison()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Count", 10);
         var template = @"@if(Context.Count > 5) {
@@ -256,9 +301,12 @@ Greater
         result.Should().Contain("Greater");
     }
 
+    [Trait(Spec.UAC, "15")]
+    [Then("it Should Handle Greater Than Or Equal Comparison")]
     [Fact]
     public void ItShouldHandleGreaterThanOrEqualComparison()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Count", 5);
         var template = @"@if(Context.Count >= 5) {
@@ -272,9 +320,12 @@ Greater or Equal
         result.Should().Contain("Greater or Equal");
     }
 
+    [Trait(Spec.UAC, "16")]
+    [Then("it Should Handle Less Than Comparison")]
     [Fact]
     public void ItShouldHandleLessThanComparison()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Count", 3);
         var template = @"@if(Context.Count < 5) {
@@ -288,9 +339,12 @@ Less
         result.Should().Contain("Less");
     }
 
+    [Trait(Spec.UAC, "17")]
+    [Then("it Should Handle Less Than Or Equal Comparison")]
     [Fact]
     public void ItShouldHandleLessThanOrEqualComparison()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Count", 5);
         var template = @"@if(Context.Count <= 5) {
@@ -304,9 +358,12 @@ Less or Equal
         result.Should().Contain("Less or Equal");
     }
 
+    [Trait(Spec.UAC, "18")]
+    [Then("it Should Handle Equality Comparison")]
     [Fact]
     public void ItShouldHandleEqualityComparison()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Status", "active");
         var template = @"@if(Context.Status == ""active"") {
@@ -320,9 +377,12 @@ Equal
         result.Should().Contain("Equal");
     }
 
+    [Trait(Spec.UAC, "19")]
+    [Then("it Should Handle Inequality Comparison")]
     [Fact]
     public void ItShouldHandleInequalityComparison()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Status", "inactive");
         var template = @"@if(Context.Status != ""active"") {
@@ -336,9 +396,12 @@ Not Equal
         result.Should().Contain("Not Equal");
     }
 
+    [Trait(Spec.UAC, "20")]
+    [Then("it Should Handle Truthy Check For String")]
     [Fact]
     public void ItShouldHandleTruthyCheckForString()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "John");
         var template = @"@if(Context.Name) {
@@ -352,9 +415,12 @@ Has Name
         result.Should().Contain("Has Name");
     }
 
+    [Trait(Spec.UAC, "21")]
+    [Then("it Should Handle Truthy Check For Empty String")]
     [Fact]
     public void ItShouldHandleTruthyCheckForEmptyString()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "");
         var template = @"@if(Context.Name) {
@@ -368,9 +434,12 @@ Has Name
         result.Should().NotContain("Has Name");
     }
 
+    [Trait(Spec.UAC, "22")]
+    [Then("it Should Handle Truthy Check For Null")]
     [Fact]
     public void ItShouldHandleTruthyCheckForNull()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", null);
         var template = @"@if(Context.Name) {
@@ -384,9 +453,12 @@ Has Name
         result.Should().NotContain("Has Name");
     }
 
+    [Trait(Spec.UAC, "23")]
+    [Then("it Should Handle Truthy Check For Number")]
     [Fact]
     public void ItShouldHandleTruthyCheckForNumber()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Count", 0);
         var template = @"@if(Context.Count) {
@@ -400,9 +472,12 @@ Has Count
         result.Should().NotContain("Has Count");
     }
 
+    [Trait(Spec.UAC, "24")]
+    [Then("it Should Handle Truthy Check For Collection")]
     [Fact]
     public void ItShouldHandleTruthyCheckForCollection()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Items", new List<string> { "a", "b" });
         var template = @"@if(Context.Items) {
@@ -420,9 +495,12 @@ Has Items
 
     #region Foreach Loop Tests
 
+    [Trait(Spec.UAC, "25")]
+    [Then("it Should Iterate Over Collection")]
     [Fact]
     public void ItShouldIterateOverCollection()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Items", new[] { "A", "B", "C" });
         var template = @"@foreach(var item in Context.Items) {
@@ -438,9 +516,12 @@ ${item}
         result.Should().Contain("C");
     }
 
+    [Trait(Spec.UAC, "26")]
+    [Then("it Should Handle Empty Collection")]
     [Fact]
     public void ItShouldHandleEmptyCollection()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Items", new string[] { });
         var template = @"@foreach(var item in Context.Items) {
@@ -454,9 +535,12 @@ ${item}
         result.Should().BeEmpty();
     }
 
+    [Trait(Spec.UAC, "27")]
+    [Then("it Should Handle Null Collection")]
     [Fact]
     public void ItShouldHandleNullCollection()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Items", null);
         var template = @"@foreach(var item in Context.Items) {
@@ -470,9 +554,12 @@ ${item}
         result.Should().BeEmpty();
     }
 
+    [Trait(Spec.UAC, "28")]
+    [Then("it Should Access Item Properties In Foreach")]
     [Fact]
     public void ItShouldAccessItemPropertiesInForeach()
     {
+        ArrangeAndAct();
         // Arrange
         var items = new[]
         {
@@ -492,9 +579,12 @@ ${person.Name} is ${person.Age}
         result.Should().Contain("Jane is 25");
     }
 
+    [Trait(Spec.UAC, "29")]
+    [Then("it Should Expose Index Metadata In Foreach")]
     [Fact]
     public void ItShouldExposeIndexMetadataInForeach()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Items", new[] { "A", "B", "C" });
         var template = @"@foreach(var item in Context.Items) {
@@ -510,9 +600,12 @@ ${_index}:${item}
         result.Should().Contain("2:C");
     }
 
+    [Trait(Spec.UAC, "30")]
+    [Then("it Should Expose First And Last Metadata In Foreach")]
     [Fact]
     public void ItShouldExposeFirstAndLastMetadataInForeach()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Items", new[] { "A", "B", "C" });
         var template = @"@foreach(var item in Context.Items) {
@@ -537,6 +630,7 @@ Middle: ${item}
     [Fact]
     public void ItShouldExposeCountMetadataInForeach()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Items", new[] { "X", "Y" });
         var template = @"@foreach(var item in Context.Items) {
@@ -554,6 +648,7 @@ ${item} (${_count} total)
     [Fact]
     public void ItShouldExposeFirstLastForSingleItemCollection()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Items", new[] { "Only" });
         var template = @"@foreach(var item in Context.Items) {
@@ -576,6 +671,7 @@ last
     [Fact]
     public void ItShouldExposeLoopMetadataWithEndSyntax()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Items", new[] { "A", "B", "C" });
         var template = "@foreach(var item in Context.Items)\n@if(_first)\nGiven ${item}\n@end\n@if(!_first)\nAnd ${item}\n@end\n@end";
@@ -598,6 +694,7 @@ last
     [Fact]
     public void ItShouldHandleNestedIfStatements()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IsActive", true);
         _context.Set("IsPremium", true);
@@ -617,6 +714,7 @@ Premium Active User
     [Fact]
     public void ItShouldHandleIfInsideForeach()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Numbers", new[] { 1, 2, 3, 4, 5 });
         var template = @"@foreach(var num in Context.Numbers) {
@@ -637,6 +735,7 @@ ${num} is greater than 3
     [Fact]
     public void ItShouldHandleForeachInsideIf()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("HasItems", true);
         _context.Set("Items", new[] { "A", "B", "C" });
@@ -662,6 +761,7 @@ Item: ${item}
     [Fact]
     public void ItShouldResolveVariablesDirectly()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "John");
         var input = "Hello, ${Context.Name}!";
@@ -676,6 +776,7 @@ Item: ${item}
     [Fact]
     public void ItShouldResolveMultipleVariables()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("First", "John");
         _context.Set("Last", "Doe");
@@ -695,6 +796,7 @@ Item: ${item}
     [Fact]
     public void ItShouldHandleTemplateWithOnlyWhitespace()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "   \n\t  ";
 
@@ -710,6 +812,7 @@ Item: ${item}
     [Fact]
     public void ItShouldHandleUnmatchedBraces()
     {
+        ArrangeAndAct();
         // Arrange
         var template = "@if(Context.Test) {\nNo closing brace";
 
@@ -723,6 +826,7 @@ Item: ${item}
     [Fact]
     public void ItShouldHandleIntegerComparison()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IntValue", 10);
         var template = @"@if(Context.IntValue > 5) {
@@ -739,6 +843,7 @@ Int Greater
     [Fact]
     public void ItShouldHandleDoubleComparison()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("DoubleValue", 10.5);
         var template = @"@if(Context.DoubleValue >= 10.5) {
@@ -755,6 +860,7 @@ Double Greater or Equal
     [Fact]
     public void ItShouldHandleStringComparisons()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "Alice");
         var template = @"@if(Context.Name == ""Alice"") {
@@ -771,6 +877,7 @@ Name is Alice
     [Fact]
     public void ItShouldBeCaseInsensitiveForStringComparisons()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "alice");
         var template = @"@if(Context.Name == ""ALICE"") {
@@ -787,6 +894,7 @@ Match
     [Fact]
     public void ItShouldHandleNullComparisons()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Value", null);
         var template = @"@if(Context.Value == null) {
@@ -803,6 +911,7 @@ Is Null
     [Fact]
     public void ItShouldHandleBooleanComparisons()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IsActive", true);
         var template = @"@if(Context.IsActive == true) {
@@ -823,6 +932,7 @@ Is True
     [Fact]
     public void ItShouldHandleComplexTemplateWithAllFeatures()
     {
+        ArrangeAndAct();
         // Arrange
         var customers = new[]
         {
@@ -873,6 +983,7 @@ End of Report";
     [Fact]
     public void ItShouldHandleTemplateWithVariablesAndHelpers()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "john doe");
         var template = "Hello, ${Context.Name | upper}!";
@@ -887,6 +998,7 @@ End of Report";
     [Fact]
     public void ItShouldHandleForeachWithConditionalRendering()
     {
+        ArrangeAndAct();
         // Arrange
         var products = new[]
         {
@@ -919,6 +1031,7 @@ End of Report";
     [Fact]
     public void ItShouldHandleSimpleNegation()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("IsActive", false);
         var template = @"@if(!Context.IsActive) {
@@ -935,6 +1048,7 @@ Inactive
     [Fact]
     public void ItShouldHandleNegationWithoutParentheses()
     {
+        ArrangeAndAct();
         // Arrange - Test that !Context.IsActive works (without extra parentheses)
         _context.Set("IsActive", false);
         var template = @"@if (!Context.IsActive) {
@@ -951,6 +1065,7 @@ Not Active
     [Fact]
     public void ItShouldHandleNegationOfTruthyValue()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Count", 5);
         var template = @"@if(!Context.Count) {
@@ -970,6 +1085,7 @@ Has Count
     [Fact]
     public void ItShouldHandleNegationOfZero()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Count", 0);
         var template = @"@if(!Context.Count) {
@@ -986,6 +1102,7 @@ Zero is falsy
     [Fact]
     public void ItShouldHandleNegationOfEmptyString()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Name", "");
         var template = @"@if(!Context.Name) {
@@ -1002,6 +1119,7 @@ Empty Name
     [Fact]
     public void ItShouldHandleNegationOfNull()
     {
+        ArrangeAndAct();
         // Arrange - NotSet means null
         var template = @"@if(!Context.Missing) {
 Missing is falsy
@@ -1021,6 +1139,7 @@ Missing is falsy
     [Fact]
     public void ItShouldHandleNumericComparisonWithDoubles()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Value", 3.14);
         var template = @"@if (Context.Value > 3) {
@@ -1037,6 +1156,7 @@ Greater
     [Fact]
     public void ItShouldHandleNumericComparisonWithDecimals()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Value", 99.99m);
         var template = @"@if (Context.Value >= 100) {
@@ -1055,6 +1175,7 @@ Affordable
     [Fact]
     public void ItShouldHandleComparisonWithBooleanLiteral()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Flag", true);
         var template = @"@if (Context.Flag == true) {
@@ -1071,6 +1192,7 @@ Is True
     [Fact]
     public void ItShouldHandleComparisonWithFalseBooleanLiteral()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Flag", false);
         var template = @"@if (Context.Flag == false) {
@@ -1088,6 +1210,7 @@ Is False
     [Fact]
     public void ItShouldHandleLessThanComparisonForAge()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Age", 17);
         var template = @"@if (Context.Age < 18) {
@@ -1106,6 +1229,7 @@ Minor
     [Fact]
     public void ItShouldHandleNotNullComparison()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Value", "something");
         var template = @"@if (Context.Value != null) {
@@ -1126,6 +1250,7 @@ Has Value
     [Fact]
     public void ItShouldTreatNonZeroIntAsTruthy()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Value", -1);
         var template = @"@if (Context.Value) {
@@ -1142,6 +1267,7 @@ Truthy
     [Fact]
     public void ItShouldTreatEmptyCollectionAsFalsy()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Items", new List<string>());
         var template = @"@if (Context.Items) {
@@ -1160,6 +1286,7 @@ No Items
     [Fact]
     public void ItShouldTreatTrueBoolAsTruthy()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Flag", true);
         var template = @"@if (Context.Flag) {
@@ -1176,6 +1303,7 @@ True
     [Fact]
     public void ItShouldTreatFalseBoolAsFalsy()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Flag", false);
         var template = @"@if (Context.Flag) {
@@ -1195,6 +1323,7 @@ False
     [Fact]
     public void ItShouldTreatObjectAsTruthy()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Obj", new { Name = "Test" });
         var template = @"@if (Context.Obj) {
@@ -1215,6 +1344,7 @@ Has Object
     [Fact]
     public void ItShouldCompareValueWithNullLiteral()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Value", "something");
         var template = @"@if (Context.Value != null) {
@@ -1231,6 +1361,7 @@ Not Null
     [Fact]
     public void ItShouldCompareMissingValueWithNull()
     {
+        ArrangeAndAct();
         // Arrange - Context.Missing is not set, so it's null
         var template = @"@if (Context.Missing == null) {
 Is Null
@@ -1246,6 +1377,7 @@ Is Null
 [Fact]
 public void ItShouldCompareNullWithValue()
 {
+    ArrangeAndAct();
         // Arrange
         _context.Set("A", null);
         _context.Set("B", 5);
@@ -1263,6 +1395,7 @@ Null Less Than Value
     [Fact]
     public void ItShouldCompareValueWithNull()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("A", 5);
         var template = @"@if (Context.A > null) {
@@ -1279,6 +1412,7 @@ Value Greater Than Null
     [Fact]
     public void ItShouldCompareStringsAlphabetically()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("A", "apple");
         _context.Set("B", "banana");
@@ -1300,6 +1434,7 @@ Apple Before Banana
     [Fact]
     public void ItShouldThrowWhenForeachIteratesOverString_Issue11()
     {
+        ArrangeAndAct();
         // Arrange - Issue #11: @foreach should not iterate over string characters
         _context.Set("Name", "Hello");
         var template = @"@foreach(var item in Context.Name) {
@@ -1315,6 +1450,7 @@ Item: ${item}
     [Fact]
     public void ItShouldHandleFloatingPointEqualityWithTolerance_Issue12()
     {
+        ArrangeAndAct();
         // Arrange - Issue #12: Floating-point equality should use tolerance
         // The classic 0.1 + 0.2 != 0.3 problem
         _context.Set("Value1", 0.1 + 0.2);  // Results in 0.30000000000000004
@@ -1337,6 +1473,7 @@ Values Are Not Equal
     [Fact]
     public void ItShouldHandleFloatingPointInequalityWithTolerance_Issue12()
     {
+        ArrangeAndAct();
         // Arrange - Issue #12: Values outside tolerance should not be equal
         _context.Set("Value1", 1.0);
         _context.Set("Value2", 1.0001);  // Outside 1e-10 tolerance
@@ -1362,6 +1499,7 @@ Values Are Not Equal
     [Fact]
     public void ItShouldHandleNegationWithParentheses()
     {
+        ArrangeAndAct();
         // Arrange - Tests the code path: !(Context.IsActive) with parentheses removal
         _context.Set("IsActive", true);
         var template = @"@if (!(Context.IsActive)) {
@@ -1381,6 +1519,7 @@ Active
     [Fact]
     public void ItShouldHandleNestedNegationWithParentheses()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Flag", false);
         var template = @"@if (!(Context.Flag)) {
@@ -1401,6 +1540,7 @@ Flag Is False
     [Fact]
     public void ItShouldCompareContextExpressionOnRightSide()
     {
+        ArrangeAndAct();
         // Arrange - Tests ResolveValueOrExpression with Context.* on right side
         _context.Set("A", 10);
         _context.Set("B", 5);
@@ -1418,6 +1558,7 @@ A Greater Than B
     [Fact]
     public void ItShouldCompareTwoContextExpressionsEquality()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("X", "hello");
         _context.Set("Y", "hello");
@@ -1435,6 +1576,7 @@ Same Value
     [Fact]
     public void ItShouldCompareTwoContextExpressionsInequality()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("X", "hello");
         _context.Set("Y", "world");
@@ -1452,6 +1594,7 @@ Different Values
     [Fact]
     public void ItShouldHandleLiteralOnRightSideInComparison()
     {
+        ArrangeAndAct();
         // Arrange - Tests ResolveValueOrExpression with literal (no Context.) on right
         _context.Set("Score", 95);
         var template = @"@if (Context.Score >= 90) {
@@ -1468,6 +1611,7 @@ Grade A
     [Fact]
     public void ItShouldCompareTwoContextExpressionsLessThan()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Min", 1);
         _context.Set("Max", 100);
@@ -1485,6 +1629,7 @@ Min Less Than Max
     [Fact]
     public void ItShouldCompareTwoContextExpressionsLessThanOrEqual()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Value1", 5);
         _context.Set("Value2", 5);
@@ -1502,6 +1647,7 @@ Less Or Equal
     [Fact]
     public void ItShouldCompareTwoContextExpressionsGreaterThanOrEqual()
     {
+        ArrangeAndAct();
         // Arrange
         _context.Set("Current", 10);
         _context.Set("Previous", 8);
@@ -1523,6 +1669,7 @@ Current Greater Or Equal
     [Fact]
     public void ItShouldHandleMalformedForeachStatement()
     {
+        ArrangeAndAct();
         // Arrange - Tests line 199: @foreach that doesn't match the expected pattern
         var template = @"@foreach {
 This is malformed
@@ -1540,6 +1687,7 @@ Normal text";
     [Fact]
     public void ItShouldHandleMalformedIfStatement()
     {
+        ArrangeAndAct();
         // Arrange - Tests line 93: @if that doesn't match the expected pattern
         var template = @"@if {
 This is malformed

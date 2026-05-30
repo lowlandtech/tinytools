@@ -3,7 +3,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US03.Operators;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "01")]
 [UserStory("03", "Template engine evaluates comparison operators")]
-public class WhenRenderingWithComparisonOperatorsTest : WhenTestingFor<TinyTemplateEngine>
+public class WhenRenderingWithComparisonOperatorsTest : TinyToolsScenario<TinyTemplateEngine>
 {
     private ToolContext _context = null!;
     private string _template = null!;
@@ -14,6 +14,7 @@ public class WhenRenderingWithComparisonOperatorsTest : WhenTestingFor<TinyTempl
         return new TinyTemplateEngine();
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         _context = new ToolContext();
@@ -37,32 +38,46 @@ public class WhenRenderingWithComparisonOperatorsTest : WhenTestingFor<TinyTempl
             """;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _result = Sut.Render(_template, _context);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Evaluate Greater Than Or Equal")]
     [Fact]
     public void ItShouldEvaluateGreaterThanOrEqual()
     {
+        ArrangeAndAct();
         _result.Should().Contain("You can purchase alcohol.");
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Evaluate Less Than")]
     [Fact]
     public void ItShouldEvaluateLessThan()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Not yet eligible for senior discount.");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Evaluate Less Than Or Equal")]
     [Fact]
     public void ItShouldEvaluateLessThanOrEqual()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Low balance warning.");
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Evaluate Greater Than")]
     [Fact]
     public void ItShouldEvaluateGreaterThan()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Bulk discount applied!");
     }
 }

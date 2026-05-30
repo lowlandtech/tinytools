@@ -3,7 +3,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "02")]
 [UserStory("03", "Real-world scenarios generate practical output")]
-public class WhenRenderingConfigurationFileTest : WhenTestingFor<TinyTemplateEngine>
+public class WhenRenderingConfigurationFileTest : TinyToolsScenario<TinyTemplateEngine>
 {
     private ToolContext _context = null!;
     private string _template = null!;
@@ -14,6 +14,7 @@ public class WhenRenderingConfigurationFileTest : WhenTestingFor<TinyTemplateEng
         return new TinyTemplateEngine();
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         _context = new ToolContext();
@@ -69,50 +70,70 @@ public class WhenRenderingConfigurationFileTest : WhenTestingFor<TinyTemplateEng
             """;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _result = Sut.Render(_template, _context);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Render App Settings")]
     [Fact]
     public void ItShouldRenderAppSettings()
     {
+        ArrangeAndAct();
         _result.Should().Contain("\"Name\": \"MyWebApp\"");
         _result.Should().Contain("\"Environment\": \"production\"");
         _result.Should().Contain("\"Port\": 8080");
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Render Https As True")]
     [Fact]
     public void ItShouldRenderHttpsAsTrue()
     {
+        ArrangeAndAct();
         _result.Should().Contain("\"UseHttps\": true");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Render Database Config")]
     [Fact]
     public void ItShouldRenderDatabaseConfig()
     {
+        ArrangeAndAct();
         _result.Should().Contain("\"Host\": \"db.example.com\"");
         _result.Should().Contain("Server=db.example.com;Database=myapp_prod");
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Include Cache Section")]
     [Fact]
     public void ItShouldIncludeCacheSection()
     {
+        ArrangeAndAct();
         _result.Should().Contain("\"Cache\":");
         _result.Should().Contain("\"Host\": \"redis.example.com\"");
     }
 
+    [Trait(Spec.UAC, "05")]
+    [Then("it Should Render Feature Flags")]
     [Fact]
     public void ItShouldRenderFeatureFlags()
     {
+        ArrangeAndAct();
         _result.Should().Contain("\"FeatureA\": True");
         _result.Should().Contain("\"FeatureB\": False");
         _result.Should().Contain("\"FeatureC\": True");
     }
 
+    [Trait(Spec.UAC, "06")]
+    [Then("it Should Remove Config Comments")]
     [Fact]
     public void ItShouldRemoveConfigComments()
     {
+        ArrangeAndAct();
         _result.Should().NotContain("Configuration for");
     }
 }

@@ -7,7 +7,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "12")]
 [UserStory("01", "String interpolation handles list templates with context")]
-public class WhenInterpolatingListWithContextTest : WhenTestingFor<List<string>>
+public class WhenInterpolatingListWithContextTest : TinyToolsScenario<List<string>>
 {
     private ToolContext _context = null!;
     private List<string>? _result;
@@ -22,6 +22,7 @@ public class WhenInterpolatingListWithContextTest : WhenTestingFor<List<string>>
         };
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         _context = new ToolContext();
@@ -30,24 +31,32 @@ public class WhenInterpolatingListWithContextTest : WhenTestingFor<List<string>>
         _context.Set("Age", 30);
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         // Use engine: null to disambiguate overload
         _result = Sut.Interpolate(_context, engine: null);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Interpolate All Templates")]
     [Fact]
     public void ItShouldInterpolateAllTemplates()
     {
+        ArrangeAndAct();
         _result.Should().HaveCount(3);
         _result![0].Should().Be("Hello John");
         _result[1].Should().Be("Welcome to Seattle");
         _result[2].Should().Be("Your age is 30");
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Interpolate With Custom Engine")]
     [Fact]
     public void ItShouldInterpolateWithCustomEngine()
     {
+        ArrangeAndAct();
         // Arrange
         var templates = new List<string> { "Hello ${Context.Name}", "Bye ${Context.Name}" };
         var context = new ToolContext();
@@ -63,9 +72,12 @@ public class WhenInterpolatingListWithContextTest : WhenTestingFor<List<string>>
         result[1].Should().Be("Bye Jane");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Handle Empty List")]
     [Fact]
     public void ItShouldHandleEmptyList()
     {
+        ArrangeAndAct();
         // Arrange
         var templates = new List<string>();
 
@@ -76,9 +88,12 @@ public class WhenInterpolatingListWithContextTest : WhenTestingFor<List<string>>
         result.Should().BeEmpty();
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Handle Single Item List")]
     [Fact]
     public void ItShouldHandleSingleItemList()
     {
+        ArrangeAndAct();
         // Arrange
         var templates = new List<string> { "Hello ${Context.Name}" };
         var context = new ToolContext();
@@ -92,9 +107,12 @@ public class WhenInterpolatingListWithContextTest : WhenTestingFor<List<string>>
         result[0].Should().Be("Hello John");
     }
 
+    [Trait(Spec.UAC, "05")]
+    [Then("it Should Throw On Null Templates")]
     [Fact]
     public void ItShouldThrowOnNullTemplates()
     {
+        ArrangeAndAct();
         // Arrange
         List<string> templates = null!;
 
@@ -105,9 +123,12 @@ public class WhenInterpolatingListWithContextTest : WhenTestingFor<List<string>>
         act.Should().Throw<ArgumentNullException>();
     }
 
+    [Trait(Spec.UAC, "06")]
+    [Then("it Should Throw On Null Context")]
     [Fact]
     public void ItShouldThrowOnNullContext()
     {
+        ArrangeAndAct();
         // Arrange
         var templates = new List<string> { "Hello" };
         ToolContext context = null!;
@@ -119,9 +140,12 @@ public class WhenInterpolatingListWithContextTest : WhenTestingFor<List<string>>
         act.Should().Throw<ArgumentNullException>();
     }
 
+    [Trait(Spec.UAC, "07")]
+    [Then("it Should Interpolate Model From Context")]
     [Fact]
     public void ItShouldInterpolateModelFromContext()
     {
+        ArrangeAndAct();
         // Arrange
         var templates = new List<string>
         {
@@ -142,9 +166,12 @@ public class WhenInterpolatingListWithContextTest : WhenTestingFor<List<string>>
         result[1].Should().Be("Doe");
     }
 
+    [Trait(Spec.UAC, "08")]
+    [Then("it Should Handle Templates With No Variables")]
     [Fact]
     public void ItShouldHandleTemplatesWithNoVariables()
     {
+        ArrangeAndAct();
         // Arrange
         var templates = new List<string> { "Hello world!", "Goodbye!" };
 
@@ -156,9 +183,12 @@ public class WhenInterpolatingListWithContextTest : WhenTestingFor<List<string>>
         result[1].Should().Be("Goodbye!");
     }
 
+    [Trait(Spec.UAC, "09")]
+    [Then("it Should Handle Mixed Templates")]
     [Fact]
     public void ItShouldHandleMixedTemplates()
     {
+        ArrangeAndAct();
         // Arrange
         var templates = new List<string>
         {
@@ -182,9 +212,12 @@ public class WhenInterpolatingListWithContextTest : WhenTestingFor<List<string>>
         result[3].Should().Be("Seattle is great");
     }
 
+    [Trait(Spec.UAC, "10")]
+    [Then("it Should Support If Control Flow In List")]
     [Fact]
     public void ItShouldSupportIfControlFlowInList()
     {
+        ArrangeAndAct();
         // Arrange
         var templates = new List<string>
         {
@@ -202,9 +235,12 @@ Active
         result[0].Should().Contain("Active");
     }
 
+    [Trait(Spec.UAC, "11")]
+    [Then("it Should Preserve List Order")]
     [Fact]
     public void ItShouldPreserveListOrder()
     {
+        ArrangeAndAct();
         // Arrange
         var templates = new List<string>
         {
@@ -226,9 +262,12 @@ Active
         result.Should().ContainInOrder("1", "2", "3", "4");
     }
 
+    [Trait(Spec.UAC, "12")]
+    [Then("it Should Handle Duplicate Templates")]
     [Fact]
     public void ItShouldHandleDuplicateTemplates()
     {
+        ArrangeAndAct();
         // Arrange
         var templates = new List<string>
         {
@@ -247,9 +286,12 @@ Active
         result.Should().AllBe("Hello John");
     }
 
+    [Trait(Spec.UAC, "13")]
+    [Then("it Should Handle Nested Properties")]
     [Fact]
     public void ItShouldHandleNestedProperties()
     {
+        ArrangeAndAct();
         // Arrange
         var templates = new List<string>
         {
@@ -267,9 +309,12 @@ Active
         result[1].Should().Be("Seattle");
     }
 
+    [Trait(Spec.UAC, "14")]
+    [Then("it Should Support Null Coalescing In List")]
     [Fact]
     public void ItShouldSupportNullCoalescingInList()
     {
+        ArrangeAndAct();
         // Arrange
         var templates = new List<string>
         {

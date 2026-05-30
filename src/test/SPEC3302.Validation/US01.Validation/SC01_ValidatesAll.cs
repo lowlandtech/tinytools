@@ -1,5 +1,3 @@
-using LowlandTech.TinyTools.Tests.Shared.Examples;
-
 namespace LowlandTech.TinyTools.Tests.SPEC3302.Validation.US01.Validation;
 
 /// <summary>
@@ -8,7 +6,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3302.Validation.US01.Validation;
 [Trait(Spec.SPEC, "3302")]
 [Trait(Spec.SC, "01")]
 [UserStory("01", "Template validation checks all templates in registry")]
-public class WhenValidatingAllTemplatesInRegistry : WhenTestingFor<TemplateRegistry>
+public class WhenValidatingAllTemplatesInRegistry : TinyToolsScenario<TemplateRegistry>
 {
     private Dictionary<string, TemplateValidationResult>? _validationResults;
 
@@ -20,35 +18,49 @@ public class WhenValidatingAllTemplatesInRegistry : WhenTestingFor<TemplateRegis
         return registry;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _validationResults = Sut.ValidateAll();
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Validate All Templates")]
     [Fact]
     public void ItShouldValidateAllTemplates()
     {
+        ArrangeAndAct();
         _validationResults.Should().NotBeNull();
         _validationResults.Should().HaveCount(2);
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Have Component Validation")]
     [Fact]
     public void ItShouldHaveComponentValidation()
     {
+        ArrangeAndAct();
         _validationResults.Should().ContainKey("component");
         _validationResults!["component"].IsValid.Should().BeTrue();
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Have Class Validation")]
     [Fact]
     public void ItShouldHaveClassValidation()
     {
+        ArrangeAndAct();
         _validationResults.Should().ContainKey("class");
         _validationResults!["class"].IsValid.Should().BeTrue();
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Have No Errors")]
     [Fact]
     public void ItShouldHaveNoErrors()
     {
+        ArrangeAndAct();
         foreach (var result in _validationResults!.Values)
         {
             result.ErrorMessage.Should().BeNullOrEmpty();
@@ -97,7 +109,7 @@ public class SimpleNonBaseTemplate : ITemplate
 [Trait(Spec.SPEC, "3302")]
 [Trait(Spec.SC, "01")]
 [UserStory("01", "Template validation checks all templates in registry")]
-public class WhenValidatingNonTemplateBaseImplementations : WhenTestingFor<TemplateRegistry>
+public class WhenValidatingNonTemplateBaseImplementations : TinyToolsScenario<TemplateRegistry>
 {
     private Dictionary<string, TemplateValidationResult>? _validationResults;
 
@@ -109,40 +121,57 @@ public class WhenValidatingNonTemplateBaseImplementations : WhenTestingFor<Templ
         return registry;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _validationResults = Sut.ValidateAll();
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Validate Both Templates")]
     [Fact]
     public void ItShouldValidateBothTemplates()
     {
+        ArrangeAndAct();
         _validationResults.Should().HaveCount(2);
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Have Valid Result For Valid Template")]
     [Fact]
     public void ItShouldHaveValidResultForValidTemplate()
     {
+        ArrangeAndAct();
         _validationResults.Should().ContainKey("simple-valid");
         _validationResults!["simple-valid"].IsValid.Should().BeTrue();
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Have No Error Message For Valid Template")]
     [Fact]
     public void ItShouldHaveNoErrorMessageForValidTemplate()
     {
+        ArrangeAndAct();
         _validationResults!["simple-valid"].ErrorMessage.Should().BeNull();
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Have Invalid Result For Invalid Template")]
     [Fact]
     public void ItShouldHaveInvalidResultForInvalidTemplate()
     {
+        ArrangeAndAct();
         _validationResults.Should().ContainKey("simple-invalid");
         _validationResults!["simple-invalid"].IsValid.Should().BeFalse();
     }
 
+    [Trait(Spec.UAC, "05")]
+    [Then("it Should Have Error Message For Invalid Template")]
     [Fact]
     public void ItShouldHaveErrorMessageForInvalidTemplate()
     {
+        ArrangeAndAct();
         _validationResults!["simple-invalid"].ErrorMessage.Should().Be("Validation failed");
     }
 }
@@ -153,7 +182,7 @@ public class WhenValidatingNonTemplateBaseImplementations : WhenTestingFor<Templ
 [Trait(Spec.SPEC, "3302")]
 [Trait(Spec.SC, "01")]
 [UserStory("01", "Template validation checks all templates in registry")]
-public class WhenValidatingMixedTemplateTypes : WhenTestingFor<TemplateRegistry>
+public class WhenValidatingMixedTemplateTypes : TinyToolsScenario<TemplateRegistry>
 {
     private Dictionary<string, TemplateValidationResult>? _validationResults;
 
@@ -165,41 +194,58 @@ public class WhenValidatingMixedTemplateTypes : WhenTestingFor<TemplateRegistry>
         return registry;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _validationResults = Sut.ValidateAll();
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Validate Both Types")]
     [Fact]
     public void ItShouldValidateBothTypes()
     {
+        ArrangeAndAct();
         _validationResults.Should().HaveCount(2);
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Validate Template Base Derived")]
     [Fact]
     public void ItShouldValidateTemplateBaseDerived()
     {
+        ArrangeAndAct();
         _validationResults.Should().ContainKey("component");
         _validationResults!["component"].IsValid.Should().BeTrue();
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Validate Non Template Base")]
     [Fact]
     public void ItShouldValidateNonTemplateBase()
     {
+        ArrangeAndAct();
         _validationResults.Should().ContainKey("simple");
         _validationResults!["simple"].IsValid.Should().BeTrue();
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Have Detailed Result For Template Base")]
     [Fact]
     public void ItShouldHaveDetailedResultForTemplateBase()
     {
+        ArrangeAndAct();
         // TemplateBase derived templates get detailed validation with ActualResult
         _validationResults!["component"].ActualResult.Should().NotBeNull();
     }
 
+    [Trait(Spec.UAC, "05")]
+    [Then("it Should Have No Detailed Result For Non Template Base")]
     [Fact]
     public void ItShouldHaveNoDetailedResultForNonTemplateBase()
     {
+        ArrangeAndAct();
         // Non-TemplateBase templates don't get ActualResult
         _validationResults!["simple"].ActualResult.Should().BeNull();
     }

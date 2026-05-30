@@ -1,5 +1,3 @@
-using LowlandTech.TinyTools.Tests.Shared.Examples;
-
 namespace LowlandTech.TinyTools.Tests.SPEC3302.Validation.US02.Failures;
 
 /// <summary>
@@ -8,7 +6,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3302.Validation.US02.Failures;
 [Trait(Spec.SPEC, "3302")]
 [Trait(Spec.SC, "01")]
 [UserStory("02", "Template validation handles failure scenarios")]
-public class WhenValidatingTemplateWithFailures : WhenTestingFor<TemplateRegistry>
+public class WhenValidatingTemplateWithFailures : TinyToolsScenario<TemplateRegistry>
 {
     private Dictionary<string, TemplateValidationResult>? _validationResults;
 
@@ -20,32 +18,46 @@ public class WhenValidatingTemplateWithFailures : WhenTestingFor<TemplateRegistr
         return registry;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _validationResults = Sut.ValidateAll();
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Have Valid Template Pass")]
     [Fact]
     public void ItShouldHaveValidTemplatePass()
     {
+        ArrangeAndAct();
         _validationResults!["valid"].IsValid.Should().BeTrue();
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Have Invalid Template Fail")]
     [Fact]
     public void ItShouldHaveInvalidTemplateFail()
     {
+        ArrangeAndAct();
         _validationResults!["invalid"].IsValid.Should().BeFalse();
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Have Error Message For Invalid Template")]
     [Fact]
     public void ItShouldHaveErrorMessageForInvalidTemplate()
     {
+        ArrangeAndAct();
         _validationResults!["invalid"].ErrorMessage.Should().NotBeNullOrEmpty();
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Have Differences For Invalid Template")]
     [Fact]
     public void ItShouldHaveDifferencesForInvalidTemplate()
     {
+        ArrangeAndAct();
         _validationResults!["invalid"].Differences.Should().NotBeNullOrEmpty();
     }
 }
@@ -101,7 +113,7 @@ public class NullableTestData
 [Trait(Spec.SPEC, "3302")]
 [Trait(Spec.SC, "01")]
 [UserStory("02", "Template validation handles failure scenarios")]
-public class WhenValidatingTemplateWithNullDeserializationResult : WhenTestingFor<NullDeserializationTemplate>
+public class WhenValidatingTemplateWithNullDeserializationResult : TinyToolsScenario<NullDeserializationTemplate>
 {
     private TemplateValidationResult? _result;
 
@@ -110,26 +122,37 @@ public class WhenValidatingTemplateWithNullDeserializationResult : WhenTestingFo
         return new NullDeserializationTemplate();
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _result = Sut.ValidateDetailed();
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Return Invalid Result")]
     [Fact]
     public void ItShouldReturnInvalidResult()
     {
+        ArrangeAndAct();
         _result!.IsValid.Should().BeFalse();
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Have Deserialization Error Message")]
     [Fact]
     public void ItShouldHaveDeserializationErrorMessage()
     {
+        ArrangeAndAct();
         _result!.ErrorMessage.Should().Contain("Failed to deserialize TestDataJson");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Have No Actual Result")]
     [Fact]
     public void ItShouldHaveNoActualResult()
     {
+        ArrangeAndAct();
         _result!.ActualResult.Should().BeNull();
     }
 }
@@ -156,7 +179,7 @@ public class ExceptionThrowingTemplate : TemplateBase
 [Trait(Spec.SPEC, "3302")]
 [Trait(Spec.SC, "01")]
 [UserStory("02", "Template validation handles failure scenarios")]
-public class WhenValidatingTemplateWithException : WhenTestingFor<ExceptionThrowingTemplate>
+public class WhenValidatingTemplateWithException : TinyToolsScenario<ExceptionThrowingTemplate>
 {
     private TemplateValidationResult? _result;
 
@@ -165,32 +188,46 @@ public class WhenValidatingTemplateWithException : WhenTestingFor<ExceptionThrow
         return new ExceptionThrowingTemplate();
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _result = Sut.ValidateDetailed();
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Return Invalid Result")]
     [Fact]
     public void ItShouldReturnInvalidResult()
     {
+        ArrangeAndAct();
         _result!.IsValid.Should().BeFalse();
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Have Exception Error Message")]
     [Fact]
     public void ItShouldHaveExceptionErrorMessage()
     {
+        ArrangeAndAct();
         _result!.ErrorMessage.Should().Contain("Validation threw exception:");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Have No Actual Result")]
     [Fact]
     public void ItShouldHaveNoActualResult()
     {
+        ArrangeAndAct();
         _result!.ActualResult.Should().BeNull();
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Not Throw Exception")]
     [Fact]
     public void ItShouldNotThrowException()
     {
+        ArrangeAndAct();
         // The validation should catch the exception and return a result, not throw
         var action = () => Sut.ValidateDetailed();
         action.Should().NotThrow();

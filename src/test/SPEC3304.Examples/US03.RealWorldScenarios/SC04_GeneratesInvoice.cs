@@ -3,7 +3,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "04")]
 [UserStory("03", "Real-world scenarios generate practical output")]
-public class WhenRenderingInvoiceTest : WhenTestingFor<TinyTemplateEngine>
+public class WhenRenderingInvoiceTest : TinyToolsScenario<TinyTemplateEngine>
 {
     private ToolContext _context = null!;
     private string _template = null!;
@@ -14,6 +14,7 @@ public class WhenRenderingInvoiceTest : WhenTestingFor<TinyTemplateEngine>
         return new TinyTemplateEngine();
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         _context = new ToolContext();
@@ -77,50 +78,70 @@ public class WhenRenderingInvoiceTest : WhenTestingFor<TinyTemplateEngine>
             """;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _result = Sut.Render(_template, _context);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Render Invoice Header")]
     [Fact]
     public void ItShouldRenderInvoiceHeader()
     {
+        ArrangeAndAct();
         _result.Should().Contain("INVOICE");
         _result.Should().Contain("Invoice #: INV-2024-0042");
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Render Company Details")]
     [Fact]
     public void ItShouldRenderCompanyDetails()
     {
+        ArrangeAndAct();
         _result.Should().Contain("TechServices LLC");
         _result.Should().Contain("789 Commerce Street, Chicago, IL 60601");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Render Client Details")]
     [Fact]
     public void ItShouldRenderClientDetails()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Global Enterprises");
         _result.Should().Contain("Robert Johnson");
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Render All Line Items")]
     [Fact]
     public void ItShouldRenderAllLineItems()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Web Development Services");
         _result.Should().Contain("UI/UX Design");
         _result.Should().Contain("Project Management");
     }
 
+    [Trait(Spec.UAC, "05")]
+    [Then("it Should Render Totals")]
     [Fact]
     public void ItShouldRenderTotals()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Subtotal:    $9500");
         _result.Should().Contain("TOTAL:       $10260");
     }
 
+    [Trait(Spec.UAC, "06")]
+    [Then("it Should Show Payment Due Message")]
     [Fact]
     public void ItShouldShowPaymentDueMessage()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Payment due by July 15, 2024");
         _result.Should().NotContain("? PAID");
     }

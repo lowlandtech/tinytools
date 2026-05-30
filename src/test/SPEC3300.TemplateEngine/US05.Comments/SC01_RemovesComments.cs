@@ -3,7 +3,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US05.Comments;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "01")]
 [UserStory("05", "Template engine removes comment blocks")]
-public class WhenRenderingWithCommentsTest : WhenTestingFor<TinyTemplateEngine>
+public class WhenRenderingWithCommentsTest : TinyToolsScenario<TinyTemplateEngine>
 {
     private ToolContext _context = null!;
     private string _template = null!;
@@ -14,6 +14,7 @@ public class WhenRenderingWithCommentsTest : WhenTestingFor<TinyTemplateEngine>
         return new TinyTemplateEngine();
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         _context = new ToolContext();
@@ -31,32 +32,46 @@ public class WhenRenderingWithCommentsTest : WhenTestingFor<TinyTemplateEngine>
             """;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _result = Sut.Render(_template, _context);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Remove Single Line Comments")]
     [Fact]
     public void ItShouldRemoveSingleLineComments()
     {
+        ArrangeAndAct();
         _result.Should().NotContain("This is a single-line comment");
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Remove Multi Line Comments")]
     [Fact]
     public void ItShouldRemoveMultiLineComments()
     {
+        ArrangeAndAct();
         _result.Should().NotContain("multi-line comment");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Remove Todo Comments")]
     [Fact]
     public void ItShouldRemoveTodoComments()
     {
+        ArrangeAndAct();
         _result.Should().NotContain("TODO:");
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Keep Actual Content")]
     [Fact]
     public void ItShouldKeepActualContent()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Hello, Alice!");
         _result.Should().Contain("Welcome to our platform.");
     }

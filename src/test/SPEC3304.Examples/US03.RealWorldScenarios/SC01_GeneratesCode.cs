@@ -3,7 +3,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "01")]
 [UserStory("03", "Real-world scenarios generate practical output")]
-public class WhenRenderingCodeGenerationTest : WhenTestingFor<TinyTemplateEngine>
+public class WhenRenderingCodeGenerationTest : TinyToolsScenario<TinyTemplateEngine>
 {
     private ToolContext _context = null!;
     private string _template = null!;
@@ -14,6 +14,7 @@ public class WhenRenderingCodeGenerationTest : WhenTestingFor<TinyTemplateEngine
         return new TinyTemplateEngine();
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         _context = new ToolContext();
@@ -53,45 +54,65 @@ public class WhenRenderingCodeGenerationTest : WhenTestingFor<TinyTemplateEngine
             """;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _result = Sut.Render(_template, _context);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Render Namespace")]
     [Fact]
     public void ItShouldRenderNamespace()
     {
+        ArrangeAndAct();
         _result.Should().Contain("namespace MyApp.Models;");
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Render Class Name")]
     [Fact]
     public void ItShouldRenderClassName()
     {
+        ArrangeAndAct();
         _result.Should().Contain("public class Customer");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Render Required Properties")]
     [Fact]
     public void ItShouldRenderRequiredProperties()
     {
+        ArrangeAndAct();
         _result.Should().Contain("public required int Id { get; set; }");
         _result.Should().Contain("public required string FirstName { get; set; }");
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Render Optional Properties")]
     [Fact]
     public void ItShouldRenderOptionalProperties()
     {
+        ArrangeAndAct();
         _result.Should().Contain("public string? Email { get; set; }");
     }
 
+    [Trait(Spec.UAC, "05")]
+    [Then("it Should Include Validation Method")]
     [Fact]
     public void ItShouldIncludeValidationMethod()
     {
+        ArrangeAndAct();
         _result.Should().Contain("public bool IsValid()");
     }
 
+    [Trait(Spec.UAC, "06")]
+    [Then("it Should Remove Comments")]
     [Fact]
     public void ItShouldRemoveComments()
     {
+        ArrangeAndAct();
         _result.Should().NotContain("Auto-generated code");
     }
 }

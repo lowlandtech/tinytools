@@ -3,7 +3,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "14")]
 [UserStory("01", "String interpolation processes files without tags")]
-public class WhenInterpolatingFilesUntaggedTest : WhenTestingFor<List<string>>
+public class WhenInterpolatingFilesUntaggedTest : TinyToolsScenario<List<string>>
 {
     private string _root = null!;
     private string _folder = null!;
@@ -22,14 +22,19 @@ public class WhenInterpolatingFilesUntaggedTest : WhenTestingFor<List<string>>
         return Directory.GetFiles(_folder, "*.*", SearchOption.AllDirectories).ToList();
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         Sut.Count.Should().Be(8);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Interpolate File Folder")]
     [Fact]
     public void ItShouldInterpolateFileFolder()
     {
+        ArrangeAndAct();
         var replacements = new Dictionary<string, string>()
         {
             { "subfolder1","src" },
@@ -41,9 +46,12 @@ public class WhenInterpolatingFilesUntaggedTest : WhenTestingFor<List<string>>
            .Be(2);
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Interpolate File Name")]
     [Fact]
     public void ItShouldInterpolateFileName()
     {
+        ArrangeAndAct();
         var replacements = new Dictionary<string, string>()
         {
             { "file1","codefile1" },
@@ -60,9 +68,12 @@ public class WhenInterpolatingFilesUntaggedTest : WhenTestingFor<List<string>>
             .Be(3);
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Interpolate File Extension")]
     [Fact]
     public void ItShouldInterpolateFileExtension()
     {
+        ArrangeAndAct();
         var replacements = new Dictionary<string, string>()
         {
             { ".txt",".cs" },
@@ -73,9 +84,12 @@ public class WhenInterpolatingFilesUntaggedTest : WhenTestingFor<List<string>>
             .Be(7);
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Interpolate File Text")]
     [Fact]
     public void ItShouldInterpolateFileText()
     {
+        ArrangeAndAct();
         var replacements = new Dictionary<string, string>()
         {
             { "file3","updated" },

@@ -5,7 +5,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US04.PipeHelpers;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "02")]
 [UserStory("04", "Template engine applies number pipe helpers")]
-public class WhenRenderingWithNumberHelpersTest : WhenTestingFor<TinyTemplateEngine>
+public class WhenRenderingWithNumberHelpersTest : TinyToolsScenario<TinyTemplateEngine>
 {
     private ToolContext _context = null!;
     private string _template = null!;
@@ -16,6 +16,7 @@ public class WhenRenderingWithNumberHelpersTest : WhenTestingFor<TinyTemplateEng
         return new TinyTemplateEngine();
     }
 
+    [Given("Setup test context")]
     protected override void Given()
     {
         // Set invariant culture for consistent test results
@@ -37,45 +38,65 @@ public class WhenRenderingWithNumberHelpersTest : WhenTestingFor<TinyTemplateEng
             """;
     }
 
+    [When("Execute test action")]
     protected override void When()
     {
+        base.When();
         _result = Sut.Render(_template, _context);
     }
 
+    [Trait(Spec.UAC, "01")]
+    [Then("it Should Format Number")]
     [Fact]
     public void ItShouldFormatNumber()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Formatted Number: 1,500");
     }
 
+    [Trait(Spec.UAC, "02")]
+    [Then("it Should Format With Two Decimals")]
     [Fact]
     public void ItShouldFormatWithTwoDecimals()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Two Decimals: 1,234.57");
     }
 
+    [Trait(Spec.UAC, "03")]
+    [Then("it Should Format As Percentage")]
     [Fact]
     public void ItShouldFormatAsPercentage()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Percentage: 86");
         _result.Should().Contain("%");
     }
 
+    [Trait(Spec.UAC, "04")]
+    [Then("it Should Round To Two Decimals")]
     [Fact]
     public void ItShouldRoundToTwoDecimals()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Round 2: 3.14");
     }
 
+    [Trait(Spec.UAC, "05")]
+    [Then("it Should Apply Floor")]
     [Fact]
     public void ItShouldApplyFloor()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Floor: 1234");
     }
 
+    [Trait(Spec.UAC, "06")]
+    [Then("it Should Apply Ceiling")]
     [Fact]
     public void ItShouldApplyCeiling()
     {
+        ArrangeAndAct();
         _result.Should().Contain("Ceiling: 1235");
     }
 }
