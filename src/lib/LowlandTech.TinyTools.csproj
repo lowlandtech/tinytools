@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;net8.0;net9.0;net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>12.0</LangVersion>
 
     <!-- Package Information -->
     <PackageId>LowlandTech.TinyTools</PackageId>
-    <Version>2026.1.5</Version>
+    <Version>2026.5.29</Version>
     <Authors>wendellmva</Authors>
     <Company>LowlandTech</Company>
     <Product>TinyTemplateEngine</Product>
@@ -75,6 +75,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.7" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.203" PrivateAssets="All" />
     <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="System.Text.Json" Version="9.0.4" Condition="'$(TargetFramework)' == 'netstandard2.1'" />
   </ItemGroup>
 
 </Project>

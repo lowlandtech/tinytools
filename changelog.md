@@ -114,11 +114,11 @@
   - `Compare` and `AreEqual` method tests
 * **InterpolationExtensions test coverage:**
   - `InterpolateWithEngine<T>` tests
-  - `Interpolate(ExecutionContext)` tests
-  - `Interpolate(List<string>, ExecutionContext)` tests
+  - `Interpolate(ToolContext)` tests
+  - `Interpolate(List<string>, ToolContext)` tests
 
 ### Bug Fixes
-* **Fixed delegate property resolution in VariableResolver** - `ExecutionContext.Get()` method was not being invoked for delegate properties, causing template services to fail silently
+* **Fixed delegate property resolution in VariableResolver** - `ToolContext.Get()` method was not being invoked for delegate properties, causing template services to fail silently
 
 ### Infrastructure
 * Upgraded to .NET 8, 9, and 10 multi-targeting
