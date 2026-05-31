@@ -1,4 +1,4 @@
-namespace LowlandTech.TinyTools.Templates;
+namespace LowlandTech.TinyTools;
 
 /// <summary>
 /// Represents the result of rendering a template.

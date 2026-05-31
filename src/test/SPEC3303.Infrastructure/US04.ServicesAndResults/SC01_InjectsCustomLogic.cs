@@ -1,5 +1,5 @@
 using Humanizer;
-using ExecutionContext = LowlandTech.TinyTools.Core.ExecutionContext;
+using ExecutionContext = LowlandTech.TinyTools.ExecutionContext;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US04.ServicesAndResults;
 

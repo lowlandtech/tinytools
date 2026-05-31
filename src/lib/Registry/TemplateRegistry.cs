@@ -1,6 +1,4 @@
-using LowlandTech.TinyTools.Templates;
-
-namespace LowlandTech.TinyTools.Registry;
+namespace LowlandTech.TinyTools;
 
 /// <summary>
 /// Registry for managing and discovering ITemplate implementations.

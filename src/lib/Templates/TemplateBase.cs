@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace LowlandTech.TinyTools.Templates;
+namespace LowlandTech.TinyTools;
 
 /// <summary>
 /// Base class for implementing ITemplate with common functionality.

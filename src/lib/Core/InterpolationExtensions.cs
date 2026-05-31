@@ -1,4 +1,4 @@
-﻿namespace LowlandTech.TinyTools.Core;
+﻿namespace LowlandTech.TinyTools;
 
 public static class InterpolationExtensions
 {

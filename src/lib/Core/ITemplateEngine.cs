@@ -1,4 +1,4 @@
-﻿namespace LowlandTech.TinyTools.Core;
+﻿namespace LowlandTech.TinyTools;
 
 /// <summary>
 /// Interface for the template engine that renders templates with model data.

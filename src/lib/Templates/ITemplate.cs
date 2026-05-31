@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace LowlandTech.TinyTools.Templates;
+namespace LowlandTech.TinyTools;
 
 /// <summary>
 /// Interface for static file-based templates designed for large-scale code generation.
@@ -176,7 +176,7 @@ public record TemplateValidationResult
         '\n' => "\\n",
         '\r' => "\\r",
         '\t' => "\\t",
-        ' ' => "·", // visible space
+        ' ' => "ï¿½", // visible space
         _ => c.ToString()
     };
 

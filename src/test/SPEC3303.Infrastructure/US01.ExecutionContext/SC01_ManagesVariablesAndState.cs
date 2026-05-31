@@ -7,11 +7,11 @@ namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US01.ExecutionCont
 [Trait(Spec.SPEC, "3303")]
 [Trait(Spec.SC, "01")]
 [UserStory("01", "Tool context manages variables and state")]
-public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
+public class WhenUsingToolContextTest : TinyToolsScenario<TinyTools.ExecutionContext>
 {
-    protected override Core.ExecutionContext For()
+    protected override TinyTools.ExecutionContext For()
     {
-        return new Core.ExecutionContext();
+        return new TinyTools.ExecutionContext();
     }
 
     [Given("Setup test context")]
@@ -36,7 +36,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
 
         // Act
         context.Key = "test-context";
@@ -52,7 +52,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange & Act
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
 
         // Assert
         context.Key.Should().BeNull();
@@ -65,7 +65,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange & Act
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
 
         // Assert
         context.Parent.Should().BeNull();
@@ -78,7 +78,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var parent = new Core.ExecutionContext { Key = "parent" };
+        var parent = new TinyTools.ExecutionContext { Key = "parent" };
 
         // Act
         var child = parent.CreateChild("child");
@@ -99,7 +99,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
         var model = new { Name = "Test", Value = 42 };
 
         // Act
@@ -117,7 +117,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
 
         // Act & Assert
         context.Model.Should().BeNull();
@@ -134,7 +134,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
 
         // Act
         context.OutputPath = @"C:\output\path";
@@ -151,7 +151,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
 
         // Act & Assert
         context.OutputPath.Should().BeNull();
@@ -168,7 +168,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
         var item = new { Name = "Test" };
 
         // Act
@@ -197,7 +197,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
         var item1 = new { Name = "First" };
         var item2 = new { Name = "Second" };
         var item3 = new { Name = "Third" };
@@ -232,7 +232,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
 
         // Act - Pop on empty stack should not throw
         context.PopCursor();
@@ -249,7 +249,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
         var item = new { Value = 100 };
 
         // Act
@@ -268,7 +268,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
 
         // Act & Assert
         context.CurrentIndex.Should().Be(-1);
@@ -285,7 +285,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
         context.Set("Existing", "value");
 
         // Act & Assert
@@ -300,7 +300,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
         context.Set("Key1", "Value1");
         context.Set("Key2", "Value2");
         context.Set("Key3", "Value3");
@@ -322,7 +322,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
         context.Set("TestKey", "value");
 
         // Act & Assert
@@ -343,7 +343,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var parent = new Core.ExecutionContext();
+        var parent = new TinyTools.ExecutionContext();
         parent.Set("Name", "Parent");
         parent.Set("Value", 42);
 
@@ -362,7 +362,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var parent = new Core.ExecutionContext();
+        var parent = new TinyTools.ExecutionContext();
         parent.RegisterService("upper", input => input?.ToString()?.ToUpper());
 
         // Act
@@ -380,7 +380,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var parent = new Core.ExecutionContext();
+        var parent = new TinyTools.ExecutionContext();
         parent.Set("Name", "Parent");
 
         var child = parent.CreateChild();
@@ -407,11 +407,11 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context1 = new Core.ExecutionContext();
+        var context1 = new TinyTools.ExecutionContext();
         context1.Set("Key1", "Value1");
         context1.Set("Key2", "Value2");
 
-        var context2 = new Core.ExecutionContext();
+        var context2 = new TinyTools.ExecutionContext();
         context2.Set("Key2", "UpdatedValue2");
         context2.Set("Key3", "Value3");
 
@@ -431,8 +431,8 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context1 = new Core.ExecutionContext();
-        var context2 = new Core.ExecutionContext();
+        var context1 = new TinyTools.ExecutionContext();
+        var context2 = new TinyTools.ExecutionContext();
         context2.Set("ExistingKey", "value");
 
         // Act - Should not throw
@@ -450,10 +450,10 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context1 = new Core.ExecutionContext();
+        var context1 = new TinyTools.ExecutionContext();
         context1.Set("Key1", "Value1");
 
-        var context2 = new Core.ExecutionContext();
+        var context2 = new TinyTools.ExecutionContext();
         context2.Set("Key2", "Value2");
 
         // Act
@@ -475,7 +475,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
 
         // Act
         context.RegisterService("test", input => $"Processed: {input}");
@@ -492,7 +492,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
         var service = new TestService();
 
         // Act
@@ -510,7 +510,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
         var services = new List<ITemplateService>
         {
             new TestService(),
@@ -532,7 +532,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
 
         // Act
         var result = context.Services("nonexistent")("test");
@@ -548,7 +548,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
         context.RegisterService("MyService", input => "result");
 
         // Act & Assert
@@ -564,7 +564,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange
-        var context = new Core.ExecutionContext();
+        var context = new TinyTools.ExecutionContext();
         context.RegisterService("test", input => "first");
 
         // Act
@@ -586,7 +586,7 @@ public class WhenUsingToolContextTest : TinyToolsScenario<Core.ExecutionContext>
     {
         ArrangeAndAct();
         // Arrange - Create parent context with services and variables
-        var parent = new Core.ExecutionContext();
+        var parent = new TinyTools.ExecutionContext();
         parent.Key = "parent-context";
         parent.Model = new { Name = "TestModel", Version = "1.0" };
         parent.OutputPath = @"C:\output";

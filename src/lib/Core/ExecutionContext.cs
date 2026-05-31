@@ -1,4 +1,4 @@
-﻿namespace LowlandTech.TinyTools.Core;
+﻿namespace LowlandTech.TinyTools;
 
 /// <summary>
 /// Runtime context for pipeline execution.

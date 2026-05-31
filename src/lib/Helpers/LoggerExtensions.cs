@@ -1,4 +1,4 @@
-﻿namespace LowlandTech.TinyTools.Helpers;
+﻿namespace LowlandTech.TinyTools;
 
 /// <summary>
 /// https://adamstorr.azurewebsites.net/blog/mocking-ilogger-with-moq

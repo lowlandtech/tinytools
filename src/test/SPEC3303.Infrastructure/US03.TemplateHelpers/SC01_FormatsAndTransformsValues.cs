@@ -1,4 +1,4 @@
-using ExecutionContext = LowlandTech.TinyTools.Core.ExecutionContext;
+using Helpers = LowlandTech.TinyTools;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US03.TemplateHelpers;
 

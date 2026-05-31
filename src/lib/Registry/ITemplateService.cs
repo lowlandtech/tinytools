@@ -1,4 +1,4 @@
-namespace LowlandTech.TinyTools.Registry;
+namespace LowlandTech.TinyTools;
 
 /// <summary>
 /// Interface for template services that transform input data.

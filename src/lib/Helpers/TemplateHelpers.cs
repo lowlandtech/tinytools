@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Globalization;
 
-namespace LowlandTech.TinyTools.Helpers;
+namespace LowlandTech.TinyTools;
 
 /// <summary>
 /// Provides helper methods for template variable transformation.
@@ -9,7 +9,7 @@ namespace LowlandTech.TinyTools.Helpers;
 /// </summary>
 public static class TemplateHelpers
 {
-    private static readonly Dictionary<string, Func<object?, string?, object?>> Helpers = new(StringComparer.OrdinalIgnoreCase)
+    public static readonly Dictionary<string, Func<object?, string?, object?>> Helpers = new(StringComparer.OrdinalIgnoreCase)
     {
         // String helpers
         ["upper"] = (value, _) => value?.ToString()?.ToUpperInvariant(),
