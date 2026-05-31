@@ -32,7 +32,7 @@ const features = [
 ];
 
 const helloWorldExample = `// Simple string interpolation
-var template = "Hello {FirstName} {LastName}!";
+var template = "Hello \${FirstName} \${LastName}!";
 var model = new { FirstName = "John", LastName = "Smith" };
 
 var result = template.Interpolate(model);`;
@@ -41,12 +41,12 @@ const helloWorldOutput = `Hello John Smith!`;
 
 const emailExample = `// Email template example
 var template = """
-    Hi {CustomerName},
+  Hi \${CustomerName},
     
-    Thank you for your order #{OrderNumber}.
-    Your total is {Total}.
+  Thank you for your order #\${OrderNumber}.
+  Your total is \${Total}.
     
-    We'll send confirmation to {Email}.
+  We'll send confirmation to \${Email}.
     """;
 
 var model = new 

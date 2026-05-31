@@ -37,7 +37,7 @@ return (
             code={`using LowlandTech.TinyTools;
 
 // Simple property interpolation
-var template = "Hello {FirstName} {LastName}!";
+var template = "Hello \${FirstName} \${LastName}!";
 var model = new { FirstName = "John", LastName = "Smith" };
 
 var result = template.Interpolate(model);
@@ -57,12 +57,12 @@ var result = template.Interpolate(model);
         <CardContent className="space-y-4">
           <CodeBlock
             code={`var template = """
-    Hi {CustomerName},
+              Hi \${CustomerName},
 
-    Thank you for your order #{OrderNumber}.
+              Thank you for your order #\${OrderNumber}.
     Your total is ${"${TotalAmount}"}.
 
-    We'll send a confirmation to {Email}.
+              We'll send a confirmation to \${Email}.
     """;
 
 var model = new 
