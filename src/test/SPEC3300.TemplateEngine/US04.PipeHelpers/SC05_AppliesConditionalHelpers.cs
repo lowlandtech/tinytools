@@ -1,3 +1,5 @@
+using ExecutionContext = LowlandTech.TinyTools.Core.ExecutionContext;
+
 namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US04.PipeHelpers;
 
 [Trait(Spec.SPEC, "3300")]
@@ -5,7 +7,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US04.PipeHelpers;
 [UserStory("04", "Template engine applies conditional pipe helpers")]
 public class WhenRenderingWithConditionalHelpersTest : TinyToolsScenario<TinyTemplateEngine>
 {
-    private ToolContext _context = null!;
+    private ExecutionContext _context = null!;
     private string _template = null!;
     private string? _result;
 
@@ -17,7 +19,7 @@ public class WhenRenderingWithConditionalHelpersTest : TinyToolsScenario<TinyTem
     [Given("Setup test context")]
     protected override void Given()
     {
-        _context = new ToolContext();
+        _context = new ExecutionContext();
         _context.Set("Name", "Alice");
         _context.Set("Nickname", null);
         _context.Set("EmptyValue", "");

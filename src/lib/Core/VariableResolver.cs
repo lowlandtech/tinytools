@@ -591,7 +591,7 @@ public partial class VariableResolver
     {
         if (obj == null) return null;
 
-        // Special handling for ToolContext - use Get() method
+        // Special handling for ExecutionContext - use Get() method
         if (obj is ToolContext ctx)
         {
             return ctx.Get(propertyName);

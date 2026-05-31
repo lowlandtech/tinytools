@@ -1,4 +1,5 @@
 using Humanizer;
+using ExecutionContext = LowlandTech.TinyTools.Core.ExecutionContext;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US04.ServicesAndResults;
 
@@ -12,7 +13,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US04.ServicesAndRe
 [UserStory("04", "Template services inject custom logic")]
 public class WhenUsingTemplateServicesTest : TinyToolsScenario<TinyTemplateEngine>
 {
-    private ToolContext _context = null!;
+    private ExecutionContext _context = null!;
     private string? _result;
 
     protected override TinyTemplateEngine For()
@@ -23,7 +24,7 @@ public class WhenUsingTemplateServicesTest : TinyToolsScenario<TinyTemplateEngin
     [Given("Setup test context")]
     protected override void Given()
     {
-        _context = new ToolContext();
+        _context = new ExecutionContext();
     }
 
     [When("Execute test action")]

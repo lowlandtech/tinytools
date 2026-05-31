@@ -1,3 +1,5 @@
+using ExecutionContext = LowlandTech.TinyTools.Core.ExecutionContext;
+
 namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US02.ControlFlow;
 
 [Trait(Spec.SPEC, "3300")]
@@ -5,7 +7,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US02.ControlFlow;
 [UserStory("02", "Template engine handles null coalescing")]
 public class WhenRenderingWithNullCoalescingTest : TinyToolsScenario<TinyTemplateEngine>
 {
-    private ToolContext _context = null!;
+    private ExecutionContext _context = null!;
     private string _template = null!;
     private string? _result;
 
@@ -17,7 +19,7 @@ public class WhenRenderingWithNullCoalescingTest : TinyToolsScenario<TinyTemplat
     [Given("Setup test context")]
     protected override void Given()
     {
-        _context = new ToolContext();
+        _context = new ExecutionContext();
         _context.Set("Name", "John");
         _context.Set("Nickname", null);
         _context.Set("Title", "");

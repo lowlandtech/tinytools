@@ -1,3 +1,5 @@
+using ExecutionContext = LowlandTech.TinyTools.Core.ExecutionContext;
+
 namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US03.TemplateHelpers;
 
 /// <summary>
@@ -225,7 +227,7 @@ public class WhenUsingTemplateHelpersTest
     {
         // Arrange
         var template = "${Context.Value | padleft:10}";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Value", "test");
         var resolver = new VariableResolver();
 
@@ -241,7 +243,7 @@ public class WhenUsingTemplateHelpersTest
     {
         // Arrange
         var template = "${Context.Value | padright:10}";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Value", "test");
         var resolver = new VariableResolver();
 
@@ -257,7 +259,7 @@ public class WhenUsingTemplateHelpersTest
     {
         // Arrange
         var template = "${Context.Number | padleft:5,0}";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Number", "42");
         var resolver = new VariableResolver();
 
@@ -273,7 +275,7 @@ public class WhenUsingTemplateHelpersTest
     {
         // Arrange
         var template = "${Context.Value | padright:8,*}";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Value", "hi");
         var resolver = new VariableResolver();
 
@@ -289,7 +291,7 @@ public class WhenUsingTemplateHelpersTest
     {
         // Arrange
         var template = "${Context.Value | upper | padleft:10}";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Value", "test");
         var resolver = new VariableResolver();
 
@@ -434,7 +436,7 @@ public class WhenUsingTemplateHelpersTest
     {
         // Arrange
         var template = "${Context.Value | round:2}";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Value", 3.14159);
         var resolver = new VariableResolver();
 
@@ -529,7 +531,7 @@ public class WhenUsingTemplateHelpersTest
     {
         // Arrange
         var template = "${Context.Missing | default:N/A}";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         var resolver = new VariableResolver();
 
         // Act
@@ -544,7 +546,7 @@ public class WhenUsingTemplateHelpersTest
     {
         // Arrange
         var template = "${Context.Name | default:Unknown}";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Name", "John");
         var resolver = new VariableResolver();
 
@@ -1108,7 +1110,7 @@ public class WhenUsingTemplateHelpersTest
         Helpers.TemplateHelpers.Register(helperName, (value, _) => value?.ToString()?.ToUpperInvariant() + "!");
         
         var template = $"${{Context.Name | {helperName}}}";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Name", "hello");
         var resolver = new VariableResolver();
 

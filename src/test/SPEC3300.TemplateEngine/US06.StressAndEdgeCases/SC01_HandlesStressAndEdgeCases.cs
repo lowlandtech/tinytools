@@ -1,3 +1,5 @@
+using ExecutionContext = LowlandTech.TinyTools.Core.ExecutionContext;
+
 namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US06.StressAndEdgeCases;
 
 /// <summary>
@@ -8,7 +10,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US06.StressAndEdge
 [UserStory("06", "Template engine handles stress and edge cases")]
 public class WhenStressingTinyTemplateEngine : TinyToolsScenario<TinyTemplateEngine>
 {
-    private ToolContext _context = null!;
+    private ExecutionContext _context = null!;
 
     protected override TinyTemplateEngine For()
     {
@@ -18,7 +20,7 @@ public class WhenStressingTinyTemplateEngine : TinyToolsScenario<TinyTemplateEng
     [Given("Setup test context")]
     protected override void Given()
     {
-        _context = new ToolContext();
+        _context = new ExecutionContext();
     }
 
     #region Nested Control Flow Tests

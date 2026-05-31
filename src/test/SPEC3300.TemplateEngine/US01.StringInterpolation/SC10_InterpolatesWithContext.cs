@@ -1,14 +1,16 @@
+using ExecutionContext = LowlandTech.TinyTools.Core.ExecutionContext;
+
 namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpolation;
 
 /// <summary>
-/// Tests for Interpolate extension method that takes an ToolContext directly.
+/// Tests for Interpolate extension method that takes an ExecutionContext directly.
 /// </summary>
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "10")]
 [UserStory("01", "String interpolation uses execution context")]
 public class WhenInterpolatingWithContextTest : TinyToolsScenario<string>
 {
-    private ToolContext _context = null!;
+    private ExecutionContext _context = null!;
     private string? _result;
 
     protected override string For()
@@ -19,7 +21,7 @@ public class WhenInterpolatingWithContextTest : TinyToolsScenario<string>
     [Given("Setup test context")]
     protected override void Given()
     {
-        _context = new ToolContext();
+        _context = new ExecutionContext();
         _context.Set("FirstName", "John");
         _context.Set("LastName", "Smith");
     }
@@ -48,7 +50,7 @@ public class WhenInterpolatingWithContextTest : TinyToolsScenario<string>
         ArrangeAndAct();
         // Arrange
         var template = "Hello ${Context.Name}";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Name", "Jane");
         var engine = new TinyTemplateEngine();
 
@@ -67,7 +69,7 @@ public class WhenInterpolatingWithContextTest : TinyToolsScenario<string>
         ArrangeAndAct();
         // Arrange
         var template = "Hello ${Context.Model.FirstName}";
-        var context = new ToolContext { Model = new Person { FirstName = "John" } };
+        var context = new ExecutionContext { Model = new Person { FirstName = "John" } };
 
         // Act
         var result = template.Interpolate(context);
@@ -84,7 +86,7 @@ public class WhenInterpolatingWithContextTest : TinyToolsScenario<string>
         ArrangeAndAct();
         // Arrange
         var template = "City: ${Context.Address.City}";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Address", new { City = "Seattle", State = "WA" });
 
         // Act
@@ -104,7 +106,7 @@ public class WhenInterpolatingWithContextTest : TinyToolsScenario<string>
         var template = @"@if (Context.IsActive) {
 Active User
 }";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("IsActive", true);
 
         // Act
@@ -124,7 +126,7 @@ Active User
         var template = @"@foreach (var item in Context.Items) {
 - ${item}
 }";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Items", new[] { "Apple", "Banana", "Cherry" });
 
         // Act
@@ -176,7 +178,7 @@ Active User
         ArrangeAndAct();
         // Arrange
         var template = "Hello ${Context.Name}";
-        ToolContext context = null!;
+        ExecutionContext context = null!;
 
         // Act
         var act = () => template.Interpolate(context);
@@ -193,7 +195,7 @@ Active User
         ArrangeAndAct();
         // Arrange
         var template = "${Context.A} + ${Context.B} = ${Context.C}";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("A", "1");
         context.Set("B", "2");
         context.Set("C", "3");
@@ -213,7 +215,7 @@ Active User
         ArrangeAndAct();
         // Arrange
         var template = "Count: ${Context.Count}";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Count", 42);
 
         // Act
@@ -231,7 +233,7 @@ Active User
         ArrangeAndAct();
         // Arrange
         var template = "Hello world! ${Context.Name} says hi.";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Name", "John");
 
         // Act
@@ -265,7 +267,7 @@ Active User
         ArrangeAndAct();
         // Arrange
         var template = "${Context.Missing ?? \"default\"}";
-        var context = new ToolContext();
+        var context = new ExecutionContext();
 
         // Act
         var result = template.Interpolate(context);
@@ -282,7 +284,7 @@ Active User
         ArrangeAndAct();
         // Arrange
         var template = "${Context.ParentValue} - ${Context.ChildValue}";
-        var parentContext = new ToolContext();
+        var parentContext = new ExecutionContext();
         parentContext.Set("ParentValue", "Parent");
         var childContext = parentContext.CreateChild();
         childContext.Set("ChildValue", "Child");

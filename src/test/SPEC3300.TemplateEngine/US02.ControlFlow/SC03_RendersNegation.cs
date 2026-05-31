@@ -1,3 +1,5 @@
+using ExecutionContext = LowlandTech.TinyTools.Core.ExecutionContext;
+
 namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US02.ControlFlow;
 
 [Trait(Spec.SPEC, "3300")]
@@ -5,7 +7,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US02.ControlFlow;
 [UserStory("02", "Template engine handles negation operators")]
 public class WhenRenderingWithNegationTest : TinyToolsScenario<TinyTemplateEngine>
 {
-    private ToolContext _context = null!;
+    private ExecutionContext _context = null!;
     private string _template = null!;
     private string? _result;
 
@@ -17,7 +19,7 @@ public class WhenRenderingWithNegationTest : TinyToolsScenario<TinyTemplateEngin
     [Given("Setup test context")]
     protected override void Given()
     {
-        _context = new ToolContext();
+        _context = new ExecutionContext();
         _context.Set("IsActive", false);
         _context.Set("HasSubscription", true);
         _context.Set("Count", 0);

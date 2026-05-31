@@ -1,3 +1,5 @@
+using ExecutionContext = LowlandTech.TinyTools.Core.ExecutionContext;
+
 namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US04.PipeHelpers;
 
 [Trait(Spec.SPEC, "3300")]
@@ -5,7 +7,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US04.PipeHelpers;
 [UserStory("04", "Template engine applies date pipe helpers")]
 public class WhenRenderingWithDateHelpersTest : TinyToolsScenario<TinyTemplateEngine>
 {
-    private ToolContext _context = null!;
+    private ExecutionContext _context = null!;
     private string _template = null!;
     private string? _result;
 
@@ -17,7 +19,7 @@ public class WhenRenderingWithDateHelpersTest : TinyToolsScenario<TinyTemplateEn
     [Given("Setup test context")]
     protected override void Given()
     {
-        _context = new ToolContext();
+        _context = new ExecutionContext();
         _context.Set("OrderDate", new DateTime(2024, 6, 15, 14, 30, 0));
         _context.Set("BirthDate", new DateTime(1990, 3, 25));
 

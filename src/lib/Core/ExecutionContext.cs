@@ -4,21 +4,21 @@
 /// Runtime context for pipeline execution.
 /// Contains all variables accessible via ${Context.xxx} expressions.
 /// </summary>
-public class ToolContext
+public class ExecutionContext
 {
     private readonly Dictionary<string, object?> _variables = new(StringComparer.OrdinalIgnoreCase);
     private readonly Stack<CursorEntry> _cursorStack = new();
     private readonly Dictionary<string, TemplateServiceFunc> _services = new(StringComparer.OrdinalIgnoreCase);
     private readonly ILogger _logger;
 
-    public ToolContext(ILoggerFactory? loggerFactory = null)
+    public ExecutionContext(ILoggerFactory? loggerFactory = null)
     {
         _logger = loggerFactory?.CreateLogger<ToolContext>()
                   ?? NullLogger<ToolContext>.Instance;
     }
 
     // Internal: used by CreateChild to propagate the same logger instance
-    private ToolContext(ILogger logger)
+    private ExecutionContext(ILogger logger)
     {
         _logger = logger;
     }

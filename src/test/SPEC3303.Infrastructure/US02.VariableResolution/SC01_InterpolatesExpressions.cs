@@ -1,3 +1,5 @@
+using ExecutionContext = LowlandTech.TinyTools.Core.ExecutionContext;
+
 namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US02.VariableResolution;
 
 /// <summary>
@@ -9,7 +11,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US02.VariableResol
 [UserStory("02", "Variable resolver interpolates template expressions")]
 public class WhenUsingVariableResolverTest : TinyToolsScenario<VariableResolver>
 {
-    private ToolContext _context = null!;
+    private ExecutionContext _context = null!;
 
     protected override VariableResolver For()
     {
@@ -19,7 +21,7 @@ public class WhenUsingVariableResolverTest : TinyToolsScenario<VariableResolver>
     [Given("Setup test context")]
     protected override void Given()
     {
-        _context = new ToolContext();
+        _context = new ExecutionContext();
     }
 
     [When("Execute test action")]

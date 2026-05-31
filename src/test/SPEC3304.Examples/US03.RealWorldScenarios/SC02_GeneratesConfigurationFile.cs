@@ -1,3 +1,5 @@
+using ExecutionContext = LowlandTech.TinyTools.Core.ExecutionContext;
+
 namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 
 [Trait(Spec.SPEC, "3304")]
@@ -5,7 +7,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 [UserStory("03", "Real-world scenarios generate practical output")]
 public class WhenRenderingConfigurationFileTest : TinyToolsScenario<TinyTemplateEngine>
 {
-    private ToolContext _context = null!;
+    private ExecutionContext _context = null!;
     private string _template = null!;
     private string? _result;
 
@@ -17,7 +19,7 @@ public class WhenRenderingConfigurationFileTest : TinyToolsScenario<TinyTemplate
     [Given("Setup test context")]
     protected override void Given()
     {
-        _context = new ToolContext();
+        _context = new ExecutionContext();
         _context.Set("Environment", "production");
         _context.Set("AppName", "MyWebApp");
         _context.Set("Port", 8080);

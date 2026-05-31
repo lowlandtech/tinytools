@@ -1,4 +1,5 @@
 using System.Globalization;
+using ExecutionContext = LowlandTech.TinyTools.Core.ExecutionContext;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US04.PipeHelpers;
 
@@ -7,7 +8,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US04.PipeHelpers;
 [UserStory("04", "Template engine applies number pipe helpers")]
 public class WhenRenderingWithNumberHelpersTest : TinyToolsScenario<TinyTemplateEngine>
 {
-    private ToolContext _context = null!;
+    private ExecutionContext _context = null!;
     private string _template = null!;
     private string? _result;
 
@@ -22,7 +23,7 @@ public class WhenRenderingWithNumberHelpersTest : TinyToolsScenario<TinyTemplate
         // Set invariant culture for consistent test results
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
-        _context = new ToolContext();
+        _context = new ExecutionContext();
         _context.Set("Price", 1234.567);
         _context.Set("Quantity", 1500);
         _context.Set("Percentage", 0.856);

@@ -1,7 +1,9 @@
+using ExecutionContext = LowlandTech.TinyTools.Core.ExecutionContext;
+
 namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpolation;
 
 /// <summary>
-/// Tests for Interpolate extension method for List&lt;string&gt; that takes an ToolContext.
+/// Tests for Interpolate extension method for List&lt;string&gt; that takes an ExecutionContext.
 /// Note: We use engine: null to disambiguate from the generic Interpolate&lt;T&gt; overload.
 /// </summary>
 [Trait(Spec.SPEC, "3300")]
@@ -9,7 +11,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [UserStory("01", "String interpolation handles list templates with context")]
 public class WhenInterpolatingListWithContextTest : TinyToolsScenario<List<string>>
 {
-    private ToolContext _context = null!;
+    private ExecutionContext _context = null!;
     private List<string>? _result;
 
     protected override List<string> For()
@@ -25,7 +27,7 @@ public class WhenInterpolatingListWithContextTest : TinyToolsScenario<List<strin
     [Given("Setup test context")]
     protected override void Given()
     {
-        _context = new ToolContext();
+        _context = new ExecutionContext();
         _context.Set("Name", "John");
         _context.Set("City", "Seattle");
         _context.Set("Age", 30);
@@ -59,7 +61,7 @@ public class WhenInterpolatingListWithContextTest : TinyToolsScenario<List<strin
         ArrangeAndAct();
         // Arrange
         var templates = new List<string> { "Hello ${Context.Name}", "Bye ${Context.Name}" };
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Name", "Jane");
         var engine = new TinyTemplateEngine();
 
@@ -96,7 +98,7 @@ public class WhenInterpolatingListWithContextTest : TinyToolsScenario<List<strin
         ArrangeAndAct();
         // Arrange
         var templates = new List<string> { "Hello ${Context.Name}" };
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Name", "John");
 
         // Act
@@ -131,7 +133,7 @@ public class WhenInterpolatingListWithContextTest : TinyToolsScenario<List<strin
         ArrangeAndAct();
         // Arrange
         var templates = new List<string> { "Hello" };
-        ToolContext context = null!;
+        ExecutionContext context = null!;
 
         // Act
         var act = () => templates.Interpolate(context, engine: null);
@@ -152,7 +154,7 @@ public class WhenInterpolatingListWithContextTest : TinyToolsScenario<List<strin
             "${Context.Model.FirstName}",
             "${Context.Model.LastName}"
         };
-        var context = new ToolContext
+        var context = new ExecutionContext
         {
             Model = new Person { FirstName = "John", LastName = "Doe" }
         };
@@ -197,7 +199,7 @@ public class WhenInterpolatingListWithContextTest : TinyToolsScenario<List<strin
             "Another static",
             "${Context.City} is great"
         };
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Name", "John");
         context.Set("City", "Seattle");
 
@@ -225,7 +227,7 @@ public class WhenInterpolatingListWithContextTest : TinyToolsScenario<List<strin
 Active
 }"
         };
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("IsActive", true);
 
         // Act
@@ -249,7 +251,7 @@ Active
             "${Context.C}",
             "${Context.D}"
         };
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("A", "1");
         context.Set("B", "2");
         context.Set("C", "3");
@@ -275,7 +277,7 @@ Active
             "Hello ${Context.Name}",
             "Hello ${Context.Name}"
         };
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Name", "John");
 
         // Act
@@ -298,7 +300,7 @@ Active
             "${Context.User.Name}",
             "${Context.User.Address.City}"
         };
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("User", new { Name = "John", Address = new { City = "Seattle" } });
 
         // Act
@@ -321,7 +323,7 @@ Active
             "${Context.Existing ?? \"default1\"}",
             "${Context.Missing ?? \"default2\"}"
         };
-        var context = new ToolContext();
+        var context = new ExecutionContext();
         context.Set("Existing", "value");
 
         // Act

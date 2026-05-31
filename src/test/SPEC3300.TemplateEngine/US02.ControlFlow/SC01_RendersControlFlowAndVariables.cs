@@ -1,3 +1,5 @@
+using ExecutionContext = LowlandTech.TinyTools.Core.ExecutionContext;
+
 namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US02.ControlFlow;
 
 /// <summary>
@@ -9,7 +11,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US02.ControlFlow;
 [UserStory("02", "Template engine renders control flow and variables")]
 public class WhenUsingTinyTemplateEngineTest : TinyToolsScenario<TinyTemplateEngine>
 {
-    private ToolContext _context = null!;
+    private ExecutionContext _context = null!;
 
     protected override TinyTemplateEngine For()
     {
@@ -19,7 +21,7 @@ public class WhenUsingTinyTemplateEngineTest : TinyToolsScenario<TinyTemplateEng
     [Given("Setup test context")]
     protected override void Given()
     {
-        _context = new ToolContext();
+        _context = new ExecutionContext();
     }
 
     [When("Execute test action")]
