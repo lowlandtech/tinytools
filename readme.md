@@ -159,7 +159,7 @@ var result = template.Interpolate(data);
 
 ```csharp
 var engine = new TinyTemplateEngine();
-var context = new ExecutionContext();
+var context = new ToolContext();
 context.Set("Name", "Alice");
 context.Set("IsPremium", true);
 context.Set("Items", new[] { "Item 1", "Item 2", "Item 3" });
@@ -186,7 +186,7 @@ var result = engine.Render(template, context);
 
 ```csharp
 var engine = new TinyTemplateEngine();
-var context = new ExecutionContext
+var context = new ToolContext
 {
     Model = new Customer
     {
@@ -357,7 +357,7 @@ services.AddSingleton<ITemplateService, HumanizerService>();
 // In controller
 public MyController(IEnumerable<ITemplateService> services)
 {
-    var context = new ExecutionContext();
+    var context = new ToolContext();
     context.RegisterServices(services);  // Registers all IoC services
 }
 ```
@@ -368,7 +368,7 @@ public MyController(IEnumerable<ITemplateService> services)
 // Install: dotnet add package Humanizer.Core
 using Humanizer;
 
-var context = new ExecutionContext();
+var context = new ToolContext();
 
 // Register pluralization service
 context.RegisterService("pluralize", input => 

@@ -22,15 +22,15 @@ return (
         <CardContent>
           <Tabs defaultValue="simple">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="simple">Simple {"{PropertyName}"}</TabsTrigger>
+              <TabsTrigger value="simple">Simple ${"${PropertyName}"}</TabsTrigger>
               <TabsTrigger value="engine">Engine ${"${Context.xxx}"}</TabsTrigger>
             </TabsList>
             <TabsContent value="simple" className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Use the <code>Interpolate</code> extension for quick, tag-based replacements.
+                Use the <code>Interpolate</code> extension for quick, `${"${var}"}`-style replacements.
               </p>
               <CodeBlock
-                code={`var template = "Hello {FirstName} {LastName}";
+                code={`var template = "Hello \${FirstName} \${LastName}";
 var model = new { FirstName = "John", LastName = "Smith" };
 
 var result = template.Interpolate(model);
@@ -41,7 +41,7 @@ var result = template.Interpolate(model);
                 Dictionary models are also supported:
               </p>
               <CodeBlock
-                code={`var template = "Hello {Name}";
+                code={`var template = "Hello \${Name}";
 var model = new Dictionary<string, string> { ["Name"] = "Jane" };
 var result = template.Interpolate(model);
 // Output: Hello Jane`}

@@ -27,10 +27,10 @@ export function ApiReferencePage() {
               language="csharp"
             />
             <p className="text-sm text-muted-foreground mt-2 mb-2">
-              Replaces {"{PropertyName}"} tags with values from an anonymous object or class.
+              Replaces {"${PropertyName}"} tags with values from an anonymous object or class.
             </p>
             <CodeBlock
-              code={`var template = "Hello {FirstName} {LastName}!";
+              code={`var template = "Hello \${FirstName} \${LastName}!";
 var model = new { FirstName = "John", LastName = "Smith" };
 var result = template.Interpolate(model);
 // Output: "Hello John Smith!"`}
@@ -44,10 +44,10 @@ var result = template.Interpolate(model);
               language="csharp"
             />
             <p className="text-sm text-muted-foreground mt-2 mb-2">
-              Replaces {"{Key}"} tags with values from a dictionary.
+              Replaces {"${Key}"} tags with values from a dictionary.
             </p>
             <CodeBlock
-              code={`var template = "Welcome to {City}, {Country}!";
+              code={`var template = "Welcome to \${City}, \${Country}!";
 var data = new Dictionary<string, string>
 {
     { "City", "Amsterdam" },

@@ -1,3 +1,29 @@
+# 2026.5.31
+## Variable Syntax Update
+
+### Breaking Changes
+
+* Variable interpolation syntax changed from `{var}` to `${var}`
+  - Applies to simple interpolation tokens in templates and strings
+  - Aligns basic interpolation syntax with the engine's `${...}` expression model
+  - Reduces ambiguity between literal braces and interpolation tokens
+
+### Migration Guide
+
+**Before:**
+```csharp
+var template = "Hello {FirstName} {LastName}!";
+```
+
+**After:**
+```csharp
+var template = "Hello ${FirstName} ${LastName}!";
+```
+
+If you are using `ToolContext` or engine expressions, continue using `${Context.Name}` and `${...}` syntax consistently.
+
+---
+
 # 2026.1.3
 ## ITemplate System - Self-Validating Code Generation Templates
 
@@ -114,11 +140,11 @@
   - `Compare` and `AreEqual` method tests
 * **InterpolationExtensions test coverage:**
   - `InterpolateWithEngine<T>` tests
-  - `Interpolate(ExecutionContext)` tests
-  - `Interpolate(List<string>, ExecutionContext)` tests
+  - `Interpolate(ToolContext)` tests
+  - `Interpolate(List<string>, ToolContext)` tests
 
 ### Bug Fixes
-* **Fixed delegate property resolution in VariableResolver** - `ExecutionContext.Get()` method was not being invoked for delegate properties, causing template services to fail silently
+* **Fixed delegate property resolution in VariableResolver** - `ToolContext.Get()` method was not being invoked for delegate properties, causing template services to fail silently
 
 ### Infrastructure
 * Upgraded to .NET 8, 9, and 10 multi-targeting

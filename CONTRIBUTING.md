@@ -86,7 +86,7 @@ Example test:
 public void ItShouldHandleNullInput()
 {
     // Arrange
-    var context = new ExecutionContext();
+    var context = new ToolContext();
     context.RegisterService("test", input => input?.ToString() ?? "default");
     
     // Act
@@ -104,7 +104,7 @@ tinytools/
 ├── src/
 │   └── lowlandtech.tinytools/      # Core library
 │       ├── TinyTemplateEngine.cs   # Main engine
-│       ├── ExecutionContext.cs     # Template context
+│       ├── ToolContext.cs     # Template context
 │       ├── VariableResolver.cs     # Expression resolver
 │       ├── TemplateHelpers.cs      # Built-in helpers
 │       └── ITemplateService.cs     # Service interface

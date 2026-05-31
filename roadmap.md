@@ -176,6 +176,8 @@ dotnet tinytools watch --template *.tmpl
 
 ## Future Considerations (2027+)
 
+Additional candidate features are tracked in [docs/Feature-Ideas.md](docs/Feature-Ideas.md). That document collects smaller ideas that may feed future roadmap updates.
+
 ### Under Consideration
 
 #### ?? Localization/Internationalization
