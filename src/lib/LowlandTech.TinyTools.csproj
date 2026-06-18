@@ -50,6 +50,11 @@
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
+  <!-- Ignore unavailable inherited sources; source selection is centralized in NuGet.Config. -->
+  <PropertyGroup>
+    <RestoreIgnoreFailedSources>true</RestoreIgnoreFailedSources>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="output\**" />
     <EmbeddedResource Remove="output\**" />
@@ -79,5 +84,3 @@
   </ItemGroup>
 
 </Project>
-
-
