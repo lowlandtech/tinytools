@@ -1,0 +1,9 @@
+namespace LowlandTech.Core.Plugins;
+
+public interface IIntentPlugin
+{
+    string Type { get; }
+    object Reduce(object state, object intent);
+}
+
+public sealed record IntentResult(object State, IReadOnlyList<string> Trace);

@@ -1,0 +1,17 @@
+using LowlandTech.Core.Plugins;
+
+namespace LowlandTech.Plugins.${Context.Plugin.Group};
+
+public sealed record ${Context.Plugin.Intent}Intent;
+
+public sealed class ${Context.Plugin.Intent}Plugin : IIntentPlugin
+{
+    public string Type => "${Context.Plugin.Group}.${Context.Plugin.Action}";
+
+    public object Reduce(object state, object intent)
+    {
+        if (intent is not ${Context.Plugin.Intent}Intent)
+            throw new ArgumentException($"Expected ${Context.Plugin.Intent}Intent.", nameof(intent));
+        return state;
+    }
+}

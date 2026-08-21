@@ -14,6 +14,36 @@ export function CodeGenerationPage() {
 
       <Card>
         <CardHeader>
+          <CardTitle>Workspace Generation with the TT Skill</CardTitle>
+          <CardDescription>
+            Give agents a reusable workflow that expands templates across projects and plugins.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <CodeBlock
+            code={`dotnet run --project src/cli -- generate \\
+  skills/tinytools-workflows/assets/graphstrip/workflow.yml \\
+  --model skills/tinytools-workflows/assets/graphstrip/model.json \\
+  --root D:/graphstrip \\
+  --templates skills/tinytools-workflows/assets/graphstrip`}
+            language="bash"
+          />
+          <CodeBlock
+            code={`name: graphstrip-bootstrap
+steps:
+  - id: plugins
+    type: template
+    forEach: Context.Model.Plugins
+    item: Plugin
+    template: plugins/intent.plugin.cs.tt
+    output: src/plugins/\${Context.Plugin.Group}/\${Context.Plugin.Action}.plugin.cs`}
+            language="yaml"
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Basic Class Generation</CardTitle>
           <CardDescription>
             Generate simple C# classes with properties.

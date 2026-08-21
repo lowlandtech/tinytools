@@ -1,0 +1,12 @@
+name: example-workspace
+variables:
+  Product: TinyTools
+steps:
+  - id: readme
+    type: template
+    template: templates/README.md.tt
+    output: generated/README.md
+  - id: inspect
+    type: command
+    command: dotnet
+    args: ["--info"]

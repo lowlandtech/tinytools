@@ -1,0 +1,4 @@
+interface:
+  display_name: "TinyTools Workflows"
+  short_description: "Generate workspaces from YAML workflows and .tt templates"
+  default_prompt: "Use TinyTools workflows to generate or update this workspace idempotently."

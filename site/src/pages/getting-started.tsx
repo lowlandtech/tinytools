@@ -49,6 +49,28 @@ var result = template.Interpolate(model);
 
       <Card>
         <CardHeader>
+          <CardTitle>Agent Workflow Generation</CardTitle>
+          <CardDescription>
+            Generate an entire workspace from YAML, JSON model data, and reusable .tt templates.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <CodeBlock
+            code={`dotnet run --project src/cli -- generate \\
+  skills/tinytools-workflows/assets/graphstrip/workflow.yml \\
+  --model skills/tinytools-workflows/assets/graphstrip/model.json \\
+  --root D:/graphstrip \\
+  --templates skills/tinytools-workflows/assets/graphstrip`}
+            language="bash"
+          />
+          <p className="text-sm text-muted-foreground">
+            Repeat the command safely: template outputs are only rewritten when their rendered content changes.
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Email Templates</CardTitle>
           <CardDescription>
             A common use case - generating personalized emails.

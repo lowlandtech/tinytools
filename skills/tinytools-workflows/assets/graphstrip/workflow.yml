@@ -1,0 +1,65 @@
+name: graphstrip-bootstrap
+variables:
+  Product: GraphStrip
+  Framework: net10.0
+steps:
+  - id: directory-build
+    type: template
+    template: directory-build.props.tt
+    output: Directory.Build.props
+  - id: solution
+    type: template
+    template: solution.slnx.tt
+    output: GraphStrip.slnx
+  - id: projects
+    type: template
+    forEach: Context.Model.Projects
+    item: Project
+    template: project.csproj.tt
+    output: ${Context.Project.Path}/${Context.Project.Name}.csproj
+  - id: core-contracts
+    type: template
+    template: core/PluginContracts.cs.tt
+    output: src/core/Plugins/PluginContracts.cs
+  - id: core-registry
+    type: template
+    template: core/IntentRegistry.cs.tt
+    output: src/core/Plugins/IntentRegistry.cs
+  - id: plugin-registration
+    type: template
+    template: plugins/Registration.cs.tt
+    output: src/plugins/PluginRegistration.cs
+  - id: shell-host
+    type: template
+    template: shell/App.razor.tt
+    output: src/shell/App.razor
+  - id: api-host
+    type: template
+    template: api/Program.cs.tt
+    output: src/api/Program.cs
+  - id: client-host
+    type: template
+    template: client/Program.cs.tt
+    output: src/client/Program.cs
+  - id: app-host
+    type: template
+    template: app/MauiProgram.cs.tt
+    output: src/app/MauiProgram.cs
+  - id: plugins
+    type: template
+    forEach: Context.Model.Plugins
+    item: Plugin
+    template: plugins/intent.plugin.cs.tt
+    output: src/plugins/${Context.Plugin.Group}/${Context.Plugin.Action}.plugin.cs
+  - id: plugin-tests
+    type: template
+    forEach: Context.Model.Plugins
+    item: Plugin
+    template: plugins/intent.test.cs.tt
+    output: src/test/Plugins/${Context.Plugin.Group}/${Context.Plugin.Action}.Tests.cs
+  - id: plugin-workitems
+    type: template
+    forEach: Context.Model.Plugins
+    item: Plugin
+    template: plugins/workitem.md.tt
+    output: docs/workitems/${Context.Plugin.Coordinate}.${Context.Plugin.Name}.md

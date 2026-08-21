@@ -14,6 +14,28 @@ export function ExamplesPage() {
 
       <Card>
         <CardHeader>
+          <CardTitle>Agent-Driven Workspace Bootstrap</CardTitle>
+          <CardDescription>
+            Use the TinyTools CLI and TT skill to generate repeatable application boilerplate and plugins.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <CodeBlock
+            code={`dotnet run --project src/cli -- generate \\
+  skills/tinytools-workflows/assets/graphstrip/workflow.yml \\
+  --model skills/tinytools-workflows/assets/graphstrip/model.json \\
+  --root D:/graphstrip \\
+  --templates skills/tinytools-workflows/assets/graphstrip`}
+            language="bash"
+          />
+          <p className="text-sm text-muted-foreground">
+            The workflow can combine ordinary templates with model-driven <code>forEach</code> steps and safe CLI commands.
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Newsletter Template</CardTitle>
           <CardDescription>
             Generate a formatted newsletter with articles and conditional offers.

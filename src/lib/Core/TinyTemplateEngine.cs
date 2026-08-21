@@ -38,6 +38,12 @@ public partial class TinyTemplateEngine : ITemplateEngine
         return _resolver.ResolveString(input, context);
     }
 
+    /// <summary>Resolves one typed expression for workflow orchestration.</summary>
+    public object? ResolveExpression(string expression, ToolContext context)
+    {
+        return _resolver.ResolveExpression(expression, context);
+    }
+
     private string ProcessControlFlow(string template, ToolContext context)
     {
         // First, remove comments (@* ... *@)
