@@ -51,16 +51,16 @@ var result = template.Interpolate(model);
         <CardHeader>
           <CardTitle>Agent Workflow Generation</CardTitle>
           <CardDescription>
-            Generate an entire workspace from YAML, JSON model data, and reusable .tt templates.
+            Generate a small workspace from YAML, JSON model data, and reusable .tt templates.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <CodeBlock
             code={`dotnet run --project src/cli -- generate \\
-  skills/tinytools-workflows/assets/graphstrip/workflow.yml \\
-  --model skills/tinytools-workflows/assets/graphstrip/model.json \\
-  --root D:/graphstrip \\
-  --templates skills/tinytools-workflows/assets/graphstrip`}
+  skills/tinytools-workflows/assets/basic/workflow.yml \\
+  --model skills/tinytools-workflows/assets/basic/model.json \\
+  --root ./generated-workspace \\
+  --templates skills/tinytools-workflows/assets/basic`}
             language="bash"
           />
           <p className="text-sm text-muted-foreground">

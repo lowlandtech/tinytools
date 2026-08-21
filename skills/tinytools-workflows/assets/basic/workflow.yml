@@ -1,0 +1,14 @@
+name: basic-workspace
+variables:
+  Product: TinyTools Example
+steps:
+  - id: readme
+    type: template
+    template: templates/README.md.tt
+    output: README.md
+  - id: source-files
+    type: template
+    forEach: Context.Model.Files
+    item: File
+    template: templates/source.cs.tt
+    output: src/${Context.File.Name}.cs

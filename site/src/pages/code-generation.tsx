@@ -22,21 +22,21 @@ export function CodeGenerationPage() {
         <CardContent className="space-y-4">
           <CodeBlock
             code={`dotnet run --project src/cli -- generate \\
-  skills/tinytools-workflows/assets/graphstrip/workflow.yml \\
-  --model skills/tinytools-workflows/assets/graphstrip/model.json \\
-  --root D:/graphstrip \\
-  --templates skills/tinytools-workflows/assets/graphstrip`}
+  skills/tinytools-workflows/assets/basic/workflow.yml \\
+  --model skills/tinytools-workflows/assets/basic/model.json \\
+  --root ./generated-workspace \\
+  --templates skills/tinytools-workflows/assets/basic`}
             language="bash"
           />
           <CodeBlock
-            code={`name: graphstrip-bootstrap
+            code={`name: basic-workspace
 steps:
-  - id: plugins
+  - id: source-files
     type: template
-    forEach: Context.Model.Plugins
-    item: Plugin
-    template: plugins/intent.plugin.cs.tt
-    output: src/plugins/\${Context.Plugin.Group}/\${Context.Plugin.Action}.plugin.cs`}
+    forEach: Context.Model.Files
+    item: File
+    template: templates/source.cs.tt
+    output: src/\${Context.File.Name}.cs`}
             language="yaml"
           />
         </CardContent>

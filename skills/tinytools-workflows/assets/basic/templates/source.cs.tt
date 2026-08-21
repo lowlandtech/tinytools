@@ -1,0 +1,4 @@
+namespace ${Context.File.Namespace};
+
+/// <summary>${Context.File.Description}</summary>
+public sealed record ${Context.File.Name}(Guid Id);

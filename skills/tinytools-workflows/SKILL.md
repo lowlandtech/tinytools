@@ -1,6 +1,6 @@
 ---
 name: tinytools-workflows
-description: Generate and update workspaces with the TinyTools YAML workflow CLI and .tt templates. Use when an agent needs repeatable, idempotent file generation, workspace bootstrapping, or a workflow combining templates with dotnet, git, or gh steps.
+description: Generate and update workspaces with the TinyTools YAML workflow CLI and .tt templates. Use when an agent needs repeatable, idempotent file generation, workspace bootstrapping, model-driven file expansion, or a workflow combining templates with dotnet, git, or gh steps.
 ---
 
 # TinyTools Workflows
@@ -52,12 +52,12 @@ Inside `.tt` files, use TinyTools expressions such as `${Context.Product}` and `
 
 Read [workflow-schema.md](references/workflow-schema.md) when adding or reviewing workflow fields.
 
-## GraphStrip bootstrap
+## Generic example pack
 
-Use the bundled GraphStrip pack when bootstrapping the migration-reset repository:
+Use the bundled generic pack to prove a workflow before adapting it to a target repository:
 
 ```bash
-dotnet run --project src/cli -- generate skills/tinytools-workflows/assets/graphstrip/workflow.yml --model skills/tinytools-workflows/assets/graphstrip/model.json --root D:/graphstrip --templates skills/tinytools-workflows/assets/graphstrip
+dotnet run --project src/cli -- generate skills/tinytools-workflows/assets/basic/workflow.yml --model skills/tinytools-workflows/assets/basic/model.json --root ./generated-workspace --templates skills/tinytools-workflows/assets/basic
 ```
 
-The pack creates the `src/core`, `src/domain`, `src/plugins`, `src/shell`, `src/api`, `src/client`, `src/app`, and `src/test` project shells, shared plugin contracts and registry, plugin registration, host entry points, one generated plugin/test/workitem per model entry, and a solution file. Treat generated plugins and tests as refinement starting points; replace their TODOs before implementation and register concrete behavior through the typed intent boundary.
+The pack creates a README and one C# source file per model entry. Use it to verify template syntax, model expansion, path handling, and idempotency. Repository-specific project layouts, plugins, registries, and conventions should live with the target repository rather than in this generic skill.

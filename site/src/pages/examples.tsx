@@ -16,16 +16,16 @@ export function ExamplesPage() {
         <CardHeader>
           <CardTitle>Agent-Driven Workspace Bootstrap</CardTitle>
           <CardDescription>
-            Use the TinyTools CLI and TT skill to generate repeatable application boilerplate and plugins.
+            Use the TinyTools CLI and TT skill to generate repeatable workspace boilerplate from model data.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <CodeBlock
             code={`dotnet run --project src/cli -- generate \\
-  skills/tinytools-workflows/assets/graphstrip/workflow.yml \\
-  --model skills/tinytools-workflows/assets/graphstrip/model.json \\
-  --root D:/graphstrip \\
-  --templates skills/tinytools-workflows/assets/graphstrip`}
+  skills/tinytools-workflows/assets/basic/workflow.yml \\
+  --model skills/tinytools-workflows/assets/basic/model.json \\
+  --root ./generated-workspace \\
+  --templates skills/tinytools-workflows/assets/basic`}
             language="bash"
           />
           <p className="text-sm text-muted-foreground">

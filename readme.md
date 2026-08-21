@@ -130,14 +130,14 @@ dotnet add package LowlandTech.TinyTools
 
 ## Agent workflow generation
 
-TinyTools also includes a CLI and an agent skill for repeatable workspace generation. The bundled GraphStrip pack creates project shells, host entry points, plugin contracts, intent registrations, plugin/test boilerplate, and workitems from a YAML workflow and JSON model:
+TinyTools also includes a CLI and an agent skill for repeatable workspace generation. The bundled generic pack demonstrates README and source-file generation from a YAML workflow and JSON model:
 
 ```sh
 dotnet run --project src/cli -- generate \
-  skills/tinytools-workflows/assets/graphstrip/workflow.yml \
-  --model skills/tinytools-workflows/assets/graphstrip/model.json \
-  --root D:/graphstrip \
-  --templates skills/tinytools-workflows/assets/graphstrip
+  skills/tinytools-workflows/assets/basic/workflow.yml \
+  --model skills/tinytools-workflows/assets/basic/model.json \
+  --root ./generated-workspace \
+  --templates skills/tinytools-workflows/assets/basic
 ```
 
 Template steps are idempotent: unchanged files are not rewritten. `forEach` steps can generate one file per model item, while command steps support allow-listed `dotnet`, `git`, and `gh` operations. See [docs/Workflow-CLI.md](docs/Workflow-CLI.md) and [skills/tinytools-workflows](skills/tinytools-workflows) for the workflow contract and agent instructions.
@@ -147,8 +147,8 @@ Template steps are idempotent: unchanged files are not rewritten. `forEach` step
 ### Basic String Interpolation
 
 ```csharp
-// Simple property interpolation with {PropertyName} syntax
-var template = "Hello {FirstName} {LastName}!";
+// Simple property interpolation with ${PropertyName} syntax
+var template = "Hello ${FirstName} ${LastName}!";
 var model = new { FirstName = "John", LastName = "Smith" };
 
 var result = template.Interpolate(model);
@@ -158,7 +158,7 @@ var result = template.Interpolate(model);
 ### Dictionary Interpolation
 
 ```csharp
-var template = "Welcome to {City}, {Country}!";
+var template = "Welcome to ${City}, ${Country}!";
 var data = new Dictionary<string, string>
 {
     { "City", "Amsterdam" },

@@ -1,0 +1,6 @@
+{
+  "Files": [
+    { "Name": "Customer", "Namespace": "Example.Domain", "Description": "A generated customer record." },
+    { "Name": "Order", "Namespace": "Example.Domain", "Description": "A generated order record." }
+  ]
+}

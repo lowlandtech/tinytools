@@ -12,7 +12,7 @@ This document outlines the planned features, improvements, and direction for Low
 **Released**: January 2026
 
 ### Core Features
-- ? Simple string interpolation (`{PropertyName}`)
+- ? Simple string interpolation (`${PropertyName}`)
 - ? Template engine with control flow (`@if`, `@foreach`)
 - ? Variable interpolation (`${Context.xxx}`)
 - ? Null coalescing (`${expr ?? "default"}`)

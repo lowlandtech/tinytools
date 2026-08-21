@@ -1,7 +1,0 @@
-<Solution>
-  <Folder Name="/src/">
-@foreach (var project in Context.Model.Projects) {
-    <Project Path="${project.Path}/${project.Name}.csproj" />
-}
-  </Folder>
-</Solution>

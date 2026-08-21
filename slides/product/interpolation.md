@@ -2,7 +2,7 @@
 
 TinyTemplateEngine supports two interpolation styles:
 
-- Simple `{PropertyName}` string interpolation for quick replacements.
+- Simple `${PropertyName}` string interpolation for quick replacements.
 - Engine-backed `${Context...}` interpolation with full template features.
 
 ## Simple String Interpolation
@@ -10,7 +10,7 @@ TinyTemplateEngine supports two interpolation styles:
 Use the `Interpolate` extension for small, tag-based replacements.
 
 ```csharp
-var template = "Hello {FirstName} {LastName}";
+var template = "Hello ${FirstName} ${LastName}";
 var model = new { FirstName = "John", LastName = "Smith" };
 
 var result = template.Interpolate(model);
@@ -20,7 +20,7 @@ var result = template.Interpolate(model);
 Dictionary models are supported as well:
 
 ```csharp
-var template = "Hello {Name}";
+var template = "Hello ${Name}";
 var model = new Dictionary<string, string> { ["Name"] = "Jane" };
 var result = template.Interpolate(model);
 // Hello Jane
