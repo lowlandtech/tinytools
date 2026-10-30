@@ -5,10 +5,13 @@ namespace LowlandTech.TinyTools;
 /// <summary>
 /// Simple template engine that handles ${Context.xxx} interpolation and @if/@foreach control flow.
 /// </summary>
-public partial class TinyTemplateEngine : ITemplateEngine
+public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
 {
+    private const int CompiledPlanCapacity = 128;
+
     private readonly VariableResolver _resolver;
     private readonly ILogger _logger;
+    private readonly TemplatePlanCache _plans = new(CompiledPlanCapacity);
 
     public TinyTemplateEngine(ILoggerFactory? loggerFactory = null)
     {
@@ -42,6 +45,25 @@ public partial class TinyTemplateEngine : ITemplateEngine
     public object? ResolveExpression(string expression, ToolContext context)
     {
         return _resolver.ResolveExpression(expression, context);
+    }
+
+    /// <summary>
+    /// Compiles the source once and reuses the plan for that exact source until it is
+    /// evicted. Compilation normalizes line endings and nothing else - it never
+    /// resolves variables, calls a helper or captures a context, and rendered output
+    /// is never cached.
+    /// </summary>
+    public CompiledTemplate Compile(string source)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+
+        if (_plans.TryGet(source, out var cached) && cached is not null) return cached;
+
+        return _plans.Add(source, () =>
+        {
+            var normalized = source.Replace("\r\n", "\n").Replace("\r", "\n");
+            return new CompiledTemplate(source, normalized, context => Render(normalized, context), this);
+        });
     }
 
     /// <summary>
