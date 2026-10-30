@@ -5,18 +5,15 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US02.ControlFlow;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "03")]
 [UserStory("02", "Template engine handles negation operators")]
-public class WhenRenderingWithNegationTest : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC03_RendersNegation : TinyToolsScenario<TinyTemplateEngine>
 {
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string? _result;
+    private string _result = string.Empty;
 
-    protected override TinyTemplateEngine For()
-    {
-        return new TinyTemplateEngine();
-    }
+    protected override TinyTemplateEngine For() => new();
 
-    [Given("Setup test context")]
+    [Given("a context with an inactive account, a subscription and an empty cart")]
     protected override void Given()
     {
         _context = new ExecutionContext();
@@ -37,37 +34,24 @@ public class WhenRenderingWithNegationTest : TinyToolsScenario<TinyTemplateEngin
             """;
     }
 
-    [When("Execute test action")]
+    [When("the negation template is rendered once")]
     protected override void When()
     {
         base.When();
         _result = Sut.Render(_template, _context);
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Show Inactive Message")]
-    [Fact]
-    public void ItShouldShowInactiveMessage()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Account is inactive.");
-    }
+    public SC03_RendersNegation() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Not Show No Subscription Message")]
-    [Fact]
-    public void ItShouldNotShowNoSubscriptionMessage()
-    {
-        ArrangeAndAct();
-        _result.Should().NotContain("No subscription found.");
-    }
+    [Then("the render should contain Account is inactive.")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_ShowsInactiveMessage() => _result.Should().Contain("Account is inactive.");
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Show No Items Message")]
-    [Fact]
-    public void ItShouldShowNoItemsMessage()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("No items in cart.");
-    }
+    [Then("the render should not contain No subscription found.")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_DoesNotShowSubscriptionMessage() => _result.Should().NotContain("No subscription found.");
+
+    [Then("the render should contain No items in cart.")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_ShowsNoItemsMessage() => _result.Should().Contain("No items in cart.");
 }

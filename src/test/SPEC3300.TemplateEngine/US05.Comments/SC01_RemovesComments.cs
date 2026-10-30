@@ -5,18 +5,15 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US05.Comments;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "01")]
 [UserStory("05", "Template engine removes comment blocks")]
-public class WhenRenderingWithCommentsTest : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC01_RemovesComments : TinyToolsScenario<TinyTemplateEngine>
 {
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string? _result;
+    private string _result = string.Empty;
 
-    protected override TinyTemplateEngine For()
-    {
-        return new TinyTemplateEngine();
-    }
+    protected override TinyTemplateEngine For() => new();
 
-    [Given("Setup test context")]
+    [Given("a template carrying single-line, multi-line and todo comments")]
     protected override void Given()
     {
         _context = new ExecutionContext();
@@ -34,47 +31,28 @@ public class WhenRenderingWithCommentsTest : TinyToolsScenario<TinyTemplateEngin
             """;
     }
 
-    [When("Execute test action")]
+    [When("the commented template is rendered once")]
     protected override void When()
     {
         base.When();
         _result = Sut.Render(_template, _context);
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Remove Single Line Comments")]
-    [Fact]
-    public void ItShouldRemoveSingleLineComments()
-    {
-        ArrangeAndAct();
-        _result.Should().NotContain("This is a single-line comment");
-    }
+    public SC01_RemovesComments() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Remove Multi Line Comments")]
-    [Fact]
-    public void ItShouldRemoveMultiLineComments()
-    {
-        ArrangeAndAct();
-        _result.Should().NotContain("multi-line comment");
-    }
+    [Then("the render should not contain This is a single-line comment")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_RemovesSingleLineComments() => _result.Should().NotContain("This is a single-line comment");
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Remove Todo Comments")]
-    [Fact]
-    public void ItShouldRemoveTodoComments()
-    {
-        ArrangeAndAct();
-        _result.Should().NotContain("TODO:");
-    }
+    [Then("the render should not contain multi-line comment")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_RemovesMultiLineComments() => _result.Should().NotContain("multi-line comment");
 
-    [Trait(Spec.UAC, "04")]
-    [Then("it Should Keep Actual Content")]
-    [Fact]
-    public void ItShouldKeepActualContent()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Hello, Alice!");
-        _result.Should().Contain("Welcome to our platform.");
-    }
+    [Then("the render should not contain TODO:")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_RemovesTodoComments() => _result.Should().NotContain("TODO:");
+
+    [Then("the render should contain Hello, Alice!")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_KeepsActualContent() => _result.Should().Contain("Hello, Alice!").And.Contain("Welcome to our platform.");
 }

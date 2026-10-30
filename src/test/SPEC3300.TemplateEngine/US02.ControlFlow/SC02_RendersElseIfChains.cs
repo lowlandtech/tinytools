@@ -5,18 +5,15 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US02.ControlFlow;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "02")]
 [UserStory("02", "Template engine handles else-if chains")]
-public class WhenRenderingWithElseIfTest : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC02_RendersElseIfChains : TinyToolsScenario<TinyTemplateEngine>
 {
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string? _result;
+    private string _result = string.Empty;
 
-    protected override TinyTemplateEngine For()
-    {
-        return new TinyTemplateEngine();
-    }
+    protected override TinyTemplateEngine For() => new();
 
-    [Given("Setup test context")]
+    [Given("a context with a score and an editor role")]
     protected override void Given()
     {
         _context = new ExecutionContext();
@@ -50,51 +47,28 @@ public class WhenRenderingWithElseIfTest : TinyToolsScenario<TinyTemplateEngine>
             """;
     }
 
-    [When("Execute test action")]
+    [When("the else-if template is rendered once")]
     protected override void When()
     {
         base.When();
         _result = Sut.Render(_template, _context);
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Select Correct Grade")]
-    [Fact]
-    public void ItShouldSelectCorrectGrade()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("C - Satisfactory");
-    }
+    public SC02_RendersElseIfChains() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Not Show Other Grades")]
-    [Fact]
-    public void ItShouldNotShowOtherGrades()
-    {
-        ArrangeAndAct();
-        _result.Should().NotContain("A - Excellent");
-        _result.Should().NotContain("B - Good job");
-        _result.Should().NotContain("D - Needs improvement");
-        _result.Should().NotContain("F - Failed");
-    }
+    [Then("the grade should contain C - Satisfactory")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_SelectsCorrectGrade() => _result.Should().Contain("C - Satisfactory");
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Select Correct Access Level")]
-    [Fact]
-    public void ItShouldSelectCorrectAccessLevel()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Edit access granted");
-    }
+    [Then("the grade should not contain A - Excellent")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_DoesNotShowOtherGrades() => _result.Should().NotContain("A - Excellent").And.NotContain("B - Good job").And.NotContain("D - Needs improvement").And.NotContain("F - Failed");
 
-    [Trait(Spec.UAC, "04")]
-    [Then("it Should Not Show Other Access Levels")]
-    [Fact]
-    public void ItShouldNotShowOtherAccessLevels()
-    {
-        ArrangeAndAct();
-        _result.Should().NotContain("Full access granted");
-        _result.Should().NotContain("Read-only access");
-        _result.Should().NotContain("Guest access");
-    }
+    [Then("the access level should contain Edit access granted")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_SelectsCorrectAccessLevel() => _result.Should().Contain("Edit access granted");
+
+    [Then("the access level should not contain Guest access")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_DoesNotShowOtherAccessLevels() => _result.Should().NotContain("Full access granted").And.NotContain("Read-only access").And.NotContain("Guest access");
 }

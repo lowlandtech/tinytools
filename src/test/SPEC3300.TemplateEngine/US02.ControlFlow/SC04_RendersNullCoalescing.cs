@@ -5,18 +5,15 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US02.ControlFlow;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "04")]
 [UserStory("02", "Template engine handles null coalescing")]
-public class WhenRenderingWithNullCoalescingTest : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC04_RendersNullCoalescing : TinyToolsScenario<TinyTemplateEngine>
 {
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string? _result;
+    private string _result = string.Empty;
 
-    protected override TinyTemplateEngine For()
-    {
-        return new TinyTemplateEngine();
-    }
+    protected override TinyTemplateEngine For() => new();
 
-    [Given("Setup test context")]
+    [Given("a context with present, null, empty and missing values")]
     protected override void Given()
     {
         _context = new ExecutionContext();
@@ -34,55 +31,32 @@ public class WhenRenderingWithNullCoalescingTest : TinyToolsScenario<TinyTemplat
             """;
     }
 
-    [When("Execute test action")]
+    [When("the coalescing template is rendered once")]
     protected override void When()
     {
         base.When();
         _result = Sut.Render(_template, _context);
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Use Actual Value When Present")]
-    [Fact]
-    public void ItShouldUseActualValueWhenPresent()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Hello, John!");
-    }
+    public SC04_RendersNullCoalescing() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Use Default When Null")]
-    [Fact]
-    public void ItShouldUseDefaultWhenNull()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Nickname: None provided");
-    }
+    [Then("the render should contain Hello, John!")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_UsesActualValueWhenPresent() => _result.Should().Contain("Hello, John!");
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Use Default When Empty")]
-    [Fact]
-    public void ItShouldUseDefaultWhenEmpty()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Title: No title");
-    }
+    [Then("the render should contain Nickname: None provided")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_UsesDefaultWhenNull() => _result.Should().Contain("Nickname: None provided");
 
-    [Trait(Spec.UAC, "04")]
-    [Then("it Should Use Actual Company Value")]
-    [Fact]
-    public void ItShouldUseActualCompanyValue()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Company: Acme Inc");
-    }
+    [Then("the render should contain Title: No title")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_UsesDefaultWhenEmpty() => _result.Should().Contain("Title: No title");
 
-    [Trait(Spec.UAC, "05")]
-    [Then("it Should Use Default When Variable Does Not Exist")]
-    [Fact]
-    public void ItShouldUseDefaultWhenVariableDoesNotExist()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Department: Unassigned");
-    }
+    [Then("the render should contain Company: Acme Inc")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_UsesActualCompanyValue() => _result.Should().Contain("Company: Acme Inc");
+
+    [Then("the render should contain Department: Unassigned")]
+    [Trait("UAC", "05"), Fact]
+    public void UAC05_UsesDefaultWhenVariableDoesNotExist() => _result.Should().Contain("Department: Unassigned");
 }
