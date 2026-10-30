@@ -37,6 +37,7 @@
 | M5-004 | SPEC3311-US01-SC01 | [Establish one version authority](done/SPEC3311.US01.SC01.version-authority.md) | P1 | tinytools | M5-003 | done | true | [#62](https://github.com/lowlandtech/tinytools/issues/62) |
 | M5-005 | SPEC3312-US01-SC01 | [Keep one release pipeline and real quality gates](doing/SPEC3312.US01.SC01.release-pipeline-and-quality-gates.md) | P2 | tinytools | M5-004 | doing | true | [#63](https://github.com/lowlandtech/tinytools/issues/63) |
 | M5-006 | SPEC3313-US01-SC01 | [Remove the duplicate test project](done/SPEC3313.US01.SC01.test-project-consolidation.md) | P2 | tinytools | None | done | true | [#64](https://github.com/lowlandtech/tinytools/issues/64) |
+| M5-007 | SPEC3318-US01-SC01 | [Repair the documentation baseline that blocks the issue mirror](doing/SPEC3318.US01.SC01.docs-baseline-repair.md) | P1 | tinytools | None | doing | true | pending |
 | M6-001 | SPEC3315-US01-SC01 | [Import the template entity model](done/SPEC3315.US01.SC01.template-entity-model.md) | P1 | tinytools | None | done | true | [#67](https://github.com/lowlandtech/tinytools/issues/67) |
 | M6-002 | SPEC3315-US02-SC01 | [Serve the template API contract](done/SPEC3315.US02.SC01.template-api-host.md) | P1 | tinytools | M6-001 | done | true | [#68](https://github.com/lowlandtech/tinytools/issues/68) |
 | M6-003 | SPEC3315-US03-SC01 | [Add the templates store, reducer and HTTP client](done/SPEC3315.US03.SC01.template-store.md) | P2 | tinytools | M6-002 | done | true | [#69](https://github.com/lowlandtech/tinytools/issues/69) |
