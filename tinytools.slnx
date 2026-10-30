@@ -5,7 +5,7 @@
     <File Path="license.md" />
     <File Path="nuget.config" />
     <File Path="readme.md" />
-    <File Path="roadmap.md" />
+    <File Path="docs/workitems/README.md" />
   </Folder>
   <Folder Name="/files/github/">
     <File Path=".github/workflows/deploy-docs.yml" />
