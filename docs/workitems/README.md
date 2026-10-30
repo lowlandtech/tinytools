@@ -1,9 +1,10 @@
 | Milestone | Title | Gate |
 |---|---|---|
 | M1 | Correctness and test foundations | Open correctness regressions, visible use-case test specifications, RazorLight cache compatibility and control-flow line-boundary behavior have executable coverage, accepted source and matching issue states. |
-| M2 | Developer experience | Validation, caching, syntax diagnostics, additional helpers and the published performance target have verified acceptance. |
+| M2 | Developer experience | Validation, caching, syntax diagnostics, additional helpers, the published performance target, and an accurate documented API, CLI and repository documentation have verified acceptance. |
 | M3 | Advanced templating | Includes, macros, asynchronous services and collection helpers meet their contracts. |
 | M4 | Ecosystem and tooling | Editor, source generation, reusable template packs and CLI delivery are accepted. |
+| M5 | Package and release integrity | The published package carries only runtime dependencies and no test-only types, the helper registry is immutable, one version authority produces every version surface, and exactly one workflow publishes each feed with real quality gates. |
 
 | Work | Scope | Title | Priority | Lane | Depends on | Status | Refined | Issue |
 |---|---|---|---|---|---|---|---|---|
@@ -17,6 +18,9 @@
 | M2-003 | SPEC3300-US08-SC01 | [Report template syntax locations](todo/SPEC3300.US08.SC01.syntax-diagnostic-locations.md) | P1 | tinytools | M2-001 | todo | true | [#40](https://github.com/lowlandtech/tinytools/issues/40) |
 | M2-004 | SPEC3303-US03-SC02 | [Add slice, match, contains and split helpers](todo/SPEC3303.US03.SC02.additional-pipe-helpers.md) | P2 | tinytools | None | todo | true | [#45](https://github.com/lowlandtech/tinytools/issues/45) |
 | M2-005 | SPEC3300-US06-SC02 | [Measure and improve variable-resolution performance](todo/SPEC3300.US06.SC02.variable-resolution-performance.md) | P2 | tinytools | None | todo | false | [#38](https://github.com/lowlandtech/tinytools/issues/38) |
+| M2-006 | SPEC3308-US01-SC01 | [Align documentation with the public API](todo/SPEC3308.US01.SC01.documentation-accuracy.md) | P2 | tinytools | None | todo | true | [#56](https://github.com/lowlandtech/tinytools/issues/56) |
+| M2-007 | SPEC3309-US01-SC01 | [Harden CLI execution and prove it with tests](todo/SPEC3309.US01.SC01.cli-execution-safety.md) | P2 | tinytools | M5-006 | todo | true | [#57](https://github.com/lowlandtech/tinytools/issues/57) |
+| M2-008 | SPEC3314-US01-SC01 | [Keep repository documentation UTF-8 and free of empty files](todo/SPEC3314.US01.SC01.documentation-encoding.md) | P3 | tinytools | None | todo | true | [#58](https://github.com/lowlandtech/tinytools/issues/58) |
 | M3-001 | SPEC3300-US09-SC01 | [Compose templates from includes and partials](todo/SPEC3300.US09.SC01.template-includes.md) | P2 | tinytools | None | todo | false | [#41](https://github.com/lowlandtech/tinytools/issues/41) |
 | M3-002 | SPEC3300-US10-SC01 | [Define and invoke template macros](todo/SPEC3300.US10.SC01.template-macros.md) | P2 | tinytools | None | todo | false | [#42](https://github.com/lowlandtech/tinytools/issues/42) |
 | M3-003 | SPEC3303-US04-SC01 | [Support asynchronous template services](todo/SPEC3303.US04.SC01.async-template-services.md) | P2 | tinytools | None | todo | false | [#47](https://github.com/lowlandtech/tinytools/issues/47) |
@@ -25,3 +29,9 @@
 | M4-002 | SPEC3306-US02-SC01 | [Generate typed template renderers at build time](todo/SPEC3306.US02.SC01.source-generator-templates.md) | P2 | tinytools | None | todo | false | [#49](https://github.com/lowlandtech/tinytools/issues/49) |
 | M4-003 | SPEC3301-US02-SC01 | [Publish and discover reusable template packs](todo/SPEC3301.US02.SC01.template-library-registry.md) | P2 | tinytools | None | todo | false | [#43](https://github.com/lowlandtech/tinytools/issues/43) |
 | M4-004 | SPEC3306-US03-SC01 | [Complete the template render and watch CLI](todo/SPEC3306.US03.SC01.render-watch-cli.md) | P2 | tinytools | None | todo | false | [#50](https://github.com/lowlandtech/tinytools/issues/50) |
+| M5-001 | SPEC3310-US01-SC01 | [Remove test-only dependencies and types from the package](todo/SPEC3310.US01.SC01.package-dependency-surface.md) | P1 | tinytools | None | todo | true | [#59](https://github.com/lowlandtech/tinytools/issues/59) |
+| M5-002 | SPEC3310-US02-SC01 | [Make the helper registry immutable and thread-safe](todo/SPEC3310.US02.SC01.helper-registry-immutability.md) | P2 | tinytools | None | todo | true | [#60](https://github.com/lowlandtech/tinytools/issues/60) |
+| M5-003 | SPEC3310-US03-SC01 | [Ship the intended package readme and metadata](todo/SPEC3310.US03.SC01.package-readme-and-metadata.md) | P2 | tinytools | M5-001 | todo | true | [#61](https://github.com/lowlandtech/tinytools/issues/61) |
+| M5-004 | SPEC3311-US01-SC01 | [Establish one version authority](todo/SPEC3311.US01.SC01.version-authority.md) | P1 | tinytools | M5-003 | todo | false | [#62](https://github.com/lowlandtech/tinytools/issues/62) |
+| M5-005 | SPEC3312-US01-SC01 | [Keep one release pipeline and real quality gates](todo/SPEC3312.US01.SC01.release-pipeline-and-quality-gates.md) | P2 | tinytools | M5-004 | todo | false | [#63](https://github.com/lowlandtech/tinytools/issues/63) |
+| M5-006 | SPEC3313-US01-SC01 | [Remove the duplicate test project](todo/SPEC3313.US01.SC01.test-project-consolidation.md) | P2 | tinytools | None | todo | true | [#64](https://github.com/lowlandtech/tinytools/issues/64) |
