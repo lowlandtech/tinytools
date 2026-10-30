@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TinyTools playground</title>
+    <base href="/playground/" />
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 2rem auto; max-width: 60rem; padding: 0 1rem; color: #1f2933; }
+        h1 { font-size: 1.6rem; }
+        .lead { color: #52606d; margin-bottom: 1.5rem; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        label { display: flex; flex-direction: column; font-weight: 600; font-size: .85rem; }
+        textarea { font-family: ui-monospace, monospace; min-height: 9rem; margin-top: .35rem; padding: .5rem; }
+        button { margin: 1rem 0; padding: .5rem 1.25rem; font-weight: 600; cursor: pointer; }
+        pre { background: #f5f7fa; border: 1px solid #e4e7eb; padding: .75rem; overflow-x: auto; }
+        .diagnostic { color: #b91c1c; font-weight: 600; }
+        .version { color: #7b8794; font-size: .8rem; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <p>Loading the WebAssembly engine…</p>
+    </div>
+
+    <div id="blazor-error-ui" style="display:none">
+        The playground failed to start. Check the browser console for details.
+    </div>
+
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+</html>

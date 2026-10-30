@@ -1,0 +1,44 @@
+@page "/"
+@using LowlandTech.TinyTools.Playground
+
+<PageTitle>Tinytools playground</PageTitle>
+
+<h1>TinyTools playground</h1>
+<p class="lead">Render a template against a JSON model with the engine compiled to WebAssembly.</p>
+
+<div class="grid">
+    <label>
+        Template
+        <textarea @bind="session.Template" @bind:event="oninput" spellcheck="false"></textarea>
+    </label>
+    <label>
+        Model
+        <textarea @bind="session.Model" @bind:event="oninput" spellcheck="false"></textarea>
+    </label>
+</div>
+
+<button @onclick="Render">Render</button>
+
+<h2>Output</h2>
+<pre class="output">@session.Output</pre>
+
+@if (session.DiagnosticCode is not null)
+{
+    <p class="diagnostic">@session.DiagnosticCode</p>
+}
+
+<h2>Use it</h2>
+<pre class="snippet">@session.CSharpSnippet</pre>
+<pre class="snippet">@session.WorkflowSnippet</pre>
+<p class="version">Engine @Version</p>
+
+@code {
+    [Inject]
+    private PlaygroundSession session { get; set; } = default!;
+
+    private static string Version => typeof(TinyTemplateEngine).Assembly.GetName().Version?.ToString() ?? "unknown";
+
+    protected override void OnInitialized() => session.Render();
+
+    private void Render() => session.Render();
+}
