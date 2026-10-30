@@ -1,4 +1,9 @@
 # 2026.10.4
+## Snapshot approvals
+
+* `tinytools test <directory> [--approve]` pins the rendered output of every `.tmpl` beside it as
+  `name.approved.txt`. A change reports the first differing line with a bounded diff, a missing
+  approval names the expected path, and `--approve` is the only way a file is written.
 ## Projection and aggregate helpers
 
 * `select:path` projects one member out of a collection, preserving order and duplicates.

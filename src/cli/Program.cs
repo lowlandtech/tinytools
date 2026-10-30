@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text.Json;
 using LowlandTech.TinyTools.Rendering;
+using LowlandTech.TinyTools.Testing;
 using LowlandTech.TinyTools.Workflows;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -8,6 +9,7 @@ using YamlDotNet.Serialization.NamingConventions;
 const string Usage = """
     tinytools generate <workflow.yml> [--model model.json] [--root directory] [--templates directory]
     tinytools render <template> [<template>...] --output <file> | --out-dir <dir> [--model model.json] [--root directory]
+    tinytools test <directory> [--approve]
     tinytools watch <template> --output <file> [--model model.json] [--root directory]
     """;
 
@@ -15,6 +17,11 @@ if (args.Length == 0 || args[0] is "--help" or "-h")
 {
     Console.WriteLine(Usage);
     return 0;
+}
+
+if (string.Equals(args[0], "test", StringComparison.OrdinalIgnoreCase))
+{
+    return RunTest(args);
 }
 
 if (string.Equals(args[0], "render", StringComparison.OrdinalIgnoreCase))
@@ -83,6 +90,33 @@ static object? ToModel(JsonElement value) => value.ValueKind switch
     JsonValueKind.False => false,
     _ => null
 };
+
+static int RunTest(string[] args)
+{
+    var directory = Directory.GetCurrentDirectory();
+    var approve = false;
+    for (var i = 1; i < args.Length; i++)
+    {
+        if (args[i] == "--approve") approve = true;
+        else if (!args[i].StartsWith("--", StringComparison.Ordinal)) directory = args[i];
+    }
+
+    var cases = TemplateSnapshotRunner.Discover(directory);
+    if (cases.Count == 0)
+    {
+        Console.Error.WriteLine($"No .tmpl cases found in '{directory}'.");
+        return 2;
+    }
+
+    var results = new TemplateSnapshotRunner().Run(cases, approve);
+    foreach (var result in results)
+    {
+        Console.WriteLine($"{(result.Ok ? "ok" : "failed"),-7} {result.Case.Name}: {result.Message}");
+        if (!result.Ok && result.Diff.Length > 0) Console.WriteLine(result.Diff);
+    }
+
+    return results.All(result => result.Ok) ? 0 : 1;
+}
 
 static int RunRender(string[] args)
 {
