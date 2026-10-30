@@ -1,4 +1,9 @@
 # 2026.10.4
+## Documentation baseline
+
+* Removed 12 superseded test-campaign summaries and moved the five remaining guides plus the feature
+  backlog into `site/public/guides/`, where they publish with the documentation site. The shared
+  roadmap validator now passes, which unblocks the repository's issue tooling.
 
 ## Interpolation is locale independent
 

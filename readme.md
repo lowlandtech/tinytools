@@ -154,7 +154,22 @@ dotnet run --project src/cli -- generate \
   --templates skills/tinytools-workflows/assets/basic
 ```
 
-Template steps are idempotent: unchanged files are not rewritten. `forEach` steps can generate one file per model item, while command steps support allow-listed `dotnet`, `git`, and `gh` operations. See [docs/Workflow-CLI.md](docs/Workflow-CLI.md) and [skills/tinytools-workflows](skills/tinytools-workflows) for the workflow contract and agent instructions.
+Template steps are idempotent: unchanged files are not rewritten. `forEach` steps can generate one file per model item, while command steps support allow-listed `dotnet`, `git`, and `gh` operations, with arguments passed without a shell. Template and command paths are confined to `--root`, and the shared contract lives in `LowlandTech.TinyTools.Workflows`, so MAUI and Blazor WASM hosts can display the same definitions. See [skills/tinytools-workflows](skills/tinytools-workflows) for the workflow contract and agent instructions.
+
+```yaml
+name: workspace
+variables:
+  Product: TinyTools
+steps:
+  - id: readme
+    type: template
+    template: templates/README.md.tt
+    output: README.md
+  - id: restore
+    type: command
+    command: dotnet
+    args: [restore]
+```
 
 ## Usage
 
@@ -493,7 +508,7 @@ Services are **simple functions** that transform data—nothing more, nothing le
 ### Advanced: IoC/DI Integration
 
 For production applications with ASP.NET Core or other DI containers, see:
-**📖 [IoC Integration Guide](docs/IOC-INTEGRATION.md)**
+**📖 [IoC Integration Guide](site/public/guides/IOC-INTEGRATION.md)**
 
 - Implement `ITemplateService` for full DI support
 - Inject services from IoC container
