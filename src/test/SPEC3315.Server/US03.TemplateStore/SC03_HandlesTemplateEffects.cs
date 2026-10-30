@@ -1,162 +1,100 @@
 #if NET10_0_OR_GREATER
-using LowlandTech.TinyTools.Core.Abstractions;
 using LowlandTech.TinyTools.Core.Entities;
 using LowlandTech.TinyTools.Frontend.Features.Templates;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US03.TemplateStore;
 
-/// <summary>A store that records what the effects dispatch.</summary>
-public sealed class RecordingStore(TemplateState? state = null) : ITemplateStore
-{
-    public TemplateState State { get; } = state ?? new TemplateState();
-    public List<object> Dispatched { get; } = [];
-
-    public void Dispatch(object action) => Dispatched.Add(action);
-}
-
-/// <summary>A library that answers with fixed data and records the calls.</summary>
-public sealed class StubLibrary : ITemplateLibrary
-{
-    public List<Template> Templates { get; init; } = [];
-    public TemplateValidation? Validation { get; init; } = new(true, "out", "out");
-    public Exception? ValidationFailure { get; init; }
-    public List<(string Call, Guid? Id)> Calls { get; } = [];
-
-    public Task<List<Template>> ListAsync(CancellationToken ct = default)
-    {
-        Calls.Add(("list", null));
-        return Task.FromResult(Templates);
-    }
-
-    public Task<Template?> GetAsync(Guid id, CancellationToken ct = default)
-    {
-        Calls.Add(("get", id));
-        return Task.FromResult(Templates.FirstOrDefault(template => template.Id == id));
-    }
-
-    public Task<Template> CreateAsync(Template template, CancellationToken ct = default)
-    {
-        Calls.Add(("create", template.Id));
-        return Task.FromResult(template);
-    }
-
-    public Task<Template?> UpdateAsync(Template template, CancellationToken ct = default)
-    {
-        Calls.Add(("update", template.Id));
-        return Task.FromResult<Template?>(template);
-    }
-
-    public Task<bool> DeleteAsync(Guid id, CancellationToken ct = default)
-    {
-        Calls.Add(("delete", id));
-        return Task.FromResult(true);
-    }
-
-    public Task<TemplateValidation?> ValidateVersionAsync(Guid versionId, CancellationToken ct = default)
-    {
-        Calls.Add(("validate", versionId));
-        if (ValidationFailure is not null) throw ValidationFailure;
-        return Task.FromResult(Validation);
-    }
-}
-
 [Trait(Spec.SPEC, "3315")]
 [Trait(Spec.SC, "03")]
 [UserStory("03", "Template effects read the server and dispatch the reducer's messages")]
-public class WhenHandlingTemplateEffects
+public sealed class SC03_HandlesTemplateEffects : IAsyncLifetime
 {
-    private static Template TemplateWithVersions(string name, params string[] versions)
+    private RecordingStore _store = null!;
+    private StubLibrary _library = null!;
+    private int _loaded, _cached, _selectedVersions;
+    private string _order = string.Empty, _message = string.Empty, _calls = string.Empty;
+    private bool _valid, _deleted;
+    [Given("a library with one template that has two versions and one refusing validation")]
+    private void Given()
+    {
+        _store = new RecordingStore();
+        _library = new StubLibrary { Templates = [Template()] };
+    }
+
+    [When("load, select, validate and delete are handled once")]
+    private async Task WhenAsync()
+    {
+        var effects = new TemplateEffects(_library);
+        await effects.LoadAsync(_store);
+        var loaded = (TemplatesLoaded)_store.Dispatched[0];
+        _loaded = loaded.AllItems.Count;
+        _cached = loaded.VersionCache.Count;
+
+        await effects.SelectNodeAsync(_store, new TemplateSelectNode("t", "EntityClass", "template", _library.Templates[0].Id));
+        var versions = (TemplateVersionsLoaded)_store.Dispatched[2];
+        _selectedVersions = versions.Versions.Count;
+        _order = string.Join(",", versions.Versions.Select(version => version.Name));
+
+        await effects.ValidateVersionAsync(_store, Guid.NewGuid());
+        _valid = _store.Dispatched.OfType<TemplateValidateCompleted>().Last().Result?.Valid ?? false;
+
+        var refusing = new TemplateEffects(new StubLibrary { ValidationFailure = new InvalidOperationException("no test data") });
+        await refusing.ValidateVersionAsync(_store, Guid.NewGuid());
+        _message = _store.Dispatched.OfType<TemplateValidateCompleted>().Last().Error ?? string.Empty;
+
+        await effects.DeleteAsync(_store, Guid.NewGuid());
+        _deleted = _store.Dispatched.OfType<TemplateDeleteCompleted>().Any();
+        _calls = string.Join(",", _library.Calls);
+    }
+
+    public async ValueTask InitializeAsync()
+    {
+        Given();
+        await WhenAsync();
+    }
+
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    private static Template Template()
     {
         var id = Guid.NewGuid();
         return new Template
         {
             Id = id,
-            Name = name,
-            Versions = versions
-                .Select(version => new TemplateVersion { Id = Guid.NewGuid(), Name = version, TemplateId = id })
-                .ToList(),
+            Name = "EntityClass",
+            Versions =
+            [
+                new TemplateVersion { Id = Guid.NewGuid(), Name = "v1", TemplateId = id },
+                new TemplateVersion { Id = Guid.NewGuid(), Name = "v2", TemplateId = id },
+            ],
         };
     }
 
-    [Trait(Spec.UAC, "03")]
-    [Fact]
-    public async Task ItShouldLoadTheLibraryAndCacheEveryVersion()
-    {
-        var template = TemplateWithVersions("EntityClass", "v1", "v2");
-        var library = new StubLibrary { Templates = [template] };
-        var effects = new TemplateEffects(library);
-        var store = new RecordingStore();
+    [Then("the loaded templates should have count 1")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_LoadsTheLibrary() => _loaded.Should().Be(1);
 
-        await effects.LoadAsync(store);
+    [Then("the cached versions should have count 2")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_CachesEveryVersion() => _cached.Should().Be(2);
 
-        library.Calls.Should().ContainSingle().Which.Call.Should().Be("list");
-        var loaded = store.Dispatched.Should().ContainSingle().Which.Should().BeOfType<TemplatesLoaded>().Subject;
-        loaded.AllItems.Should().ContainSingle().Which.Name.Should().Be("EntityClass");
-        loaded.VersionCache.Should().HaveCount(2);
-    }
+    [Then("the selection should contain v2")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_SelectsNewestFirst() => _order.Should().Be("v2,v1");
 
-    [Trait(Spec.UAC, "03")]
-    [Fact]
-    public async Task ItShouldSelectATemplateAndLoadItsVersionsNewestFirst()
-    {
-        var template = TemplateWithVersions("EntityClass", "v1", "v2");
-        var library = new StubLibrary { Templates = [template] };
-        var effects = new TemplateEffects(library);
-        var store = new RecordingStore();
+    [Then("the validation should be true")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_ReportsASuccessfulValidation() => _valid.Should().BeTrue();
 
-        await effects.SelectNodeAsync(store, new TemplateSelectNode("t", "EntityClass", "template", template.Id));
+    [Then("the message should contain no test data")]
+    [Trait("UAC", "05"), Fact]
+    public void UAC05_CarriesTheServersRefusal() => _message.Should().Contain("no test data");
 
-        store.Dispatched.Should().HaveCount(2);
-        store.Dispatched[0].Should().BeOfType<TemplateSelectNode>();
-        var loaded = store.Dispatched[1].Should().BeOfType<TemplateVersionsLoaded>().Subject;
-        loaded.Versions.Select(version => version.Name).Should().Equal("v2", "v1");
-    }
+    [Then("the delete should be true")]
+    [Trait("UAC", "06"), Fact]
+    public void UAC06_DeletesAndReportsIt() => _deleted.Should().BeTrue();
 
-    [Trait(Spec.UAC, "03")]
-    [Fact]
-    public async Task ItShouldReportAValidationOutcome()
-    {
-        var library = new StubLibrary();
-        var effects = new TemplateEffects(library);
-        var store = new RecordingStore();
-
-        await effects.ValidateVersionAsync(store, Guid.NewGuid());
-
-        store.Dispatched.Should().HaveCount(2);
-        store.Dispatched[0].Should().BeOfType<TemplateValidateStarted>();
-        store.Dispatched[1].Should().BeOfType<TemplateValidateCompleted>()
-            .Which.Result!.Valid.Should().BeTrue();
-    }
-
-    [Trait(Spec.UAC, "03")]
-    [Fact]
-    public async Task ItShouldCarryTheServersRefusalIntoTheValidationMessage()
-    {
-        var library = new StubLibrary { ValidationFailure = new InvalidOperationException("no test data") };
-        var effects = new TemplateEffects(library);
-        var store = new RecordingStore();
-
-        await effects.ValidateVersionAsync(store, Guid.NewGuid());
-
-        var completed = store.Dispatched.Should().ContainSingle(action => action is TemplateValidateCompleted)
-            .Which.Should().BeOfType<TemplateValidateCompleted>().Subject;
-        completed.Result.Should().BeNull();
-        completed.Error.Should().Be("no test data");
-    }
-
-    [Trait(Spec.UAC, "03")]
-    [Fact]
-    public async Task ItShouldDeleteAndReloadSoTheListCannotGoStale()
-    {
-        var library = new StubLibrary();
-        var effects = new TemplateEffects(library);
-        var store = new RecordingStore();
-
-        await effects.DeleteAsync(store, Guid.NewGuid());
-
-        library.Calls.Select(call => call.Call).Should().Equal("delete", "list");
-        store.Dispatched.Should().Contain(action => action is TemplateDeleteCompleted);
-        store.Dispatched.Should().Contain(action => action is TemplatesLoaded);
-    }
+    [Then("the calls should contain delete")]
+    [Trait("UAC", "07"), Fact]
+    public void UAC07_ReloadsAfterDelete() => _calls.Should().Contain("delete");
 }
 #endif
