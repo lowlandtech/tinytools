@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace LowlandTech.TinyTools;
 
@@ -52,6 +52,11 @@ public partial class TinyTemplateEngine : ITemplateEngine
         // Normalize line endings to \n for consistent processing
         template = template.Replace("\r\n", "\n").Replace("\r", "\n");
         
+        // Every plain line is emitted with the canonical LF separator, so output does
+        // not vary by host platform. A block replaces whole source lines and carries
+        // its own terminating line break, so one is only appended when the block
+        // rendered text without one; an empty block emitted no line and must not add
+        // a boundary either.
         var result = new StringBuilder();
         var lines = template.Split('\n');
         var lineIndex = 0;
@@ -64,30 +69,39 @@ public partial class TinyTemplateEngine : ITemplateEngine
             if (trimmed.StartsWith("@if"))
             {
                 var (processed, newIndex) = ProcessIfBlock(lines, lineIndex, context);
-                result.Append(processed);
+                AppendBlock(result, processed, newIndex < lines.Length);
                 lineIndex = newIndex;
             }
             else if (trimmed.StartsWith("@foreach"))
             {
                 var (processed, newIndex) = ProcessForeachBlock(lines, lineIndex, context);
-                result.Append(processed);
+                AppendBlock(result, processed, newIndex < lines.Length);
                 lineIndex = newIndex;
             }
             else
             {
-                result.AppendLine(line);
+                result.Append(line);
+                if (lineIndex < lines.Length - 1)
+                {
+                    result.Append('\n');
+                }
                 lineIndex++;
             }
         }
 
-        // Remove trailing newline if original didn't have one
+        // Split leaves a final empty line when the template ends with a line break, so
+        // a template without one has to lose the separator this loop added.
         var resultStr = result.ToString();
-        if (!template.EndsWith('\n') && resultStr.EndsWith(Environment.NewLine))
-        {
-            resultStr = resultStr.TrimEnd('\r', '\n');
-        }
+        return template.EndsWith('\n') ? resultStr : resultStr.TrimEnd('\n');
+    }
 
-        return resultStr;
+    private static void AppendBlock(StringBuilder result, string processed, bool hasFollowingLine)
+    {
+        result.Append(processed);
+        if (hasFollowingLine && processed.Length > 0 && !processed.EndsWith('\n'))
+        {
+            result.Append('\n');
+        }
     }
 
 #if NET7_0_OR_GREATER
@@ -206,6 +220,15 @@ public partial class TinyTemplateEngine : ITemplateEngine
     private static Regex ElseIfPattern() => _elseIfPattern;
 #endif
 
+
+    /// <summary>
+    /// Joins a block's body lines back into template text. The closing brace always
+    /// occupies its own source line, so a non-empty body is terminated by the line
+    /// break that preceded that brace - without it, a blank line at the end of a loop
+    /// body would collapse and an @if body would lose the boundary that follows it.
+    /// </summary>
+    private static string BlockText(List<string> lines) =>
+        lines.Count == 0 ? string.Empty : string.Join("\n", lines) + "\n";
     private record ConditionalBlock(string? Condition, string Content);
 
     private (List<ConditionalBlock> blocks, int endIndex) ExtractIfElseIfBlocks(string[] lines, int startIndex)
@@ -227,7 +250,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
             if (inBlock && braceCount == 1 && elseIfMatch.Success)
             {
                 // Save current block and start new else-if block
-                blocks.Add(new ConditionalBlock(currentCondition, string.Join("\n", currentLines)));
+                blocks.Add(new ConditionalBlock(currentCondition, BlockText(currentLines)));
                 currentLines.Clear();
                 currentCondition = elseIfMatch.Groups[1].Value.Trim();
                 continue;
@@ -237,7 +260,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
             if (inBlock && braceCount == 1 && (trimmed.StartsWith("} else {") || trimmed.StartsWith("} else{")))
             {
                 // Save current block and start else block
-                blocks.Add(new ConditionalBlock(currentCondition, string.Join("\n", currentLines)));
+                blocks.Add(new ConditionalBlock(currentCondition, BlockText(currentLines)));
                 currentLines.Clear();
                 currentCondition = null; // null indicates else block
                 continue;
@@ -253,7 +276,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
             // Check for block end
             if (braceCount == 0 && inBlock)
             {
-                blocks.Add(new ConditionalBlock(currentCondition, string.Join("\n", currentLines)));
+                blocks.Add(new ConditionalBlock(currentCondition, BlockText(currentLines)));
                 return (blocks, i + 1);
             }
 
@@ -265,7 +288,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
                 currentLines.Add(line);
         }
 
-        blocks.Add(new ConditionalBlock(currentCondition, string.Join("\n", currentLines)));
+        blocks.Add(new ConditionalBlock(currentCondition, BlockText(currentLines)));
         return (blocks, i);
     }
 
@@ -367,13 +390,13 @@ public partial class TinyTemplateEngine : ITemplateEngine
             // Check if we've closed the block
             if (braceCount == 0 && inBlock)
             {
-                return (string.Join("\n", blockLines), i + 1);
+                return (BlockText(blockLines), i + 1);
             }
 
             blockLines.Add(line);
         }
 
-        return (string.Join("\n", blockLines), lines.Length);
+        return (BlockText(blockLines), lines.Length);
     }
 
     private int FindClosingBrace(string[] lines, int startIndex)
@@ -422,7 +445,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
                 depth--;
                 if (depth == 0)
                 {
-                    blocks.Add(new ConditionalBlock(currentCondition, string.Join("\n", currentLines)));
+                    blocks.Add(new ConditionalBlock(currentCondition, BlockText(currentLines)));
                     return (blocks, i + 1);
                 }
             }
@@ -433,7 +456,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
                 var elseIfMatch = ElseIfEndPattern().Match(trimmed);
                 if (elseIfMatch.Success)
                 {
-                    blocks.Add(new ConditionalBlock(currentCondition, string.Join("\n", currentLines)));
+                    blocks.Add(new ConditionalBlock(currentCondition, BlockText(currentLines)));
                     currentLines.Clear();
                     currentCondition = elseIfMatch.Groups[1].Value.Trim();
                     continue;
@@ -441,7 +464,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
 
                 if (trimmed == "@else")
                 {
-                    blocks.Add(new ConditionalBlock(currentCondition, string.Join("\n", currentLines)));
+                    blocks.Add(new ConditionalBlock(currentCondition, BlockText(currentLines)));
                     currentLines.Clear();
                     currentCondition = null; // null indicates else block
                     continue;
@@ -451,7 +474,7 @@ public partial class TinyTemplateEngine : ITemplateEngine
             currentLines.Add(lines[i]);
         }
 
-        blocks.Add(new ConditionalBlock(currentCondition, string.Join("\n", currentLines)));
+        blocks.Add(new ConditionalBlock(currentCondition, BlockText(currentLines)));
         return (blocks, lines.Length);
     }
 
@@ -481,13 +504,13 @@ public partial class TinyTemplateEngine : ITemplateEngine
             {
                 depth--;
                 if (depth == 0)
-                    return (string.Join("\n", blockLines), i + 1);
+                    return (BlockText(blockLines), i + 1);
             }
 
             blockLines.Add(lines[i]);
         }
 
-        return (string.Join("\n", blockLines), lines.Length);
+        return (BlockText(blockLines), lines.Length);
     }
 
     private int FindEndMarker(string[] lines, int startIndex)
