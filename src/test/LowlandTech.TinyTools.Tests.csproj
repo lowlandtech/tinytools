@@ -36,6 +36,7 @@
 		     same Roslyn the analyzer targets. -->
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
 		<ProjectReference Include="..\generators\LowlandTech.TinyTools.Generators.csproj" />
+		<ProjectReference Include="..\lsp\LowlandTech.TinyTools.LanguageServer.csproj" />
 		<ProjectReference Include="..\api\LowlandTech.TinyTools.Api.csproj" />
 		<!-- Both hosts declare a top-level entry point, so the page scenarios reach
 		     the app through an alias and keep API's Program unambiguous. -->

@@ -1,4 +1,10 @@
 # 2026.10.4
+## Language server
+
+* `src/lsp` ships `tinytools-lsp`, an LSP 3.17 server over stdio that publishes template diagnostics,
+  completes model members and pipe helper names, and renders a preview on request. It reuses the
+  engine, so an editor sees exactly what a build or a render would produce. No editor extension is
+  claimed; the server is what an extension hosts.
 ## Build-time member checking
 
 * The template source generator now resolves every `${Context.*}` path against the declared model
