@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>LowlandTech.TinyTools.Api</RootNamespace>
+    <AssemblyName>LowlandTech.TinyTools.Api</AssemblyName>
+    <!-- The host is a development entry point until the plugin packaging item
+         makes it a served package. -->
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\core\LowlandTech.TinyTools.Core.csproj" />
+    <ProjectReference Include="..\lib\LowlandTech.TinyTools.csproj" />
+  </ItemGroup>
+
+</Project>

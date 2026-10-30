@@ -13,6 +13,7 @@
     <File Path=".github/workflows/tags.yml" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/api/LowlandTech.TinyTools.Api.csproj" />
     <Project Path="src/core/LowlandTech.TinyTools.Core.csproj" />
     <Project Path="src/lib/LowlandTech.TinyTools.csproj" />
     <Project Path="src/cli/LowlandTech.TinyTools.Cli.csproj" />
