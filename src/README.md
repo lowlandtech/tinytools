@@ -52,7 +52,7 @@ var result = template.Interpolate(data);
 using LowlandTech.TinyTools;
 
 var engine = new TinyTemplateEngine();
-var context = new ToolContext();
+var context = new ExecutionContext();
 context.Set("Name", "Alice");
 context.Set("IsPremium", true);
 context.Set("Items", new[] { "Item 1", "Item 2", "Item 3" });

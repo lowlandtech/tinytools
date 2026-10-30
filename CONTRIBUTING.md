@@ -1,4 +1,4 @@
-﻿# Contributing to TinyTemplateEngine
+# Contributing to TinyTemplateEngine
 
 Thank you for your interest in contributing to TinyTemplateEngine! We welcome contributions from the community.
 
@@ -86,7 +86,7 @@ Example test:
 public void ItShouldHandleNullInput()
 {
     // Arrange
-    var context = new ToolContext();
+    var context = new ExecutionContext();
     context.RegisterService("test", input => input?.ToString() ?? "default");
     
     // Act
@@ -102,18 +102,18 @@ public void ItShouldHandleNullInput()
 ```
 tinytools/
 ├── src/
-│   └── lowlandtech.tinytools/      # Core library
-│       ├── TinyTemplateEngine.cs   # Main engine
-│       ├── ToolContext.cs     # Template context
-│       ├── VariableResolver.cs     # Expression resolver
-│       ├── TemplateHelpers.cs      # Built-in helpers
-│       └── ITemplateService.cs     # Service interface
-├── test/
-│   └── lowlandtech.tinytools.unittests/  # Unit tests
-├── samples/
-│   └── README.md                   # Service examples
-├── .github/
-│   └── workflows/                  # CI/CD pipelines
+│   ├── lib/                        # The engine and its public API
+│   │   ├── Core/TinyTemplateEngine.cs
+│   │   ├── Core/ExecutionContext.cs     # Template context
+│   │   ├── Core/VariableResolver.cs
+│   │   ├── Helpers/TemplateHelpers.cs
+│   │   └── Registry/ITemplateService.cs
+│   ├── core/                       # Template entity model of the server
+│   ├── api/                        # ASP.NET Core host serving the template contract
+│   ├── frontend/                   # Razor package the Harness composes
+│   ├── cli/                        # tinytools generate
+│   └── test/                       # Executable specifications
+├── docs/workitems/                 # Roadmap board and source workitems
 └── readme.md                       # Main documentation
 ```
 

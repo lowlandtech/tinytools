@@ -173,7 +173,7 @@ var result = template.Interpolate(data);
 
 ```csharp
 var engine = new TinyTemplateEngine();
-var context = new ToolContext();
+var context = new ExecutionContext();
 context.Set("Name", "Alice");
 context.Set("IsPremium", true);
 context.Set("Items", new[] { "Item 1", "Item 2", "Item 3" });
@@ -200,7 +200,7 @@ var result = engine.Render(template, context);
 
 ```csharp
 var engine = new TinyTemplateEngine();
-var context = new ToolContext
+var context = new ExecutionContext
 {
     Model = new Customer
     {
@@ -276,6 +276,9 @@ Transform values using the pipe syntax: `${Context.Value | helper}` or `${Contex
 | `capitalize` | `${Context.Name \| capitalize}` | `John` |
 | `camelcase` | `${Context.Name \| camelcase}` | `firstName` |
 | `pascalcase` | `${Context.Name \| pascalcase}` | `FirstName` |
+| `kebabcase` | `${Context.Name \| kebabcase}` | `first-name` |
+| `snakecase` | `${Context.Name \| snakecase}` | `first_name` |
+| `titlecase` | `${Context.Name \| titlecase}` | `First Name` |
 | `trim` | `${Context.Text \| trim}` | `hello` |
 | `truncate:N` | `${Context.Desc \| truncate:20}` | `This is a long te...` |
 | `replace:old,new` | `${Context.Path \| replace:old,new}` | Replaces text |
@@ -371,7 +374,7 @@ services.AddSingleton<ITemplateService, HumanizerService>();
 // In controller
 public MyController(IEnumerable<ITemplateService> services)
 {
-    var context = new ToolContext();
+    var context = new ExecutionContext();
     context.RegisterServices(services);  // Registers all IoC services
 }
 ```
@@ -382,7 +385,7 @@ public MyController(IEnumerable<ITemplateService> services)
 // Install: dotnet add package Humanizer.Core
 using Humanizer;
 
-var context = new ToolContext();
+var context = new ExecutionContext();
 
 // Register pluralization service
 context.RegisterService("pluralize", input => 
