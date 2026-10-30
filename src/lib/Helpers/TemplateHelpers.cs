@@ -409,7 +409,11 @@ public static class TemplateHelpers
         {
             expression = new Regex(argument, RegexOptions.None, TimeSpan.FromSeconds(1));
         }
+#if NET7_0_OR_GREATER
         catch (RegexParseException error)
+#else
+        catch (ArgumentException error)
+#endif
         {
             // One named refusal for a malformed pattern, so the parser's own
             // subtype is normalized to ArgumentException.

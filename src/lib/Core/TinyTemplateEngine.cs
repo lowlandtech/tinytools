@@ -55,7 +55,7 @@ public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
     /// </summary>
     public CompiledTemplate Compile(string source)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        if (source is null) throw new ArgumentNullException(nameof(source));
 
         if (_plans.TryGet(source, out var cached) && cached is not null) return cached;
 
