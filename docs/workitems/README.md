@@ -10,7 +10,7 @@
 |---|---|---|---|---|---|---|---|---|
 | M1-001 | SPEC3300-US03-SC02 | [Preserve comparison operator precedence](todo/SPEC3300.US03.SC02.operator-precedence.md) | P1 | tinytools | None | todo | true | [#10](https://github.com/lowlandtech/tinytools/issues/10) |
 | M1-002 | SPEC3300-US03-SC03 | [Compare floating-point values with a tolerance](todo/SPEC3300.US03.SC03.floating-point-equality.md) | P3 | tinytools | None | todo | true | [#12](https://github.com/lowlandtech/tinytools/issues/12) |
-| M1-003 | SPEC3305-US02-SC01 | [Convert existing tests to visible use-case specifications](todo/SPEC3305.US02.SC01.visible-use-case-test-specifications.md) | P0 | tinytools | None | todo | true | [#52](https://github.com/lowlandtech/tinytools/issues/52) |
+| M1-003 | SPEC3305-US02-SC01 | [Convert existing tests to visible use-case specifications](doing/SPEC3305.US02.SC01.visible-use-case-test-specifications.md) | P0 | tinytools | None | doing | true | [#52](https://github.com/lowlandtech/tinytools/issues/52) |
 | M1-004 | SPEC3300-US11-SC01 | [Restore and fully test RazorLight cache compatibility](todo/SPEC3300.US11.SC01.razorlight-cache-compatibility.md) | P1 | tinytools | None | todo | true | [#53](https://github.com/lowlandtech/tinytools/issues/53) |
 | M1-005 | SPEC3300-US12-SC01 | [Preserve line boundaries after control-flow blocks](todo/SPEC3300.US12.SC01.control-flow-line-boundaries.md) | P2 | tinytools | M1-003 | todo | true | [#55](https://github.com/lowlandtech/tinytools/issues/55) |
 | M2-001 | SPEC3302-US04-SC01 | [Validate template syntax before rendering](todo/SPEC3302.US04.SC01.pre-render-syntax-validation.md) | P1 | tinytools | None | todo | true | [#44](https://github.com/lowlandtech/tinytools/issues/44) |

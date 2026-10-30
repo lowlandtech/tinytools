@@ -5,18 +5,19 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US03.Operators;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "01")]
 [UserStory("03", "Template engine evaluates comparison operators")]
+[Story(typeof(ComparisonOperatorStory))]
 public class WhenRenderingWithComparisonOperatorsTest : TinyToolsScenario<TinyTemplateEngine>
 {
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string? _result;
+    private ComparisonOperatorResult _result = null!;
 
     protected override TinyTemplateEngine For()
     {
         return new TinyTemplateEngine();
     }
 
-    [Given("Setup test context")]
+    [Given("a model whose values sit inside four comparison rules")]
     protected override void Given()
     {
         _context = new ExecutionContext();
@@ -40,46 +41,50 @@ public class WhenRenderingWithComparisonOperatorsTest : TinyToolsScenario<TinyTe
             """;
     }
 
-    [When("Execute test action")]
+    [When("the template is rendered once through the public engine")]
     protected override void When()
     {
         base.When();
-        _result = Sut.Render(_template, _context);
+        _result = ComparisonOperatorResult.From(Sut.Render(_template, _context));
     }
 
+    [Case<ComparisonOperatorCase>(ComparisonOperatorCase.GreaterOrEqualSatisfied)]
     [Trait(Spec.UAC, "01")]
     [Then("it Should Evaluate Greater Than Or Equal")]
     [Fact]
     public void ItShouldEvaluateGreaterThanOrEqual()
     {
         ArrangeAndAct();
-        _result.Should().Contain("You can purchase alcohol.");
+        _result.GreaterOrEqualRendered.Should().BeTrue();
     }
 
+    [Case<ComparisonOperatorCase>(ComparisonOperatorCase.LessThanSatisfied)]
     [Trait(Spec.UAC, "02")]
     [Then("it Should Evaluate Less Than")]
     [Fact]
     public void ItShouldEvaluateLessThan()
     {
         ArrangeAndAct();
-        _result.Should().Contain("Not yet eligible for senior discount.");
+        _result.LessThanRendered.Should().BeTrue();
     }
 
+    [Case<ComparisonOperatorCase>(ComparisonOperatorCase.LessOrEqualSatisfied)]
     [Trait(Spec.UAC, "03")]
     [Then("it Should Evaluate Less Than Or Equal")]
     [Fact]
     public void ItShouldEvaluateLessThanOrEqual()
     {
         ArrangeAndAct();
-        _result.Should().Contain("Low balance warning.");
+        _result.LessOrEqualRendered.Should().BeTrue();
     }
 
+    [Case<ComparisonOperatorCase>(ComparisonOperatorCase.GreaterThanSatisfied)]
     [Trait(Spec.UAC, "04")]
     [Then("it Should Evaluate Greater Than")]
     [Fact]
     public void ItShouldEvaluateGreaterThan()
     {
         ArrangeAndAct();
-        _result.Should().Contain("Bulk discount applied!");
+        _result.GreaterThanRendered.Should().BeTrue();
     }
 }
