@@ -27,6 +27,8 @@
     "stylesheets": [
       "_content/LowlandTech.TinyTools.Frontend/app.css"
     ],
-    "scripts": []
+    "scripts": [
+      "_content/LowlandTech.TinyTools.Frontend/templates.js"
+    ]
   }
 }

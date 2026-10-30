@@ -30,9 +30,12 @@ public sealed class SC02_ValidatesClientAssets : IClassFixture<UseCases.PluginPa
     {
         var manifest = SC01_DeclaresPluginPackages.Read(Path.Combine("src", "frontend", "lowlandtech", "plugin.json"));
         var stylesheet = manifest.Assets.Stylesheets[0];
+        var script = manifest.Assets.Scripts[0];
 
         useCase.Cases["Declared"] = stylesheet;
         useCase.Cases["Resolved"] = Verdict(stylesheet, PluginClientAssetKind.Stylesheet);
+        useCase.Cases["DeclaredScript"] = script;
+        useCase.Cases["ScriptResolved"] = Verdict(script, PluginClientAssetKind.Script);
         useCase.Cases["HostRelative"] = Verdict("app.css", PluginClientAssetKind.Stylesheet);
         useCase.Cases["Absolute"] = Verdict("/_content/" + FrontendPackage + "/app.css", PluginClientAssetKind.Stylesheet);
         useCase.Cases["Traversing"] = Verdict("_content/" + FrontendPackage + "/../other/app.css", PluginClientAssetKind.Stylesheet);
@@ -44,6 +47,14 @@ public sealed class SC02_ValidatesClientAssets : IClassFixture<UseCases.PluginPa
     [Then("the declared stylesheet should contain _content")]
     [Trait("UAC", "07"), Fact]
     public void UAC07_DeclaresTheAssetUnderContentRoot() => ((string)useCase.Cases["Declared"]!).Should().StartWith("_content/" + FrontendPackage + "/");
+
+    [Then("the declared script should contain templates.js")]
+    [Trait("UAC", "15"), Fact]
+    public void UAC07c_DeclaresTheScriptAsset() => ((string)useCase.Cases["DeclaredScript"]!).Should().Contain("templates.js");
+
+    [Then("the declared script should be accepted")]
+    [Trait("UAC", "16"), Fact]
+    public void UAC07d_ResolvesTheDeclaredScript() => ((string)useCase.Cases["ScriptResolved"]!).Should().Be("accepted");
 
     [Then("the declared asset should be accepted")]
     [Trait("UAC", "08"), Fact]
