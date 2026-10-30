@@ -43,4 +43,4 @@
 | M6-005 | SPEC3316-US01-SC01 | [Import the template API specifications](todo/SPEC3316.US01.SC01.template-api-specs.md) | P2 | tinytools | M6-002 | todo | true | [#71](https://github.com/lowlandtech/tinytools/issues/71) |
 | M6-006 | SPEC3316-US03-SC01 | [Import the template store specifications](todo/SPEC3316.US03.SC01.template-store-specs.md) | P2 | tinytools | M6-003 | todo | true | [#72](https://github.com/lowlandtech/tinytools/issues/72) |
 | M6-007 | SPEC3316-US02-SC01 | [Import the templates page specifications](todo/SPEC3316.US02.SC01.template-page-specs.md) | P2 | tinytools | M6-004 | todo | true | [#73](https://github.com/lowlandtech/tinytools/issues/73) |
-| M6-008 | SPEC3317-US01-SC01 | [Package Tinytools as a Harness extension plugin](todo/SPEC3317.US01.SC01.harness-extension-plugin.md) | P2 | tinytools | M6-002, M6-004 | todo | false | [#74](https://github.com/lowlandtech/tinytools/issues/74) |
+| M6-008 | SPEC3317-US01-SC01 | [Package Tinytools as a Harness extension plugin](todo/SPEC3317.US01.SC01.harness-extension-plugin.md) | P1 | tinytools | M5-004, M6-002, M6-004 | todo | true | [#74](https://github.com/lowlandtech/tinytools/issues/74) |
