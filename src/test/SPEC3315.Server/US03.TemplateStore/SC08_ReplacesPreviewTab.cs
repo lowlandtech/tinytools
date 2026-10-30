@@ -24,8 +24,10 @@ public sealed class SC08_ReplacesPreviewTab
         When();
     }
 
-    [Then("the open tabs should have count 1")]
+    [Then("the preview tab should be replaced by the new selection")]
     [Trait("UAC", "06"), Fact]
-    public void UAC06_SecondSelectionReplacesPreview() => _state.OpenTabs.Count.Should().Be(1);
+    public void UAC06_SecondSelectionReplacesPreview() =>
+        new { Count = _state.OpenTabs.Count, Label = _state.OpenTabs[0].Label }
+            .Should().BeEquivalentTo(new { Count = 1, Label = "B" });
 }
 #endif

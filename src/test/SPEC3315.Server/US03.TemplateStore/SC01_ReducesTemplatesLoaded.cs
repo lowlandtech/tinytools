@@ -15,14 +15,15 @@ public sealed class SC01_ReducesTemplatesLoaded
         new() { Id = Guid.NewGuid(), Name = "Bar" },
     ];
 
+    private readonly Dictionary<Guid, TemplateVersion?> _cache = new();
+
     private TemplateState _state = new();
 
     [Given("a store with no templates loaded")]
     private void Given() => _state = new TemplateState();
 
     [When("the loaded templates arrive")]
-    private void When() => _state = TemplateReducer.Reduce(
-        _state, new TemplatesLoaded(_items, new Dictionary<Guid, TemplateVersion?>()));
+    private void When() => _state = TemplateReducer.Reduce(_state, new TemplatesLoaded(_items, _cache));
 
     public SC01_ReducesTemplatesLoaded()
     {
@@ -30,8 +31,10 @@ public sealed class SC01_ReducesTemplatesLoaded
         When();
     }
 
-    [Then("the templates should have count 2")]
+    [Then("the loaded templates and version cache should be stored")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_LoadedTemplatesAreStored() => _state.AllItems.Should().HaveCount(2);
+    public void UAC01_LoadedTemplatesAreStored() =>
+        new { Count = _state.AllItems.Count, Cache = _state.VersionCache }
+            .Should().BeEquivalentTo(new { Count = 2, Cache = _cache });
 }
 #endif

@@ -23,8 +23,10 @@ public sealed class SC09_ReducesPinnedTab
         When();
     }
 
-    [Then("the open tabs should have count 1")]
+    [Then("the pin should open a single pinned tab")]
     [Trait("UAC", "07"), Fact]
-    public void UAC07_PinOpensATab() => _state.OpenTabs.Count.Should().Be(1);
+    public void UAC07_PinOpensATab() =>
+        new { Count = _state.OpenTabs.Count, Pinned = _state.OpenTabs[0].IsPinned }
+            .Should().BeEquivalentTo(new { Count = 1, Pinned = true });
 }
 #endif

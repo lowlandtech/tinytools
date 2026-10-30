@@ -13,7 +13,7 @@ public sealed class SC16_ReducesNextVersion
     [Given("a version list positioned on the first version")]
     private void Given() => _state = new TemplateState
     {
-        Versions = [new() { Name = "v1" }, new() { Name = "v2" }],
+        Versions = [new() { Name = "v1", Content = "v1content" }, new() { Name = "v2", Content = "v2" }],
         VersionIndex = 0,
     };
 
@@ -26,8 +26,10 @@ public sealed class SC16_ReducesNextVersion
         When();
     }
 
-    [Then("the version index should be 1")]
+    [Then("the next version should be shown")]
     [Trait("UAC", "14"), Fact]
-    public void UAC14_NextMovesForward() => _state.VersionIndex.Should().Be(1);
+    public void UAC14_NextMovesForward() =>
+        new { _state.VersionIndex, _state.VersionContent }
+            .Should().BeEquivalentTo(new { VersionIndex = 1, VersionContent = "v2" });
 }
 #endif

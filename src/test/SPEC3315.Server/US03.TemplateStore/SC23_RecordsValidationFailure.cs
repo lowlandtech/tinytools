@@ -22,8 +22,15 @@ public sealed class SC23_RecordsValidationFailure
         When();
     }
 
-    [Then("the validation error should be Something broke")]
+    [Then("the failed validation should report its error")]
     [Trait("UAC", "21"), Fact]
-    public void UAC21_CompletedStoresError() => _state.ValidationError.Should().Be("Something broke");
+    public void UAC21_CompletedStoresError() =>
+        new { _state.IsValidating, _state.ValidationResult, _state.ValidationError }
+            .Should().BeEquivalentTo(new
+            {
+                IsValidating = false,
+                ValidationResult = (object?)null,
+                ValidationError = "Something broke",
+            });
 }
 #endif

@@ -28,8 +28,15 @@ public sealed class SC06_ReducesDirtySelection
         When();
     }
 
-    [Then("the dirty dialog should be true")]
+    [Then("the dirty selection should be pending on the dialog")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_DirtySelectionShowsDialog() => _state.ShowDirtyDialog.Should().BeTrue();
+    public void UAC04_DirtySelectionShowsDialog() =>
+        new { _state.ShowDirtyDialog, _state.PendingNodeKey, _state.SelectedNodeKey }
+            .Should().BeEquivalentTo(new
+            {
+                ShowDirtyDialog = true,
+                PendingNodeKey = $"tpl:{Other}",
+                SelectedNodeKey = $"tpl:{Current}",
+            });
 }
 #endif

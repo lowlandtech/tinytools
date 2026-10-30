@@ -24,8 +24,10 @@ public sealed class SC10_KeepsPinnedTab
         When();
     }
 
-    [Then("the open tabs should have count 2")]
+    [Then("the pinned tab should be kept beside the new preview")]
     [Trait("UAC", "08"), Fact]
-    public void UAC08_PinnedTabIsNotReplaced() => _state.OpenTabs.Count.Should().Be(2);
+    public void UAC08_PinnedTabIsNotReplaced() =>
+        new { Count = _state.OpenTabs.Count, FirstPinned = _state.OpenTabs[0].IsPinned, SecondPinned = _state.OpenTabs[1].IsPinned }
+            .Should().BeEquivalentTo(new { Count = 2, FirstPinned = true, SecondPinned = false });
 }
 #endif

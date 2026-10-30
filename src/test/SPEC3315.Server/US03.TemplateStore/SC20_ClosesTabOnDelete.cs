@@ -11,8 +11,6 @@ public sealed class SC20_ClosesTabOnDelete
     private readonly Guid _id = Guid.NewGuid();
     private TemplateState _state = new();
 
-    private string TabKey => $"tpl:{_id}";
-
     [Given("an open template tab with unsaved changes")]
     private void Given() => _state = new TemplateState
     {
@@ -30,8 +28,10 @@ public sealed class SC20_ClosesTabOnDelete
         When();
     }
 
-    [Then("the open tabs should be empty")]
+    [Then("the deleted template should leave no open tab")]
     [Trait("UAC", "18"), Fact]
-    public void UAC18_DeleteClosesTab() => _state.OpenTabs.Should().BeEmpty();
+    public void UAC18_DeleteClosesTab() =>
+        new { Count = _state.OpenTabs.Count, _state.IsDirty }
+            .Should().BeEquivalentTo(new { Count = 0, IsDirty = false });
 }
 #endif

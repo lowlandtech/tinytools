@@ -27,8 +27,10 @@ public sealed class SC27_FallsBackToSessionTab
         When();
     }
 
-    [Then("the active tab key should be session")]
+    [Then("the closed tab should leave the session tab active")]
     [Trait("UAC", "25"), Fact]
-    public void UAC25_CloseFallsBackToSession() => _state.ActiveTabKey.Should().Be("session");
+    public void UAC25_CloseFallsBackToSession() =>
+        new { Count = _state.OpenTabs.Count, _state.ActiveTabKey }
+            .Should().BeEquivalentTo(new { Count = 0, ActiveTabKey = "session" });
 }
 #endif

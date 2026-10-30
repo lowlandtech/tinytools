@@ -9,13 +9,14 @@ namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US03.TemplateStore;
 [UserStory("03", "Template reducer produces correct state transitions")]
 public sealed class SC18_ReducesVersionCreated
 {
+    private readonly TemplateVersion _created = new() { Content = "new", Text = "txt" };
     private TemplateState _state = new();
 
     [Given("an editor showing one version")]
-    private void Given() => _state = new TemplateState { Versions = [new() { Name = "v1" }] };
+    private void Given() => _state = new TemplateState { Versions = [new() { Content = "old" }], VersionIndex = 0 };
 
     [When("a new version is created")]
-    private void When() => _state = TemplateReducer.Reduce(_state, new TemplateVersionCreated(new TemplateVersion { Name = "v2" }));
+    private void When() => _state = TemplateReducer.Reduce(_state, new TemplateVersionCreated(_created));
 
     public SC18_ReducesVersionCreated()
     {
@@ -23,8 +24,17 @@ public sealed class SC18_ReducesVersionCreated
         When();
     }
 
-    [Then("the versions should have count 2")]
+    [Then("the created version should become the visible edition")]
     [Trait("UAC", "16"), Fact]
-    public void UAC16_CreatedVersionIsAdded() => _state.Versions.Count.Should().Be(2);
+    public void UAC16_CreatedVersionIsAdded() =>
+        new { Count = _state.Versions.Count, First = _state.Versions[0], _state.VersionIndex, _state.VersionContent, _state.VersionText }
+            .Should().BeEquivalentTo(new
+            {
+                Count = 2,
+                First = _created,
+                VersionIndex = 0,
+                VersionContent = "new",
+                VersionText = "txt",
+            });
 }
 #endif

@@ -23,8 +23,16 @@ public sealed class SC07_ReducesPreviewTab
         When();
     }
 
-    [Then("the open tabs should have count 1")]
+    [Then("the selection should be an active unpinned preview tab")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_SelectionOpensOnePreviewTab() => _state.OpenTabs.Count.Should().Be(1);
+    public void UAC05_SelectionOpensOnePreviewTab() =>
+        new { Count = _state.OpenTabs.Count, Pinned = _state.OpenTabs[0].IsPinned, _state.ActiveTabKey, _state.SelectedNodeKey }
+            .Should().BeEquivalentTo(new
+            {
+                Count = 1,
+                Pinned = false,
+                ActiveTabKey = $"tpl:{Node}",
+                SelectedNodeKey = $"tpl:{Node}",
+            });
 }
 #endif

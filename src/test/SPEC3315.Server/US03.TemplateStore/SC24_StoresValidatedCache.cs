@@ -11,15 +11,18 @@ public sealed class SC24_StoresValidatedCache
 {
     private readonly Dictionary<Guid, TemplateVersion?> _cache = new();
     private TemplateState _state = new();
+    private bool _running;
 
     [Given("a validation run over every template")]
-    private void Given()
-    {
-        _state = TemplateReducer.Reduce(new TemplateState(), new TemplateValidateAllStarted());
-    }
+    private void Given() => _state = new TemplateState();
 
     [When("the validate-all run completes")]
-    private void When() => _state = TemplateReducer.Reduce(_state, new TemplateValidateAllCompleted(_cache));
+    private void When()
+    {
+        _state = TemplateReducer.Reduce(_state, new TemplateValidateAllStarted());
+        _running = _state.IsValidatingAll;
+        _state = TemplateReducer.Reduce(_state, new TemplateValidateAllCompleted(_cache));
+    }
 
     public SC24_StoresValidatedCache()
     {
@@ -27,8 +30,10 @@ public sealed class SC24_StoresValidatedCache
         When();
     }
 
-    [Then("the version cache should be the validated cache")]
+    [Then("the validate-all run should store the validated cache and finish")]
     [Trait("UAC", "22"), Fact]
-    public void UAC22_CompletedStoresCache() => _state.VersionCache.Should().BeSameAs(_cache);
+    public void UAC22_CompletedStoresCache() =>
+        new { Started = _running, _state.IsValidatingAll, Cache = _state.VersionCache }
+            .Should().BeEquivalentTo(new { Started = true, IsValidatingAll = false, Cache = _cache });
 }
 #endif
