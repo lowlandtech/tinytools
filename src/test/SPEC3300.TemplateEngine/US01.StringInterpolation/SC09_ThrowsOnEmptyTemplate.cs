@@ -3,41 +3,30 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "09")]
 [UserStory("01", "String interpolation validates input parameters")]
-public class WhenInterpolatingEmptyStringsTest : TinyToolsScenario<string>
+public sealed class SC09_ThrowsOnEmptyTemplate : TinyToolsScenario<string>
 {
     private Person _person = null!;
     private Action? _act;
 
-    protected override string For()
-    {
-        return "";
-    }
+    protected override string For() => "";
 
-    [Given("Setup test context")]
-    protected override void Given()
+    [Given("a person with a first and last name")]
+    protected override void Given() => _person = new Person
     {
-        _person = new Person
-        {
-            FirstName = "John",
-            LastName = "Smith"
-        };
-    }
+        FirstName = "John",
+        LastName = "Smith",
+    };
 
-    [When("Execute test action")]
+    [When("the empty template is interpolated")]
     protected override void When()
     {
         base.When();
         _act = () => Sut.Interpolate(_person);
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Throw A Template Argument Exception")]
-    [Fact]
-    public void ItShouldThrowATemplateArgumentException()
-    {
-        ArrangeAndAct();
-        _act.Should()
-            .Throw<ArgumentException>()
-            .WithMessage("Template should be supplied. (Parameter 'template')");
-    }
+    public SC09_ThrowsOnEmptyTemplate() => ArrangeAndAct();
+
+    [Then("the interpolation should fail with ArgumentException")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_ThrowsOnEmptyTemplate() => _act.Should().Throw<ArgumentException>().WithMessage("Template should be supplied. (Parameter 'template')");
 }

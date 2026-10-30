@@ -3,38 +3,26 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "04")]
 [UserStory("01", "String interpolation handles date values")]
-public class WhenInterpolatingDatesTest : TinyToolsScenario<string>
+public sealed class SC04_InterpolatesDates : TinyToolsScenario<string>
 {
     private Person _person = null!;
     private string? _result;
 
-    protected override string For()
-    {
-        return "Hello world, date of birth: ${Dob}";
-    }
+    protected override string For() => "Hello world, date of birth: ${Dob}";
 
-    [Given("Setup test context")]
-    protected override void Given()
-    {
-        _person = new Person
-        {
-            Dob = new DateTime(2001, 1, 25)
-        };
-    }
+    [Given("a person with a date of birth")]
+    protected override void Given() => _person = new Person { Dob = new DateTime(2001, 1, 25) };
 
-    [When("Execute test action")]
+    [When("the template is interpolated with the person")]
     protected override void When()
     {
         base.When();
         _result = Sut.Interpolate(_person);
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("should Interpolate Date Ofb Birth")]
-    [Fact]
-    public void ShouldInterpolateDateOfbBirth()
-    {
-        ArrangeAndAct();
-        _result.Should().Be("Hello world, date of birth: " + _person.Dob);
-    }
+    public SC04_InterpolatesDates() => ArrangeAndAct();
+
+    [Then("the interpolated text should be exact")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_InterpolatesDateOfBirth() => _result.Should().Be("Hello world, date of birth: " + _person.Dob);
 }

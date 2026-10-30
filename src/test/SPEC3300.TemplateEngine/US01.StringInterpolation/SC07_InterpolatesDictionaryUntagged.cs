@@ -3,39 +3,30 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "07")]
 [UserStory("01", "String interpolation replaces dictionary values without tags")]
-public class WhenInterpolatingDictionaryUntaggedTest : TinyToolsScenario<string>
+public sealed class SC07_InterpolatesDictionaryUntagged : TinyToolsScenario<string>
 {
     private IDictionary _person = null!;
     private string? _result;
 
-    protected override string For()
-    {
-        return "Hello world, I'm FirstName LastName";
-    }
+    protected override string For() => "Hello world, I'm FirstName LastName";
 
-    [Given("Setup test context")]
-    protected override void Given()
+    [Given("a dictionary holding a first and last name")]
+    protected override void Given() => _person = new Dictionary<string, string>
     {
-        _person = new Dictionary<string, string>()
-        {
-            { "FirstName","John" },
-            { "LastName","Smith" }
-        };
-    }
+        { "FirstName", "John" },
+        { "LastName", "Smith" },
+    };
 
-    [When("Execute test action")]
+    [When("the dictionary template is interpolated without tags")]
     protected override void When()
     {
         base.When();
         _result = Sut.Interpolate(_person, hasTags: false);
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Interpolate First And Last Name")]
-    [Fact]
-    public void ItShouldInterpolateFirstAndLastName()
-    {
-        ArrangeAndAct();
-        _result.Should().Be("Hello world, I'm John Smith");
-    }
+    public SC07_InterpolatesDictionaryUntagged() => ArrangeAndAct();
+
+    [Then("the interpolated text should be exact")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_InterpolatesDictionaryUntagged() => _result.Should().Be("Hello world, I'm John Smith");
 }

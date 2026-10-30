@@ -3,38 +3,26 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "05")]
 [UserStory("01", "String interpolation handles integer values")]
-public class WhenInterpolatingIntegersTest : TinyToolsScenario<string>
+public sealed class SC05_InterpolatesIntegers : TinyToolsScenario<string>
 {
     private Person _person = null!;
     private string? _result;
 
-    protected override string For()
-    {
-        return "Hello world, I'm ${Age} years old";
-    }
+    protected override string For() => "Hello world, I'm ${Age} years old";
 
-    [Given("Setup test context")]
-    protected override void Given()
-    {
-        _person = new Person
-        {
-            Age = 20
-        };
-    }
+    [Given("a person aged twenty")]
+    protected override void Given() => _person = new Person { Age = 20 };
 
-    [When("Execute test action")]
+    [When("the template is interpolated with the person")]
     protected override void When()
     {
         base.When();
         _result = Sut.Interpolate(_person);
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Interpolate Age")]
-    [Fact]
-    public void ItShouldInterpolateAge()
-    {
-        ArrangeAndAct();
-        _result.Should().Be("Hello world, I'm 20 years old");
-    }
+    public SC05_InterpolatesIntegers() => ArrangeAndAct();
+
+    [Then("the interpolated text should be exact")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_InterpolatesAge() => _result.Should().Be("Hello world, I'm 20 years old");
 }
