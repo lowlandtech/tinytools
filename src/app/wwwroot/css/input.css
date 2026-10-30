@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* The Razor sources that contribute class names to this host. */
+@source "../../Components/**/*.razor";
+@source "../../Features/**/*.razor";
+@source "../../../frontend/**/*.razor";
+@source "../../../frontend/**/*.cs";

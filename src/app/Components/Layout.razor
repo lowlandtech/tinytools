@@ -1,13 +1,13 @@
 @inherits LayoutComponentBase
 
-<div class="app-shell">
-    <header class="app-header">
-        <span class="brand">Tinytools</span>
-        <nav>
-            <a href="templates">Templates</a>
+<div class="flex min-h-screen flex-col">
+    <header class="flex items-center justify-between gap-4 border-b px-6 py-3">
+        <span class="text-lg font-semibold">Tinytools</span>
+        <nav class="flex items-center gap-4 text-sm">
+            <a class="text-sm underline-offset-4 hover:underline" href="templates">Templates</a>
         </nav>
     </header>
-    <main class="app-main">
+    <main class="flex-1 px-6 py-4">
         @Body
     </main>
 </div>

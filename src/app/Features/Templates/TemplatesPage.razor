@@ -1,55 +1,49 @@
 @page "/templates"
+@using LowlandTech.Components
 @using LowlandTech.TinyTools.App.Components
+@using LowlandTech.TinyTools.Core.Entities
 @using LowlandTech.TinyTools.Frontend.Features.Templates
 @implements IDisposable
 @inject TemplateSessionStore Store
 @inject TemplateEffects Effects
 
-<h1 class="page-title">Templates</h1>
+<PageTitle>Templates</PageTitle>
+
+<div class="flex items-center justify-between gap-4 py-4">
+    <h1 class="text-xl font-semibold">Templates</h1>
+    <div class="flex items-center gap-2">
+        <Button Variant="outline" Size="sm" @onclick="RefreshAsync">Refresh</Button>
+        <Button Variant="default" Size="sm" @onclick="BeginCreate">New template</Button>
+    </div>
+</div>
 
 @if (_error is not null)
 {
     <p class="alert alert-destructive" role="alert">@_error</p>
 }
 
-<p class="label">@Store.State.AllItems.Count template(s)</p>
-
-@if (Store.State.AllItems.Count == 0 && _error is null)
-{
-    <p class="label">No templates yet.</p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Versions</th>
-                <th>Active</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var template in Store.State.AllItems)
-            {
-                <tr @key="template.Id">
-                    <td>@template.Name</td>
-                    <td>@template.Versions.Count</td>
-                    <td>@(template.IsActive ? "Yes" : "No")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<DataGrid TItem="Template" Items="@Store.State.AllItems" EmptyText="No templates yet.">
+    <Columns>
+        <DataGridColumn TItem="Template" Property="Name" Title="Name" />
+        <DataGridColumn TItem="Template" Property="Versions.Count" Title="Versions" />
+        <DataGridColumn TItem="Template" Title="Active">
+            <Template>@(context.IsActive ? "Yes" : "No")</Template>
+        </DataGridColumn>
+    </Columns>
+</DataGrid>
 
 @code {
     private string? _error;
-    private bool _loaded;
 
     protected override async Task OnInitializedAsync()
     {
         Store.Changed += OnStoreChanged;
         await LoadAsync();
     }
+
+    private async Task RefreshAsync() => await LoadAsync();
+
+    private void BeginCreate() => Store.Dispatch(new TemplateSetCreateContext("templates", "template", null));
 
     private async Task LoadAsync()
     {
@@ -61,10 +55,6 @@ else
         catch (Exception exception) when (exception is HttpRequestException or InvalidOperationException)
         {
             _error = $"The template library is unavailable: {exception.Message}";
-        }
-        finally
-        {
-            _loaded = true;
         }
     }
 

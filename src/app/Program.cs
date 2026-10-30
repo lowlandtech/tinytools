@@ -8,6 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// The component library localizes its own chrome, so a host must register the
+// localizer services before rendering its components.
+builder.Services.AddLocalization();
+
 // The page reads through the server, never through a bare HttpClient, so the
 // base address is configuration and a missing value fails here rather than at
 // the first render.

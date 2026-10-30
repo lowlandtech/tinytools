@@ -11,7 +11,7 @@
 		<PackageReference Include="FluentAssertions" Version="8.10.0" />
 		<PackageReference Include="Humanizer" Version="3.0.10" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
-		<PackageReference Include="NCalcSync" Version="5.12.0" />
+		<PackageReference Include="NCalcSync" Version="6.3.2" />
 		<PackageReference Include="xunit.v3" Version="3.2.2" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -31,8 +31,13 @@
 	     NET10_0_OR_GREATER. -->
 	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.9" />
+		<PackageReference Include="bunit" Version="2.7.2" />
 		<ProjectReference Include="..\api\LowlandTech.TinyTools.Api.csproj" />
+		<!-- Both hosts declare a top-level entry point, so the page scenarios reach
+		     the app through an alias and keep API's Program unambiguous. -->
+		<ProjectReference Include="..\app\LowlandTech.TinyTools.App.csproj" Aliases="app" />
 		<ProjectReference Include="..\frontend\LowlandTech.TinyTools.Frontend.csproj" />
+		<Using Include="Bunit" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -20,4 +20,33 @@
     <ProjectReference Include="..\frontend\LowlandTech.TinyTools.Frontend.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!--
+      The Tailwind sources are inputs of the CSS build, not runtime assets. The
+      built wwwroot/app.css is authoritative and committed, so a machine without
+      Node still serves the same styles through SkipTailwindBuild=true.
+    -->
+    <Content Remove="wwwroot\node_modules\**" />
+    <Content Remove="wwwroot\package.json" />
+    <Content Remove="wwwroot\package-lock.json" />
+    <Content Remove="wwwroot\css\**" />
+    <None Remove="wwwroot\node_modules\**" />
+    <None Remove="wwwroot\package.json" />
+    <None Remove="wwwroot\package-lock.json" />
+    <None Remove="wwwroot\css\**" />
+  </ItemGroup>
+
+  <!--
+    Builds wwwroot/app.css from wwwroot/css/input.css. Set SkipTailwindBuild=true
+    to use the committed app.css on a machine without Node; nothing else changes.
+  -->
+  <Target Name="BuildTailwindCSS" BeforeTargets="BeforeBuild" Condition="'$(SkipTailwindBuild)' != 'true'">
+    <PropertyGroup>
+      <WwwRootPath>$(MSBuildProjectDirectory)/wwwroot</WwwRootPath>
+      <NodeModulesPath>$(WwwRootPath)/node_modules</NodeModulesPath>
+    </PropertyGroup>
+    <Exec Command="npm install" WorkingDirectory="$(WwwRootPath)" Condition="!Exists('$(NodeModulesPath)')" ConsoleToMSBuild="true" IgnoreExitCode="false" />
+    <Exec Command="npm run build:css" WorkingDirectory="$(WwwRootPath)" ConsoleToMSBuild="true" IgnoreExitCode="false" />
+  </Target>
+
 </Project>
