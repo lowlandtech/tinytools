@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>LowlandTech.TinyTools.Playground</RootNamespace>
+    <!-- The session is a plain library so the page logic can be tested without a browser; the
+         WebAssembly host that serves the page lives in the docs site build. -->
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\lib\LowlandTech.TinyTools.csproj" />
+  </ItemGroup>
+
+</Project>

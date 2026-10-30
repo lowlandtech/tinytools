@@ -668,6 +668,13 @@ public partial class VariableResolver
             return ctx.Get(propertyName);
         }
 
+        // A dictionary model answers from its entries first: a JSON key named Count must win over
+        // the dictionary's own Count property, otherwise the entry value is never rendered.
+        if (obj is IDictionary<string, object?> entries && entries.TryGetValue(propertyName, out var entry))
+        {
+            return entry;
+        }
+
         var type = obj.GetType();
         var member = Members.GetOrAdd((type, propertyName), static key => new MemberCacheEntry(
             key.Type.GetProperty(key.Name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase),
