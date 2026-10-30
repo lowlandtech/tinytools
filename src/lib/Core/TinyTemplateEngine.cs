@@ -31,6 +31,12 @@ public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
     {
         if (string.IsNullOrEmpty(template)) return template;
 
+        if (template.Contains("@service(", StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                "Asynchronous service calls require RenderAsync; the synchronous Render path does not block on them.");
+        }
+
         if (depth > MacroRecursionLimit)
         {
             throw new InvalidOperationException(
@@ -57,6 +63,102 @@ public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
         return result;
     }
 
+    private static readonly System.Text.RegularExpressions.Regex AsyncServicePattern = new(
+        @"@service\(",
+        System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    /// <summary>
+    /// Renders a template that may invoke asynchronous services. Every
+    /// <c>@service("name", expression)</c> call is awaited in source order, and the resolved
+    /// values then pass through the normal renderer.
+    ///
+    /// The order is sequential by contract, so a later call cannot run before an earlier one
+    /// completes. A service that throws becomes a <see cref="TemplateServiceException"/> naming
+    /// only the service, and a cancelled token surfaces as <see cref="OperationCanceledException"/>
+    /// before any further service is invoked. Calling the synchronous <see cref="Render"/> with
+    /// an async service in the template is an explicit refusal rather than a blocking wait.
+    /// </summary>
+    public async Task<string> RenderAsync(
+        string template,
+        ToolContext context,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrEmpty(template)) return template;
+
+        var position = 0;
+        var builder = new System.Text.StringBuilder(template.Length);
+        while (true)
+        {
+            var start = template.IndexOf("@service(", position, StringComparison.Ordinal);
+            if (start < 0)
+            {
+                builder.Append(template, position, template.Length - position);
+                break;
+            }
+
+            builder.Append(template, position, start - position);
+
+            var open = start + "@service".Length;
+            var end = FindClosingParenthesis(template, open);
+            if (end < 0)
+            {
+                throw new InvalidOperationException("An @service call is missing its closing parenthesis.");
+            }
+
+            var arguments = template[(open + 1)..end];
+            var comma = arguments.IndexOf(',');
+            if (comma < 0)
+            {
+                throw new InvalidOperationException("@service requires a service name and an argument expression.");
+            }
+
+            var name = arguments[..comma].Trim().Trim('"', '\'');
+            var expression = arguments[(comma + 1)..].Trim();
+
+            if (!context.TryGetAsyncService(name, out var service) || service is null)
+            {
+                throw new InvalidOperationException($"Asynchronous service '{name}' is not registered.");
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var input = _resolver.ResolveExpression(expression, context);
+            object? value;
+            try
+            {
+                value = await service(input, cancellationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception error)
+            {
+                throw new TemplateServiceException(name, error);
+            }
+
+            builder.Append(value?.ToString() ?? string.Empty);
+            position = end + 1;
+        }
+
+        return RenderInternal(builder.ToString(), context, 0, null);
+    }
+
+    private static int FindClosingParenthesis(string source, int openIndex)
+    {
+        var depth = 0;
+        for (var index = openIndex; index < source.Length; index++)
+        {
+            if (source[index] == '(') depth++;
+            else if (source[index] == ')')
+            {
+                depth--;
+                if (depth == 0) return index;
+            }
+        }
+
+        return -1;
+    }
     public string ResolveVariables(string input, ToolContext context)
     {
         return _resolver.ResolveString(input, context);

@@ -29,7 +29,7 @@ public sealed class SC01_AwaitsRegisteredServices : IClassFixture<UseCases.Async
         context.RegisterAsyncService("first", first);
         context.RegisterAsyncService("second", second);
         context.RegisterAsyncService("failure", failure);
-        Func<object?, object?> synchronous = input => "sync:" + input;
+        LowlandTech.TinyTools.TemplateServiceFunc synchronous = input => "sync:" + input;
         context.RegisterService("sync", synchronous);
         cancellation = new CancellationTokenSource();
         cancellation.Cancel();
@@ -56,26 +56,26 @@ public sealed class SC01_AwaitsRegisteredServices : IClassFixture<UseCases.Async
     }
 
     [Then("Result.AsyncServiceOutput should be Ada")]
-    [Trait("UAC", "01"), Fact(Skip = "TODO: add the async render API and await registered service")]
+    [Trait("UAC", "01"), Fact]
     public void UAC01_AwaitsService() => useCase.Cases["AsyncServiceOutput"].Should().Be("Ada");
 
     [Then("Result.AsyncServiceOrder should have count 2")]
-    [Trait("UAC", "02"), Fact(Skip = "TODO: execute async service calls sequentially")]
+    [Trait("UAC", "02"), Fact]
     public void UAC02_PreservesSourceOrder() => ((string[])useCase.Cases["AsyncServiceOrder"]!).Should().Equal("first", "second");
 
     [Then("Service failure should fail with TemplateServiceException")]
-    [Trait("UAC", "03"), Fact(Skip = "TODO: add the named service failure result")]
+    [Trait("UAC", "03"), Fact]
     public void UAC03_HidesServiceDetail() => ((string)useCase.Cases["ServiceFailureResult"]!).Should().Contain("TemplateServiceException").And.NotContain("private service detail");
 
     [Then("Cancellation should fail with OperationCanceledException")]
-    [Trait("UAC", "04"), Fact(Skip = "TODO: propagate async render cancellation")]
+    [Trait("UAC", "04"), Fact]
     public void UAC04_PropagatesCancellation() => useCase.Cases["CancellationResult"].Should().Be("OperationCanceledException");
 
     [Then("Result.SynchronousOutput should be sync:Ada")]
-    [Trait("UAC", "05"), Fact(Skip = "TODO: preserve current synchronous service behavior")]
+    [Trait("UAC", "05"), Fact]
     public void UAC05_PreservesSynchronousServices() => useCase.Cases["SynchronousOutput"].Should().Be("sync:Ada");
 
     [Then("Sync async service should fail with InvalidOperationException")]
-    [Trait("UAC", "06"), Fact(Skip = "TODO: refuse async service invocation on sync Render")]
+    [Trait("UAC", "06"), Fact]
     public void UAC06_DoesNotBlockSynchronously() => useCase.Cases["SyncAsyncServiceResult"].Should().Be("InvalidOperationException");
 }

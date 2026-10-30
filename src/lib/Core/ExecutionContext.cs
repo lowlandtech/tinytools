@@ -1,4 +1,4 @@
-﻿namespace LowlandTech.TinyTools;
+namespace LowlandTech.TinyTools;
 
 /// <summary>
 /// Runtime context for pipeline execution.
@@ -9,6 +9,29 @@ public class ExecutionContext
     private readonly Dictionary<string, object?> _variables = new(StringComparer.OrdinalIgnoreCase);
     private readonly Stack<CursorEntry> _cursorStack = new();
     private readonly Dictionary<string, TemplateServiceFunc> _services = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, Func<object?, CancellationToken, ValueTask<object?>>> _asyncServices = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Registers an asynchronous template service. Async services are only reachable from
+    /// <see cref="TinyTemplateEngine.RenderAsync"/> with <c>@service("name", expression)</c>;
+    /// the synchronous render path refuses them instead of blocking on the work.
+    /// </summary>
+    public void RegisterAsyncService(string key, Func<object?, CancellationToken, ValueTask<object?>> service)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+            throw new ArgumentException("A service key must not be null, empty or whitespace.", nameof(key));
+        if (service is null) throw new ArgumentNullException(nameof(service));
+
+        _asyncServices[key] = service;
+    }
+
+    /// <summary>Whether an asynchronous service is registered under the key.</summary>
+    public bool HasAsyncService(string key) => _asyncServices.ContainsKey(key);
+
+    internal bool TryGetAsyncService(
+        string key,
+        out Func<object?, CancellationToken, ValueTask<object?>>? service) =>
+        _asyncServices.TryGetValue(key, out service);
     private readonly ILogger _logger;
 
     public ExecutionContext(ILoggerFactory? loggerFactory = null)
