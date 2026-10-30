@@ -22,4 +22,7 @@
     <Project Path="src/test/LowlandTech.TinyTools.Tests.csproj" />
     <Project Path="src/infrastructure/LowlandTech.TinyTools.Tests.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/generators/">
+    <Project Path="src/generators/LowlandTech.TinyTools.Generators.csproj" />
+  </Folder>
 </Solution>

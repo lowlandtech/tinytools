@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- An analyzer, not a runtime dependency: the package ships it under analyzers/dotnet/cs. -->
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <IsPackable>true</IsPackable>
+    <PackageId>LowlandTech.TinyTools.Generators</PackageId>
+    <Description>Build-time source generation for Tinytools templates: a typed renderer per .tmpl item, with no runtime template compilation.</Description>
+    <PackageTags>lowlandtech tinytools templates generator roslyn</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Authors>LowlandTech</Authors>
+    <Company>LowlandTech</Company>
+    <RepositoryUrl>https://github.com/lowlandtech/tinytools</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The analyzer ships in the analyzers folder, which is what makes it a build-time
+         dependency only. -->
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+  </ItemGroup>
+
+</Project>
