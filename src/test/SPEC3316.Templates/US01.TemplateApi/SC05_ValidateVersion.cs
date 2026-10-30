@@ -11,10 +11,10 @@ public class SC05_ValidateVersion : TemplateApiScenario
 {
     private HttpResponseMessage _response = null!;
 
-    [When("POST /api/tinytools/templates/versions/{id}/validate is called with EntityClass v1")]
+    [When("POST /api/templates/versions/{id}/validate is called with EntityClass v1")]
     protected override async Task WhenAsync()
     {
-        _response = await Client.PostAsync($"/api/tinytools/templates/versions/{EntityClassV1Id}/validate", null);
+        _response = await Client.PostAsync($"/api/templates/versions/{EntityClassV1Id}/validate", null);
     }
 
     [Fact(DisplayName = "UAC01: Response is 200 OK with valid=true")]
@@ -36,7 +36,7 @@ public class SC05_ValidateVersion : TemplateApiScenario
     {
         await ArrangeAndActAsync();
 
-        var notFound = await Client.PostAsync($"/api/tinytools/templates/versions/{Guid.NewGuid()}/validate", null);
+        var notFound = await Client.PostAsync($"/api/templates/versions/{Guid.NewGuid()}/validate", null);
         notFound.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -47,7 +47,7 @@ public class SC05_ValidateVersion : TemplateApiScenario
     {
         await ArrangeAndActAsync();
 
-        var badRequest = await Client.PostAsync($"/api/tinytools/templates/versions/{DbContextClassV1Id}/validate", null);
+        var badRequest = await Client.PostAsync($"/api/templates/versions/{DbContextClassV1Id}/validate", null);
         badRequest.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }

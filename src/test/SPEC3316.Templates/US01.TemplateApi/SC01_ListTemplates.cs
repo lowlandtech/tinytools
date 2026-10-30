@@ -11,10 +11,10 @@ public class SC01_ListTemplates : TemplateApiScenario
 {
     private HttpResponseMessage _response = null!;
 
-    [When("GET /api/tinytools/templates is called")]
+    [When("GET /api/templates is called")]
     protected override async Task WhenAsync()
     {
-        _response = await Client.GetAsync("/api/tinytools/templates");
+        _response = await Client.GetAsync("/api/templates");
     }
 
     [Fact(DisplayName = "UAC01: Response is 200 OK")]

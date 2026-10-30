@@ -12,10 +12,10 @@ public class SC04_RenderTemplate : TemplateApiScenario
 {
     private HttpResponseMessage _response = null!;
 
-    [When("POST /api/tinytools/templates/render is called with template and JSON")]
+    [When("POST /api/templates/render is called with template and JSON")]
     protected override async Task WhenAsync()
     {
-        _response = await Client.PostAsJsonAsync("/api/tinytools/templates/render", new
+        _response = await Client.PostAsJsonAsync("/api/templates/render", new
         {
             Template = "Hello ${Context.Name}",
             Json = """{"Name":"World"}""",

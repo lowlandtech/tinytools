@@ -28,26 +28,26 @@ public sealed class SC01_ServesTemplateContract : IAsyncLifetime
     private async Task WhenAsync()
     {
         var client = _development.CreateClient();
-        var created = await client.PostAsJsonAsync("/api/tinytools/templates", new
+        var created = await client.PostAsJsonAsync("/api/templates", new
         {
             Name = "EntityClass",
             Versions = new[] { new { Name = "v1", Content = "Hello ${Name}!", Json = """{"Name":"Ada"}""", Text = "Hello Ada!" } },
         });
         var version = (await created.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("versions")[0].GetProperty("id").GetGuid();
-        var listed = await client.GetAsync("/api/tinytools/templates");
+        var listed = await client.GetAsync("/api/templates");
         _createStatus = created.StatusCode;
         _listStatus = listed.StatusCode;
         _listedCount = (await listed.Content.ReadFromJsonAsync<JsonElement>()).GetArrayLength();
-        var rendered = await client.PostAsJsonAsync("/api/tinytools/templates/render", new { Template = "Hello ${Name}!", Json = """{"Name":"Ada"}""" });
+        var rendered = await client.PostAsJsonAsync("/api/templates/render", new { Template = "Hello ${Name}!", Json = """{"Name":"Ada"}""" });
         _renderOutput = (await rendered.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("output").GetString();
-        var validated = await client.PostAsync($"/api/tinytools/templates/versions/{version}/validate", null);
+        var validated = await client.PostAsync($"/api/templates/versions/{version}/validate", null);
         _validated = (await validated.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("valid").GetBoolean();
         var openApi = await client.GetFromJsonAsync<JsonElement>("/openapi/v1.json");
         _openApiPathCount = openApi.GetProperty("paths").EnumerateObject().Count();
-        _anonymousStatus = (await _production.CreateClient().GetAsync("/api/tinytools/templates")).StatusCode;
+        _anonymousStatus = (await _production.CreateClient().GetAsync("/api/templates")).StatusCode;
         var keyed = _production.CreateClient();
         keyed.DefaultRequestHeaders.Add("X-Api-Key", "secret-key");
-        _keyedStatus = (await keyed.GetAsync("/api/tinytools/templates")).StatusCode;
+        _keyedStatus = (await keyed.GetAsync("/api/templates")).StatusCode;
         using var database = _development.CreateDbContext();
         _providerName = database.Database.ProviderName;
     }

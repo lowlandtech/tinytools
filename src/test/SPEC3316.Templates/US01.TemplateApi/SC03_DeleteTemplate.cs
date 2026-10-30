@@ -11,10 +11,10 @@ public class SC03_DeleteTemplate : TemplateApiScenario
 {
     private HttpResponseMessage _response = null!;
 
-    [When("DELETE /api/tinytools/templates/{id} is called with the EntityClass ID")]
+    [When("DELETE /api/templates/{id} is called with the EntityClass ID")]
     protected override async Task WhenAsync()
     {
-        _response = await Client.DeleteAsync($"/api/tinytools/templates/{EntityClassId}");
+        _response = await Client.DeleteAsync($"/api/templates/{EntityClassId}");
     }
 
     [Fact(DisplayName = "UAC01: Response is 204 NoContent")]
@@ -45,7 +45,7 @@ public class SC03_DeleteTemplate : TemplateApiScenario
     {
         await ArrangeAndActAsync();
 
-        var notFound = await Client.DeleteAsync($"/api/tinytools/templates/{Guid.NewGuid()}");
+        var notFound = await Client.DeleteAsync($"/api/templates/{Guid.NewGuid()}");
         notFound.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }

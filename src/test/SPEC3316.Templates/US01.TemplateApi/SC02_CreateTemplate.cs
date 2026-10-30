@@ -12,10 +12,10 @@ public class SC02_CreateTemplate : TemplateApiScenario
 {
     private HttpResponseMessage _response = null!;
 
-    [When("POST /api/tinytools/templates is called with a new template")]
+    [When("POST /api/templates is called with a new template")]
     protected override async Task WhenAsync()
     {
-        _response = await Client.PostAsJsonAsync("/api/tinytools/templates", new
+        _response = await Client.PostAsJsonAsync("/api/templates", new
         {
             Name = "ServiceClass",
             IsActive = true,

@@ -12,7 +12,7 @@ public static class TemplateEndpoints
 {
     public static void MapTemplateEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/api/tinytools/templates")
+        var group = app.MapGroup("/api/templates")
             .RequireAuthorization(ApiKeyPolicy.Name)
             .WithTags("Templates");
 
@@ -32,7 +32,7 @@ public static class TemplateEndpoints
         group.MapPost("/", async (Template template, ITemplateLibrary service, CancellationToken ct) =>
             {
                 var created = await service.CreateAsync(template, ct);
-                return Results.Created($"/api/tinytools/templates/{created.Id}", created.ToResponse());
+                return Results.Created($"/api/templates/{created.Id}", created.ToResponse());
             })
             .WithName("CreateTemplate")
             .WithDescription("Create a template with its versions.");

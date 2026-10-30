@@ -13,7 +13,7 @@ namespace LowlandTech.TinyTools.Frontend.Services.Http;
 public sealed class HttpTemplateLibrary(HttpClient client) : ITemplateLibrary
 {
     /// <summary>The route prefix the server serves the library under.</summary>
-    public const string RoutePrefix = "/api/tinytools/templates";
+    public const string RoutePrefix = "/api/templates";
 
     public async Task<List<Template>> ListAsync(CancellationToken ct = default) =>
         await client.GetFromJsonAsync<List<Template>>(RoutePrefix, ct) ?? [];
