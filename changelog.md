@@ -1,4 +1,10 @@
 # 2026.10.4
+## Build-time member checking
+
+* The template source generator now resolves every `${Context.*}` path against the declared model
+  type through the compilation's semantic model. A typo reports `TTG005` and a nullable dereference
+  `TTG006`, both as build errors with the template path and position; `TinyToolsLenient=true` opts
+  an item out.
 ## Strict rendering
 
 * `TemplateRenderOptions` adds an opt-in strict policy: an unknown context key raises

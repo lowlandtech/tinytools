@@ -28,6 +28,22 @@ internal static class Diagnostics
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
+    internal static readonly DiagnosticDescriptor UnknownMember = new(
+        "TTG005",
+        "Template names a member the model does not have",
+        "Template '{0}' uses '{1}', which is not a member of '{2}'",
+        Category,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
+    internal static readonly DiagnosticDescriptor NullableSegment = new(
+        "TTG006",
+        "Template dereferences a nullable member",
+        "Template '{0}' dereferences nullable '{1}' of '{2}' without a value",
+        Category,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
     internal static readonly DiagnosticDescriptor DuplicateName = new(
         "TTG003",
         "Two templates generate the same renderer",
@@ -139,6 +155,7 @@ public sealed class TemplateRendererGenerator : IIncrementalGenerator
     private const string ModelMetadata = "TinyToolsModel";
     private const string NamespaceMetadata = "TinyToolsNamespace";
     private const string OutputMetadata = "TinyToolsOutputName";
+    private const string LenientMetadata = "TinyToolsLenient";
 
     /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -151,7 +168,11 @@ public sealed class TemplateRendererGenerator : IIncrementalGenerator
                 pair.Left.GetText(cancellationToken)?.ToString() ?? string.Empty,
                 pair.Right.GetOptions(pair.Left)));
 
-        context.RegisterSourceOutput(templates.Collect(), static (production, inputs) => Emit(production, inputs));
+        // The compilation is combined in so member paths can be checked against the declared
+        // model type instead of being trusted.
+        context.RegisterSourceOutput(
+            templates.Collect().Combine(context.CompilationProvider),
+            static (production, pair) => Emit(production, pair.Left, pair.Right));
     }
 
     private static TemplateCandidate Describe(string path, string text, AnalyzerConfigOptions options)
@@ -159,6 +180,7 @@ public sealed class TemplateRendererGenerator : IIncrementalGenerator
         options.TryGetValue(ModelMetadata, out var model);
         options.TryGetValue(NamespaceMetadata, out var @namespace);
         options.TryGetValue(OutputMetadata, out var output);
+        options.TryGetValue(LenientMetadata, out var lenient);
 
         var name = Sanitize(string.IsNullOrWhiteSpace(output)
             ? System.IO.Path.GetFileNameWithoutExtension(path)
@@ -169,10 +191,11 @@ public sealed class TemplateRendererGenerator : IIncrementalGenerator
             text,
             model,
             string.IsNullOrWhiteSpace(@namespace) ? "Templates" : @namespace!,
-            name);
+            name,
+            string.Equals(lenient, "true", StringComparison.OrdinalIgnoreCase));
     }
 
-    private static void Emit(SourceProductionContext production, IReadOnlyList<TemplateCandidate> inputs)
+    private static void Emit(SourceProductionContext production, IReadOnlyList<TemplateCandidate> inputs, Compilation compilation)
     {
         var seen = new Dictionary<string, string>(StringComparer.Ordinal);
 
@@ -203,6 +226,13 @@ public sealed class TemplateRendererGenerator : IIncrementalGenerator
                     error.Value.Line,
                     error.Value.Column,
                     error.Value.Message));
+                continue;
+            }
+
+            var memberError = candidate.Lenient ? null : MemberValidation.Validate(candidate, compilation);
+            if (memberError is not null)
+            {
+                production.ReportDiagnostic(Diagnostic.Create(memberError.Value.Descriptor, candidate.Location(memberError.Value.Offset), memberError.Value.Arguments));
                 continue;
             }
 
@@ -248,12 +278,89 @@ public sealed class TemplateRendererGenerator : IIncrementalGenerator
         return char.ToUpperInvariant(name[0]) + name.Substring(1);
     }
 
+    /// <summary>
+    /// Checks each <c>${Context.X...}</c> path against the declared model type, so a typo fails the
+    /// build instead of rendering an empty string at run time.
+    /// </summary>
+    private static class MemberValidation
+    {
+        private static readonly System.Text.RegularExpressions.Regex Token = new(
+            @"\$\{([^}]+)\}",
+            System.Text.RegularExpressions.RegexOptions.Compiled);
+
+        internal static (DiagnosticDescriptor Descriptor, int Offset, object[] Arguments)? Validate(
+            TemplateCandidate candidate,
+            Compilation compilation)
+        {
+            var model = compilation.GetTypeByMetadataName(candidate.Model!);
+            if (model is null) return null;
+
+            foreach (System.Text.RegularExpressions.Match match in Token.Matches(candidate.Text))
+            {
+                var offset = match.Index;
+                var path = match.Groups[1].Value.Split('|')[0].Trim();
+                if (path.StartsWith("Context.", StringComparison.OrdinalIgnoreCase))
+                {
+                    path = path.Substring("Context.".Length);
+                }
+
+                // The first segment names the context key that holds the model, so member
+                // checking starts at the type itself rather than looking for a "Model" member.
+                if (path.StartsWith("Model.", StringComparison.Ordinal))
+                {
+                    path = path.Substring("Model.".Length);
+                }
+
+                if (path.Length == 0 || path[0] == '"' || path[0] == '\''
+                    || path.Contains("??", StringComparison.Ordinal) || path.IndexOf('?') >= 0 || path.IndexOf('(') >= 0)
+                {
+                    continue;
+                }
+
+                var current = (ITypeSymbol?)model;
+                for (var index = 0; index < path.Split('.').Length; index++)
+                {
+                    var segment = path.Split('.')[index];
+                    if (current is null) break;
+
+                    var member = FindMember(current, segment);
+                    if (member is null)
+                    {
+                        return (Diagnostics.UnknownMember, offset, [candidate.Path, segment, candidate.Model!]);
+                    }
+
+                    current = member.Value.Type;
+                    var more = index < path.Split('.').Length - 1;
+                    if (more && current.NullableAnnotation == NullableAnnotation.Annotated)
+                    {
+                        return (Diagnostics.NullableSegment, offset, [candidate.Path, segment, candidate.Model!]);
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static (ITypeSymbol Type, ISymbol Symbol)? FindMember(ITypeSymbol type, string name)
+        {
+            foreach (var member in type.GetMembers(name))
+            {
+                if (member is IPropertySymbol { Type: var property }) return (property, member);
+                if (member is IFieldSymbol { Type: var field }) return (field, member);
+            }
+
+            return null;
+        }
+    }
+
     private sealed class TemplateCandidate
     {
-        internal TemplateCandidate(string path, string text, string? model, string @namespace, string name)
+        internal TemplateCandidate(string path, string text, string? model, string @namespace, string name, bool lenient)
         {
-            Path = path; Text = text; Model = model; Namespace = @namespace; Name = name;
+            Path = path; Text = text; Model = model; Namespace = @namespace; Name = name; Lenient = lenient;
         }
+
+        internal bool Lenient { get; }
 
         internal string Path { get; }
         internal string Text { get; }

@@ -17,7 +17,16 @@ internal static class GeneratorHarness
     /// <summary>The consumer source the fixture compiles: a model plus a static entry point.</summary>
     internal const string ConsumerSource = """
         namespace Consumer;
-        public sealed class Model { public string Name { get; set; } = ""; }
+        public sealed class Model
+        {
+            public string Name { get; set; } = "";
+            public Address Address { get; set; } = new();
+            public Owner? Owner { get; set; }
+        }
+
+        public sealed class Address { public string City { get; set; } = ""; }
+
+        public sealed class Owner { public string Name { get; set; } = ""; }
         public static class Entry { public static string Run() => Templates.GreetingRenderer.Render(new Model { Name = "Ada" }); }
         """;
 
