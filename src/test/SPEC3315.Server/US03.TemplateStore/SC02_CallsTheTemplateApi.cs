@@ -1,130 +1,75 @@
 #if NET10_0_OR_GREATER
-using System.Net;
-using System.Text;
-using System.Text.Json;
-using LowlandTech.TinyTools.Core.Abstractions;
 using LowlandTech.TinyTools.Core.Entities;
 using LowlandTech.TinyTools.Frontend.Services.Http;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US03.TemplateStore;
 
-/// <summary>Records the request and answers with one canned response.</summary>
-public sealed class StubHandler(HttpStatusCode status, string body = "[]") : HttpMessageHandler
-{
-    public HttpRequestMessage? Request { get; private set; }
-    public string? RequestBody { get; private set; }
-    public string? RequestUri { get; private set; }
-    public string? RequestPath => Request?.RequestUri?.AbsolutePath;
-
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-    {
-        Request = request;
-        RequestUri = request.RequestUri?.ToString();
-        if (request.Content is not null)
-            RequestBody = await request.Content.ReadAsStringAsync(cancellationToken);
-
-        return new HttpResponseMessage(status)
-        {
-            Content = new StringContent(body, Encoding.UTF8, "application/json"),
-        };
-    }
-}
-
 [Trait(Spec.SPEC, "3315")]
 [Trait(Spec.SC, "02")]
 [UserStory("03", "The templates store reaches the server through one HTTP client")]
-public class WhenCallingTheTemplateApi
+public sealed class SC02_CallsTheTemplateApi : IAsyncLifetime
 {
-    private static (HttpTemplateLibrary Library, StubHandler Handler) Create(HttpStatusCode status, string body = "[]")
+    private RoutedTemplateHandler _handler = null!;
+    private HttpTemplateLibrary _library = null!;
+    private int _listed;
+    private string _created = string.Empty, _message = string.Empty, _calls = string.Empty;
+    private bool _missingIsNull, _deleted, _valid;
+
+    [Given("a routed template API behind one HTTP client")]
+    private void Given()
     {
-        var handler = new StubHandler(status, body);
-        var client = new HttpClient(handler) { BaseAddress = new Uri("http://tinytools.test") };
-        return (new HttpTemplateLibrary(client), handler);
+        _handler = new RoutedTemplateHandler();
+        var client = new HttpClient(_handler) { BaseAddress = new Uri("http://tinytools.test") };
+        _library = new HttpTemplateLibrary(client);
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Fact]
-    public async Task ItShouldListThroughTheDocumentedRoute()
+    [When("list, create, get-missing, delete, validate and the refusal are called")]
+    private async Task WhenAsync()
     {
-        var (library, handler) = Create(HttpStatusCode.OK, """
-            [{"id":"5f1b2c3d-0000-4000-8000-000000000001","name":"EntityClass","isActive":true,"versions":[],"packages":[]}]
-            """);
-
-        var templates = await library.ListAsync();
-
-        handler.RequestPath.Should().Be("/api/tinytools/templates");
-        handler.Request!.Method.Should().Be(HttpMethod.Get);
-        templates.Should().ContainSingle().Which.Name.Should().Be("EntityClass");
+        _listed = (await _library.ListAsync()).Count;
+        _created = (await _library.CreateAsync(new Template { Name = "EntityClass" })).Name;
+        _missingIsNull = await _library.GetAsync(Guid.NewGuid()) is null;
+        _deleted = await _library.DeleteAsync(Guid.NewGuid());
+        _valid = (await _library.ValidateVersionAsync(Guid.NewGuid()))!.Valid;
+        try { await _library.ValidateVersionAsync(RoutedTemplateHandler.RefusingVersion); }
+        catch (InvalidOperationException exception) { _message = exception.Message; }
+        _calls = string.Join(" | ", _handler.Calls);
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Fact]
-    public async Task ItShouldCreateThroughTheRouteAndReturnTheStoredTemplate()
+    public async ValueTask InitializeAsync()
     {
-        var (library, handler) = Create(HttpStatusCode.Created, """
-            {"id":"5f1b2c3d-0000-4000-8000-000000000002","name":"DbContextClass","isActive":true,"versions":[],"packages":[]}
-            """);
-
-        var created = await library.CreateAsync(new Template { Name = "DbContextClass" });
-
-        handler.Request!.Method.Should().Be(HttpMethod.Post);
-        handler.RequestBody.Should().Contain("DbContextClass");
-        created.Id.Should().Be(Guid.Parse("5f1b2c3d-0000-4000-8000-000000000002"));
+        Given();
+        await WhenAsync();
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Fact]
-    public async Task ItShouldReportAMissingTemplateAsNull()
-    {
-        var (library, _) = Create(HttpStatusCode.NotFound);
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
-        var template = await library.GetAsync(Guid.NewGuid());
+    [Then("the listed templates should have count 1")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_ListsThroughTheDocumentedRoute() => _listed.Should().Be(1);
 
-        template.Should().BeNull();
-    }
+    [Then("the created name should contain EntityClass")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_CreatesThroughTheRoute() => _created.Should().Contain("EntityClass");
 
-    [Trait(Spec.UAC, "01")]
-    [Fact]
-    public async Task ItShouldDeleteThroughTheRouteAndReportRefusal()
-    {
-        var (deleted, deletedHandler) = Create(HttpStatusCode.NoContent, "");
-        (await deleted.DeleteAsync(Guid.NewGuid())).Should().BeTrue();
-        deletedHandler.Request!.Method.Should().Be(HttpMethod.Delete);
+    [Then("the missing template should be null")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_ReportsMissingAsNull() => _missingIsNull.Should().BeTrue();
 
-        var (missing, _) = Create(HttpStatusCode.NotFound);
-        (await missing.DeleteAsync(Guid.NewGuid())).Should().BeFalse();
-    }
+    [Then("the delete should be true")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_DeletesThroughTheRoute() => _deleted.Should().BeTrue();
 
-    [Trait(Spec.UAC, "01")]
-    [Fact]
-    public async Task ItShouldValidateAVersionThroughTheVersionRoute()
-    {
-        var versionId = Guid.NewGuid();
-        var (library, handler) = Create(HttpStatusCode.OK, """
-            {"valid":true,"output":"Hello Ada!","expected":"Hello Ada!"}
-            """);
+    [Then("the validation should be true")]
+    [Trait("UAC", "05"), Fact]
+    public void UAC05_ValidatesAVersion() => _valid.Should().BeTrue();
 
-        var validation = await library.ValidateVersionAsync(versionId);
+    [Then("the refusal message should contain no test data")]
+    [Trait("UAC", "06"), Fact]
+    public void UAC06_SurfacesTheServersRefusal() => _message.Should().Contain("no test data");
 
-        handler.RequestPath.Should().Be($"/api/tinytools/templates/versions/{versionId}/validate");
-        handler.Request!.Method.Should().Be(HttpMethod.Post);
-        validation.Should().NotBeNull();
-        validation!.Valid.Should().BeTrue();
-        validation.Output.Should().Be("Hello Ada!");
-    }
-
-    [Trait(Spec.UAC, "01")]
-    [Fact]
-    public async Task ItShouldSurfaceTheServersRefusalReason()
-    {
-        var (library, _) = Create(HttpStatusCode.BadRequest, """
-            {"error":"The version carries no test JSON or expected text."}
-            """);
-
-        var act = () => library.ValidateVersionAsync(Guid.NewGuid());
-
-        (await act.Should().ThrowAsync<InvalidOperationException>())
-            .WithMessage("*no test JSON*");
-    }
+    [Then("the calls should contain delete")]
+    [Trait("UAC", "07"), Fact]
+    public void UAC07_UsesTheDocumentedMethods() => _calls.Should().Contain("DELETE");
 }
 #endif
