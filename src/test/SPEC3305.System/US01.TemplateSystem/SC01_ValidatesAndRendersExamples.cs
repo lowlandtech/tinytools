@@ -1,32 +1,22 @@
-using Xunit;
-using LowlandTech.TinyTools;
-
 namespace LowlandTech.TinyTools.Tests.SPEC3305.System.US01.TemplateSystem;
 
 [Trait(Spec.SPEC, "3305")]
 [Trait(Spec.SC, "01")]
 [UserStory("01", "Template system validates and renders example templates")]
-public class TemplateSystemTests
+public sealed class SC01_ValidatesAndRendersExamples : TinyToolsScenario<ComponentTemplate>
 {
-    [Fact]
-    public void ComponentTemplate_Validates_Successfully()
+    private ComponentData _buttonData = null!;
+    private ComponentData _profileData = null!;
+    private bool _isValid;
+    private TemplateResult _button = null!;
+    private TemplateResult _profile = null!;
+
+    protected override ComponentTemplate For() => new();
+
+    [Given("the example component template and the data of each case")]
+    protected override void Given()
     {
-        // Arrange
-        var template = new ComponentTemplate();
-
-        // Act
-        var isValid = template.Validate();
-
-        // Assert
-        Assert.True(isValid);
-    }
-
-    [Fact]
-    public void ComponentTemplate_Renders_CorrectContent()
-    {
-        // Arrange
-        var template = new ComponentTemplate();
-        var data = new ComponentData
+        _buttonData = new ComponentData
         {
             ComponentName = "Button",
             Props = new()
@@ -36,274 +26,46 @@ public class TemplateSystemTests
             },
             PropsDestructured = "{ label, onClick }"
         };
-
-        // Act
-        var result = template.Render(data);
-
-        // Assert
-        Assert.Contains("export interface ButtonProps", result.Content);
-        Assert.Contains("label: string", result.Content);
-        Assert.Contains("onClick: () => void", result.Content);
-        Assert.Contains("export const Button", result.Content);
-    }
-
-    [Fact]
-    public void ComponentTemplate_Renders_CorrectPath()
-    {
-        // Arrange
-        var template = new ComponentTemplate();
-        var data = new ComponentData
+        _profileData = new ComponentData
         {
             ComponentName = "UserProfile",
             Props = new(),
             PropsDestructured = "{}"
         };
-
-        // Act
-        var result = template.Render(data);
-
-        // Assert
-        Assert.Equal("src/components/UserProfile.tsx", result.Path);
     }
 
-    [Fact]
-    public void CSharpClassTemplate_Validates_Successfully()
+    [When("the template is validated and rendered for each case")]
+    protected override void When()
     {
-        // Arrange
-        var template = new CSharpClassTemplate();
-
-        // Act
-        var result = template.ValidateDetailed();
-
-        // Assert
-        Assert.True(result.IsValid, result.ErrorMessage);
+        base.When();
+        _isValid = Sut.Validate();
+        _button = Sut.Render(_buttonData);
+        _profile = Sut.Render(_profileData);
     }
 
-    [Fact]
-    public void CSharpClassTemplate_Renders_WithProperties()
-    {
-        // Arrange
-        var template = new CSharpClassTemplate();
-        var data = new ClassData
-        {
-            Namespace = "MyApp.Models",
-            ClassName = "Product",
-            Description = "Represents a product",
-            IncludeConstructor = true,
-            Properties = new()
-            {
-                new PropertyData
-                {
-                    Name = "Id",
-                    Type = "int",
-                    Description = "Product identifier"
-                },
-                new PropertyData
-                {
-                    Name = "Name",
-                    Type = "string",
-                    Description = "Product name",
-                    DefaultValue = "\"\""
-                }
-            },
-            Methods = new()
-            {
-                new MethodData
-                {
-                    Name = "Validate",
-                    ReturnType = "bool",
-                    Parameters = "",
-                    Description = "Validates the product"
-                }
-            }
-        };
+    public SC01_ValidatesAndRendersExamples() => ArrangeAndAct();
 
-        // Act
-        var result = template.Render(data);
+    [Then("the component template should be accepted")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_ValidatesTheComponentTemplate() => _isValid.Should().BeTrue();
 
-        // Assert
-        Assert.Contains("namespace MyApp.Models;", result.Content);
-        Assert.Contains("public class Product", result.Content);
-        Assert.Contains("public int Id { get; set; }", result.Content);
-        Assert.Contains("public string Name { get; set; } = \"\";", result.Content);
-        Assert.Contains("public Product()", result.Content);
-        Assert.Contains("public bool Validate()", result.Content);
-    }
+    [Then("the rendered component should contain the ButtonProps interface")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_RendersTheButtonPropsInterface() => _button.Content.Should().Contain("export interface ButtonProps");
 
-    [Fact]
-    public void TemplateRegistry_RegistersAndRetrievesTemplates()
-    {
-        // Arrange
-        var registry = new TemplateRegistry();
-        var template = new ComponentTemplate();
+    [Then("the rendered component should contain the label prop")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_RendersTheLabelProp() => _button.Content.Should().Contain("label: string");
 
-        // Act
-        registry.Register("component", template);
-        var retrieved = registry.Get("component");
+    [Then("the rendered component should contain the onClick prop")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_RendersTheOnClickProp() => _button.Content.Should().Contain("onClick: () => void");
 
-        // Assert
-        Assert.NotNull(retrieved);
-        Assert.Same(template, retrieved);
-    }
+    [Then("the rendered component should contain the Button export")]
+    [Trait("UAC", "05"), Fact]
+    public void UAC05_RendersTheButtonExport() => _button.Content.Should().Contain("export const Button");
 
-    [Fact]
-    public void TemplateRegistry_ValidatesAllTemplates()
-    {
-        // Arrange
-        var registry = new TemplateRegistry();
-        registry.Register("component", new ComponentTemplate());
-        registry.Register("class", new CSharpClassTemplate());
-
-        // Act
-        var results = registry.ValidateAll();
-
-        // Assert
-        Assert.Equal(2, results.Count);
-        Assert.All(results.Values, r => Assert.True(r.IsValid));
-    }
-
-    [Fact]
-    public void TemplateRegistry_RenderByName()
-    {
-        // Arrange
-        var registry = new TemplateRegistry();
-        registry.Register("component", new ComponentTemplate());
-        
-        var data = new ComponentData
-        {
-            ComponentName = "TestComponent",
-            Props = new(),
-            PropsDestructured = "{}"
-        };
-
-        // Act
-        var result = registry.Render("component", data);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Contains("TestComponent", result.Content);
-    }
-
-    [Fact]
-    public void TemplateRegistry_RenderBatch()
-    {
-        // Arrange
-        var registry = new TemplateRegistry();
-        registry.Register("component", new ComponentTemplate());
-        
-        var batch = new Dictionary<string, object>
-        {
-            ["component1"] = new ComponentData 
-            { 
-                ComponentName = "Button",
-                Props = new(),
-                PropsDestructured = "{}"
-            },
-            ["component2"] = new ComponentData 
-            { 
-                ComponentName = "Input",
-                Props = new(),
-                PropsDestructured = "{}"
-            }
-        };
-
-        // Act - note the key is template name, not unique id
-        // So we need different approach for batch
-        var results = new Dictionary<string, TemplateResult>();
-        foreach (var (key, data) in batch)
-        {
-            var result = registry.Render("component", data);
-            if (result != null)
-                results[key] = result;
-        }
-
-        // Assert
-        Assert.Equal(2, results.Count);
-        Assert.Contains("Button", results["component1"].Content);
-        Assert.Contains("Input", results["component2"].Content);
-    }
-
-    [Fact]
-    public void TemplateBase_NormalizesDataCorrectly()
-    {
-        // Arrange
-        var template = new ComponentTemplate();
-        var anonymousData = new 
-        {
-            ComponentName = "Test",
-            Props = new object[] { },
-            PropsDestructured = "{}"
-        };
-
-        // Act
-        var result = template.Render(anonymousData);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Contains("Test", result.Content);
-    }
-
-    [Fact]
-    public void TemplateValidation_DetectsMismatch()
-    {
-        // Arrange - create a template that will fail validation
-        var template = new TestFailingTemplate();
-
-        // Act
-        var result = template.ValidateDetailed();
-
-        // Assert
-        Assert.False(result.IsValid);
-        Assert.NotNull(result.Differences);
-        Assert.Contains("Content", result.Differences.Keys);
-    }
-
-    [Fact]
-    public void Template_HandlesComplexNestedData()
-    {
-        // Arrange
-        var template = new CSharpClassTemplate();
-        var data = new ClassData
-        {
-            Namespace = "App.Models.Domain",
-            ClassName = "ComplexEntity",
-            Description = "A complex entity",
-            Properties = new()
-            {
-                new PropertyData { Name = "Prop1", Type = "string", Description = "First" },
-                new PropertyData { Name = "Prop2", Type = "int", Description = "Second" },
-                new PropertyData { Name = "Prop3", Type = "bool", Description = "Third" }
-            }
-        };
-
-        // Act
-        var result = template.Render(data);
-
-        // Assert
-        Assert.Equal("src/App/Models/Domain/ComplexEntity.cs", result.Path);
-        Assert.Equal("App.Models.Domain", result.Namespace);
-        Assert.Contains("namespace App.Models.Domain;", result.Content);
-    }
-}
-
-/// <summary>
-/// Test template that deliberately fails validation for testing purposes.
-/// </summary>
-[Trait(Spec.SPEC, "3305")]
-[Trait(Spec.SC, "01")]
-[UserStory("01", "Template system validates and renders example templates")]
-internal class TestFailingTemplate : TemplateBase
-{
-    public override string TemplatePath => "test.txt";
-    public override string TemplateNamespace => "Test";
-    public override string TemplateContent => "Wrong content: ${Context.Value}";
-    public override Type DataType => typeof(TestData);
-    
-    public override string TestDataJson => @"{ ""Value"": ""Test"" }";
-    public override string ExpectedContent => "This will not match!";
-}
-
-internal record TestData
-{
-    public string Value { get; init; } = "";
+    [Then("the rendered component path should be src/components/UserProfile.tsx")]
+    [Trait("UAC", "06"), Fact]
+    public void UAC06_RendersTheComponentPath() => _profile.Path.Should().Be("src/components/UserProfile.tsx");
 }

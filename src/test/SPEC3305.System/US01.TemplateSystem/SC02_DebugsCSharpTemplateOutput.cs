@@ -1,34 +1,29 @@
 namespace LowlandTech.TinyTools.Tests.SPEC3305.System.US01.TemplateSystem;
 
-/// <summary>
-/// Debug test to see actual template output vs expected
-/// </summary>
 [Trait(Spec.SPEC, "3305")]
 [Trait(Spec.SC, "02")]
 [UserStory("01", "Template system validates and renders example templates")]
-public class WhenDebuggingTemplateOutput : TinyToolsScenario<CSharpClassTemplate>
+public sealed class SC02_DebugsCSharpTemplateOutput : TinyToolsScenario<CSharpClassTemplate>
 {
-    private TemplateValidationResult? _validationResult;
+    private TemplateValidationResult _validation = null!;
 
-    protected override CSharpClassTemplate For()
+    protected override CSharpClassTemplate For() => new();
+
+    [Given("the example C# class template")]
+    protected override void Given()
     {
-        return new CSharpClassTemplate();
     }
 
-    [When("Execute test action")]
+    [When("the template is validated with detail")]
     protected override void When()
     {
         base.When();
-        _validationResult = Sut.ValidateDetailed();
+        _validation = Sut.ValidateDetailed();
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("show Validation Result")]
-    [Fact]
-    public void ShowValidationResult()
-    {
-        ArrangeAndAct();
-        _validationResult.IsValid.Should().BeTrue(_validationResult.ErrorMessage ?? "Validation should pass");
-    }
+    public SC02_DebugsCSharpTemplateOutput() => ArrangeAndAct();
+
+    [Then("the validation should be accepted")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_ValidatesTheCSharpTemplate() => _validation.IsValid.Should().BeTrue(_validation.ErrorMessage ?? "Validation should pass");
 }
-
