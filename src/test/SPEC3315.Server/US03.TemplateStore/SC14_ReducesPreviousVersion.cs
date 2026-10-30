@@ -28,8 +28,6 @@ public sealed class SC14_ReducesPreviousVersion
 
     [Then("the previous version should be shown")]
     [Trait("UAC", "12"), Fact]
-    public void UAC12_PreviousMovesBack() =>
-        new { _state.VersionIndex, _state.VersionContent }
-            .Should().BeEquivalentTo(new { VersionIndex = 0, VersionContent = "v1content" });
+    public void UAC12_PreviousMovesBack() => new { _state.VersionIndex, _state.VersionContent }.Should().BeEquivalentTo(new { VersionIndex = 0, VersionContent = "v1content" });
 }
 #endif

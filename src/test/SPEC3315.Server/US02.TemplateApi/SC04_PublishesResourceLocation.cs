@@ -36,7 +36,7 @@ public sealed class SC04_PublishesResourceLocation : IAsyncLifetime
         return ValueTask.CompletedTask;
     }
 
-    [Then("the location should be the created template path")]
+    [Then("the location should be canonical")]
     [Trait("UAC", "12"), Fact]
     public void UAC12_LocationUsesTheResourcePath() => _location.Should().Be($"/api/templates/{_createdId}");
 }

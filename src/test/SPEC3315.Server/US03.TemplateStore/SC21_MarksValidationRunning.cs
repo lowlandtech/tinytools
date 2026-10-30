@@ -22,15 +22,8 @@ public sealed class SC21_MarksValidationRunning
         When();
     }
 
-    [Then("the editor should be validating without a result")]
+    [Then("the editor should be validating")]
     [Trait("UAC", "19"), Fact]
-    public void UAC19_StartSetsValidating() =>
-        new { _state.IsValidating, _state.ValidationResult, _state.ValidationError }
-            .Should().BeEquivalentTo(new
-            {
-                IsValidating = true,
-                ValidationResult = (object?)null,
-                ValidationError = (string?)null,
-            });
+    public void UAC19_StartSetsValidating() => new { _state.IsValidating, _state.ValidationResult, _state.ValidationError }.Should().BeEquivalentTo(new { IsValidating = true, ValidationResult = (object?)null, ValidationError = (string?)null });
 }
 #endif

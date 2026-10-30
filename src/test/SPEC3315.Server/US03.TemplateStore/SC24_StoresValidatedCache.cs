@@ -30,10 +30,8 @@ public sealed class SC24_StoresValidatedCache
         When();
     }
 
-    [Then("the validate-all run should store the validated cache and finish")]
+    [Then("the validated cache should be stored")]
     [Trait("UAC", "22"), Fact]
-    public void UAC22_CompletedStoresCache() =>
-        new { Started = _running, _state.IsValidatingAll, Cache = _state.VersionCache }
-            .Should().BeEquivalentTo(new { Started = true, IsValidatingAll = false, Cache = _cache });
+    public void UAC22_CompletedStoresCache() => new { Started = _running, _state.IsValidatingAll, Cache = _state.VersionCache }.Should().BeEquivalentTo(new { Started = true, IsValidatingAll = false, Cache = _cache });
 }
 #endif

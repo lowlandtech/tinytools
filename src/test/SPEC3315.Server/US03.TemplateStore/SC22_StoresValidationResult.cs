@@ -24,15 +24,8 @@ public sealed class SC22_StoresValidationResult
         When();
     }
 
-    [Then("the successful validation should be shown without an error")]
+    [Then("the validation should be valid")]
     [Trait("UAC", "20"), Fact]
-    public void UAC20_CompletedStoresResult() =>
-        new { _state.IsValidating, _state.ValidationResult, _state.ValidationError }
-            .Should().BeEquivalentTo(new
-            {
-                IsValidating = false,
-                ValidationResult = _result,
-                ValidationError = (string?)null,
-            });
+    public void UAC20_CompletedStoresResult() => new { _state.IsValidating, _state.ValidationResult, _state.ValidationError }.Should().BeEquivalentTo(new { IsValidating = false, ValidationResult = _result, ValidationError = (string?)null });
 }
 #endif

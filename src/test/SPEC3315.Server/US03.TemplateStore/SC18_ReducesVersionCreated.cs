@@ -24,17 +24,8 @@ public sealed class SC18_ReducesVersionCreated
         When();
     }
 
-    [Then("the created version should become the visible edition")]
+    [Then("the created version should be visible")]
     [Trait("UAC", "16"), Fact]
-    public void UAC16_CreatedVersionIsAdded() =>
-        new { Count = _state.Versions.Count, First = _state.Versions[0], _state.VersionIndex, _state.VersionContent, _state.VersionText }
-            .Should().BeEquivalentTo(new
-            {
-                Count = 2,
-                First = _created,
-                VersionIndex = 0,
-                VersionContent = "new",
-                VersionText = "txt",
-            });
+    public void UAC16_CreatedVersionIsAdded() => new { Count = _state.Versions.Count, First = _state.Versions[0], _state.VersionIndex, _state.VersionContent, _state.VersionText }.Should().BeEquivalentTo(new { Count = 2, First = _created, VersionIndex = 0, VersionContent = "new", VersionText = "txt" });
 }
 #endif

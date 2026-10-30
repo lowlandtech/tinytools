@@ -28,8 +28,6 @@ public sealed class SC16_ReducesNextVersion
 
     [Then("the next version should be shown")]
     [Trait("UAC", "14"), Fact]
-    public void UAC14_NextMovesForward() =>
-        new { _state.VersionIndex, _state.VersionContent }
-            .Should().BeEquivalentTo(new { VersionIndex = 1, VersionContent = "v2" });
+    public void UAC14_NextMovesForward() => new { _state.VersionIndex, _state.VersionContent }.Should().BeEquivalentTo(new { VersionIndex = 1, VersionContent = "v2" });
 }
 #endif

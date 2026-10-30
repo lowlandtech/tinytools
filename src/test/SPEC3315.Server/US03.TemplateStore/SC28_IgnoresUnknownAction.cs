@@ -27,7 +27,7 @@ public sealed class SC28_IgnoresUnknownAction
         When();
     }
 
-    [Then("the state should be the original state")]
+    [Then("the state should be unchanged")]
     [Trait("UAC", "26"), Fact]
     public void UAC26_UnknownActionIsIgnored() => _state.Should().Be(_before);
 }

@@ -31,10 +31,8 @@ public sealed class SC01_ReducesTemplatesLoaded
         When();
     }
 
-    [Then("the loaded templates and version cache should be stored")]
+    [Then("the loaded library should be stored")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_LoadedTemplatesAreStored() =>
-        new { Count = _state.AllItems.Count, Cache = _state.VersionCache }
-            .Should().BeEquivalentTo(new { Count = 2, Cache = _cache });
+    public void UAC01_LoadedTemplatesAreStored() => new { Count = _state.AllItems.Count, Cache = _state.VersionCache }.Should().BeEquivalentTo(new { Count = 2, Cache = _cache });
 }
 #endif

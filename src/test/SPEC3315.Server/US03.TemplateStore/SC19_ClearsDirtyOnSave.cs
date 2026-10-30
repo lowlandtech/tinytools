@@ -22,15 +22,8 @@ public sealed class SC19_ClearsDirtyOnSave
         When();
     }
 
-    [Then("the editor should be saved and clean")]
+    [Then("the editor should be clean")]
     [Trait("UAC", "17"), Fact]
-    public void UAC17_SaveClearsDirty() =>
-        new { _state.IsDirty, _state.ValidationResult, _state.ValidationError }
-            .Should().BeEquivalentTo(new
-            {
-                IsDirty = false,
-                ValidationResult = (object?)null,
-                ValidationError = (string?)null,
-            });
+    public void UAC17_SaveClearsDirty() => new { _state.IsDirty, _state.ValidationResult, _state.ValidationError }.Should().BeEquivalentTo(new { IsDirty = false, ValidationResult = (object?)null, ValidationError = (string?)null });
 }
 #endif

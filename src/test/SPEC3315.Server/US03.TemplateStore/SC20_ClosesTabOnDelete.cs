@@ -28,10 +28,8 @@ public sealed class SC20_ClosesTabOnDelete
         When();
     }
 
-    [Then("the deleted template should leave no open tab")]
+    [Then("the tab should be closed")]
     [Trait("UAC", "18"), Fact]
-    public void UAC18_DeleteClosesTab() =>
-        new { Count = _state.OpenTabs.Count, _state.IsDirty }
-            .Should().BeEquivalentTo(new { Count = 0, IsDirty = false });
+    public void UAC18_DeleteClosesTab() => new { Count = _state.OpenTabs.Count, _state.IsDirty }.Should().BeEquivalentTo(new { Count = 0, IsDirty = false });
 }
 #endif

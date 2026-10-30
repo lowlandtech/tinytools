@@ -26,10 +26,8 @@ public sealed class SC25_CancelsDirtyDialog
         When();
     }
 
-    [Then("the cancelled dialog should drop its pending node")]
+    [Then("the dialog should be cancelled")]
     [Trait("UAC", "23"), Fact]
-    public void UAC23_CancelHidesDialog() =>
-        new { _state.ShowDirtyDialog, _state.PendingNodeKey }
-            .Should().BeEquivalentTo(new { ShowDirtyDialog = false, PendingNodeKey = (string?)null });
+    public void UAC23_CancelHidesDialog() => new { _state.ShowDirtyDialog, _state.PendingNodeKey }.Should().BeEquivalentTo(new { ShowDirtyDialog = false, PendingNodeKey = (string?)null });
 }
 #endif
