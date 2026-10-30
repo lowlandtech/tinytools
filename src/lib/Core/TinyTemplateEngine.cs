@@ -9,9 +9,14 @@ public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
 {
     private const int CompiledPlanCapacity = 128;
 
+    private static readonly System.Text.RegularExpressions.Regex IncludePattern = new(
+        """@include\(\s*['"](?<name>[^'"]+)['"]\s*\)""",
+        System.Text.RegularExpressions.RegexOptions.Compiled);
+
     private readonly VariableResolver _resolver;
     private readonly ILogger _logger;
     private readonly TemplatePlanCache _plans = new(CompiledPlanCapacity);
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, string> _fragments = new(StringComparer.Ordinal);
 
     public TinyTemplateEngine(ILoggerFactory? loggerFactory = null)
     {
@@ -26,8 +31,12 @@ public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
 
         _logger.LogTrace("Render called, template length: {Length}", template.Length);
 
+        // Includes expand first: a fragment is plain template source, so the control-flow
+        // and variable passes then run over the composed text in one go.
+        var composed = ExpandIncludes(template, Array.Empty<string>());
+
         // First, process control flow (@if, @foreach)
-        var processed = ProcessControlFlow(template, context);
+        var processed = ProcessControlFlow(composed, context);
 
         // Then, resolve variables
         var result = ResolveVariables(processed, context);
@@ -39,6 +48,62 @@ public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
     public string ResolveVariables(string input, ToolContext context)
     {
         return _resolver.ResolveString(input, context);
+    }
+
+    /// <summary>
+    /// Registers a named fragment that a template can pull in with <c>@include("name")</c>.
+    /// Fragments are in-memory template source owned by this engine instance: there is no
+    /// filesystem, network or package resolution, and nothing is shared between engines.
+    /// The name is compared ordinally.
+    /// </summary>
+    public void RegisterFragment(string name, string source)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("A fragment name must not be null, empty or whitespace.", nameof(name));
+        if (source is null)
+            throw new ArgumentNullException(nameof(source));
+
+        _fragments[name] = source;
+    }
+
+    /// <summary>Removes a registered fragment. Removing a missing name is not an error.</summary>
+    public bool UnregisterFragment(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("A fragment name must not be null, empty or whitespace.", nameof(name));
+
+        return _fragments.TryRemove(name, out _);
+    }
+
+    /// <summary>The fragments registered on this engine, exposed read-only.</summary>
+    public IReadOnlyDictionary<string, string> Fragments => _fragments;
+
+    /// <summary>
+    /// Replaces every <c>@include("name")</c> with the named fragment's source, recursively.
+    /// A fragment renders with the caller's own context, so values passed to one render are
+    /// visible to its fragments and never leak into another render. A missing name or a cycle
+    /// fails before any output is produced, so a caller never receives partial text.
+    /// </summary>
+    private string ExpandIncludes(string source, IReadOnlyList<string> nesting)
+    {
+        return IncludePattern.Replace(source, match =>
+        {
+            var name = match.Groups["name"].Value;
+
+            if (nesting.Contains(name))
+            {
+                var path = string.Join(" -> ", nesting.Append(name));
+                throw new InvalidOperationException($"Include cycle detected: {path}");
+            }
+
+            if (!_fragments.TryGetValue(name, out var fragment))
+            {
+                throw new InvalidOperationException($"Include '{name}' was not registered on this engine.");
+            }
+
+            var deeper = new List<string>(nesting) { name };
+            return ExpandIncludes(fragment, deeper);
+        });
     }
 
     /// <summary>Resolves one typed expression for workflow orchestration.</summary>
