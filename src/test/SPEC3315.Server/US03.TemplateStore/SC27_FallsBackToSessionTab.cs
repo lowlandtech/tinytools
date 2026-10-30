@@ -1,0 +1,34 @@
+#if NET10_0_OR_GREATER
+using LowlandTech.TinyTools.Frontend.Features.Templates;
+
+namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US03.TemplateStore;
+
+[Trait(Spec.SPEC, "3315")]
+[Trait(Spec.SC, "27")]
+[UserStory("03", "Template reducer produces correct state transitions")]
+public sealed class SC27_FallsBackToSessionTab
+{
+    private readonly Guid _id = Guid.NewGuid();
+    private TemplateState _state = new();
+
+    [Given("a single open template tab")]
+    private void Given() => _state = new TemplateState
+    {
+        OpenTabs = [new TemplateOpenTab($"tpl:{_id}", "X", "template", _id, true)],
+        ActiveTabKey = $"tpl:{_id}",
+    };
+
+    [When("that tab is closed")]
+    private void When() => _state = TemplateReducer.Reduce(_state, new TemplateCloseTab($"tpl:{_id}"));
+
+    public SC27_FallsBackToSessionTab()
+    {
+        Given();
+        When();
+    }
+
+    [Then("the active tab key should be session")]
+    [Trait("UAC", "25"), Fact]
+    public void UAC25_CloseFallsBackToSession() => _state.ActiveTabKey.Should().Be("session");
+}
+#endif
