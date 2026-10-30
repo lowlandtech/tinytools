@@ -26,30 +26,32 @@ for (var i = 2; i < args.Length; i++)
     else if (args[i] == "--templates" && i + 1 < args.Length) templateRoot = args[++i];
 }
 
-var yaml = await File.ReadAllTextAsync(workflowFile);
-var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
-var workflow = deserializer.Deserialize<WorkflowDefinition>(yaml) ?? throw new InvalidOperationException("Workflow is empty.");
-object? model = modelFile is null ? null : ToModel(JsonSerializer.Deserialize<JsonElement>(await File.ReadAllTextAsync(modelFile)));
-var runner = new WorkflowRunner();
-var result = await runner.RunAsync(workflow, root, model, RunCommandAsync, templateRootDirectory: templateRoot);
-foreach (var step in result.Steps) Console.WriteLine($"{(step.Changed ? "changed" : "unchanged"),-9} {step.Id ?? step.Type}: {step.Message}");
-return 0;
-
-static async Task<WorkflowStepResult> RunCommandAsync(WorkflowStep step, string root, CancellationToken cancellationToken)
+try
 {
-    var command = step.Command?.Trim();
-    if (command is not ("dotnet" or "git" or "gh")) throw new InvalidOperationException($"Command is not allowed: {command}");
-    var workingDirectory = string.IsNullOrWhiteSpace(step.WorkingDirectory) ? root : Path.GetFullPath(Path.Combine(root, step.WorkingDirectory));
-    if (!workingDirectory.StartsWith(root.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) && !string.Equals(workingDirectory, root, StringComparison.OrdinalIgnoreCase))
-        throw new InvalidOperationException($"Working directory escapes workflow root: {step.WorkingDirectory}");
-    var startInfo = new ProcessStartInfo(command) { WorkingDirectory = workingDirectory, RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false };
-    foreach (var arg in step.Args) startInfo.ArgumentList.Add(arg);
-    using var process = Process.Start(startInfo) ?? throw new InvalidOperationException($"Could not start {command}.");
-    var output = await process.StandardOutput.ReadToEndAsync(cancellationToken);
-    var error = await process.StandardError.ReadToEndAsync(cancellationToken);
-    await process.WaitForExitAsync(cancellationToken);
-    if (process.ExitCode != 0) throw new InvalidOperationException($"{command} failed ({process.ExitCode}): {error}");
-    return new(step.Id, step.Type, true, string.IsNullOrWhiteSpace(output) ? "completed" : output.Trim());
+    var yaml = await File.ReadAllTextAsync(workflowFile);
+    var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+    var workflow = deserializer.Deserialize<WorkflowDefinition>(yaml) ?? throw new InvalidOperationException("Workflow is empty.");
+    object? model = modelFile is null ? null : ToModel(JsonSerializer.Deserialize<JsonElement>(await File.ReadAllTextAsync(modelFile)));
+    var runner = new WorkflowRunner();
+    var result = await runner.RunAsync(
+        workflow,
+        root,
+        model,
+        (step, stepRoot, cancellationToken) => WorkflowCommandExecutor.RunAsync(step, stepRoot, cancellationToken),
+        templateRootDirectory: templateRoot);
+    foreach (var step in result.Steps) Console.WriteLine($"{(step.Changed ? "changed" : "unchanged"),-9} {step.Id ?? step.Type}: {step.Message}");
+    return 0;
+}
+catch (WorkflowCommandRefusedException refused)
+{
+    // The policy is a refusal, not a crash: name the value and exit with its own code.
+    Console.Error.WriteLine(refused.Message);
+    return 3;
+}
+catch (Exception error) when (error is InvalidOperationException or IOException or FileNotFoundException)
+{
+    Console.Error.WriteLine(error.Message);
+    return 1;
 }
 
 static object? ToModel(JsonElement value) => value.ValueKind switch
