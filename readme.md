@@ -337,7 +337,11 @@ invariant currency symbol `¤` and the invariant percent pattern (`86 %`) are wh
 regardless of the machine's locale. `round:2` therefore always renders `3.14`: a template cannot
 change its text, or the files it generates, with the developer's regional settings.
 
-| `floor` | `${Context.Value \| floor}` | `3` |
+| `select:path` | `${Context.Items \| select:Name}` | `Ada,Ben,Cy` |
+| `sum` | `${Context.Scores \| sum}` | `6.5` |
+| `avg` | `${Context.Scores \| avg}` | `2.1666…` |
+| `min` | `${Context.Scores \| min}` | `1` |
+| `max` | `${Context.Scores \| max}` | `3` || `floor` | `${Context.Value \| floor}` | `3` |
 | `ceiling` | `${Context.Value \| ceiling}` | `4` |
 
 ### Collection Helpers

@@ -69,6 +69,11 @@ public static class TemplateHelpers
         Registry["orderby"] = (value, arg) => OrderBy(value, arg);
         Registry["groupby"] = (value, arg) => GroupBy(value, arg);
         Registry["distinct"] = (value, _) => Distinct(value);
+        Registry["select"] = (value, arg) => Select(value, arg);
+        Registry["sum"] = (value, _) => Aggregate(value, AggregateKind.Sum);
+        Registry["avg"] = (value, _) => Aggregate(value, AggregateKind.Average);
+        Registry["min"] = (value, _) => Aggregate(value, AggregateKind.Minimum);
+        Registry["max"] = (value, _) => Aggregate(value, AggregateKind.Maximum);
     }
 
     /// <summary>
@@ -473,6 +478,53 @@ public static class TemplateHelpers
             .ToList();
     }
 
+    private enum AggregateKind { Sum, Average, Minimum, Maximum }
+
+    private static List<object?> Select(object? value, string? argument)
+    {
+        if (string.IsNullOrWhiteSpace(argument))
+            throw new ArgumentException("select requires a member path.", nameof(argument));
+
+        var path = argument.Trim();
+        var items = Items(value).ToList();
+        foreach (var item in items)
+        {
+            if (!TryReadMember(item, path, out _))
+            {
+                throw new ArgumentException($"select: '{path}' is not a member of every item.");
+            }
+        }
+
+        return items.Select(item => ReadMember(item, path)).ToList();
+    }
+
+    private static object? Aggregate(object? value, AggregateKind kind)
+    {
+        var numbers = new List<decimal>();
+        foreach (var item in Items(value))
+        {
+            // Non-numeric and null entries are skipped rather than coerced, so a mixed collection
+            // aggregates its numbers instead of failing.
+            if (item is null || item is string) continue;
+            try
+            {
+                numbers.Add(Convert.ToDecimal(item, CultureInfo.InvariantCulture));
+            }
+            catch (Exception error) when (error is InvalidCastException or FormatException or OverflowException)
+            {
+                // skipped on purpose
+            }
+        }
+
+        return kind switch
+        {
+            AggregateKind.Sum => numbers.Sum(),
+            AggregateKind.Average => numbers.Count == 0 ? null : numbers.Average(),
+            AggregateKind.Minimum => numbers.Count == 0 ? null : numbers.Min(),
+            AggregateKind.Maximum => numbers.Count == 0 ? null : numbers.Max(),
+            _ => null,
+        };
+    }
     private static List<object?> Distinct(object? value)
     {
         var seen = new List<object?>();

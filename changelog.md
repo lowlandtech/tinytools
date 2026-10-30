@@ -1,4 +1,10 @@
 # 2026.10.4
+## Projection and aggregate helpers
+
+* `select:path` projects one member out of a collection, preserving order and duplicates.
+* `sum`, `avg`, `min` and `max` aggregate numeric values, skipping null and non-numeric entries; an
+  empty sequence yields `0` for `sum` and null for the others. A missing member path is refused by
+  name, matching `orderby`.
 ## Language server
 
 * `src/lsp` ships `tinytools-lsp`, an LSP 3.17 server over stdio that publishes template diagnostics,
