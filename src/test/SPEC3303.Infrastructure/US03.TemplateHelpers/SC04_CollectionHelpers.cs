@@ -40,7 +40,7 @@ public sealed class SC04_CollectionHelpers : IClassFixture<UseCases.CollectionHe
         useCase.Cases["OrderedSequence"] = engine.ResolveExpression("Context.Items | orderby:Rank", context);
         try { useCase.Cases["OrderFailureResult"] = engine.ResolveExpression("Context.Items | orderby:Missing", context); }
         catch (ArgumentException error) { useCase.Cases["OrderFailureResult"] = error.GetType().Name + ":" + error.Message; }
-        useCase.Cases["GroupedSequence"] = engine.ResolveExpression("Context.Items | groupby:Team", context);
+        useCase.Cases["GroupedSequence"] = ((IEnumerable<IGrouping<object?, object?>>)engine.ResolveExpression("Context.Items | groupby:Team", context)!).Select(group => $"{group.Key}-first-{string.Join("-", group.Select(item => ((Dictionary<string, object?>)item!)["Name"]))}").ToArray();
         useCase.Cases["DistinctSequence"] = engine.ResolveExpression("Context.Items | distinct", context);
         useCase.Cases["GroupedNullResult"] = engine.ResolveExpression("Context.NullItems | groupby:Team", context);
         try { useCase.Cases["InvalidHelperResult"] = engine.ResolveExpression("Context.Items | where:Active===true", context); }
@@ -68,9 +68,9 @@ public sealed class SC04_CollectionHelpers : IClassFixture<UseCases.CollectionHe
     [Trait("UAC", "05"), Fact(Skip = "TODO: implement named invalid order paths")]
     public void UAC05_MissingOrderPath() => ((string)useCase.Cases["OrderFailureResult"]!).Should().StartWith("ArgumentException:");
 
-    [Then("Result.GroupedSequence should have count 2")]
+    [Then("Result.GroupedSequence should be A-first-Ada-Cy-Ada-B-first-Ben")]
     [Trait("UAC", "06"), Fact(Skip = "TODO: implement stable grouping")]
-    public void UAC06_GroupsInFirstSeenOrder() => ((IEnumerable<object?>)useCase.Cases["GroupedSequence"]!).Should().HaveCount(2);
+    public void UAC06_GroupsInFirstSeenOrder() => ((string[])useCase.Cases["GroupedSequence"]!).Should().Equal("A-first-Ada-Cy-Ada", "B-first-Ben");
 
     [Then("Result.DistinctSequence should have count 3")]
     [Trait("UAC", "07"), Fact(Skip = "TODO: implement equality-based distinct")]
