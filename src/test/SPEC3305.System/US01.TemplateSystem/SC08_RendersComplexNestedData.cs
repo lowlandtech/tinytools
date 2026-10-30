@@ -3,10 +3,16 @@ namespace LowlandTech.TinyTools.Tests.SPEC3305.System.US01.TemplateSystem;
 [Trait(Spec.SPEC, "3305")]
 [Trait(Spec.SC, "08")]
 [UserStory("01", "Template system validates and renders example templates")]
-public sealed class SC08_RendersComplexNestedData : TinyToolsScenario<CSharpClassTemplate>
+public sealed class SC08_RendersComplexNestedData : TinyToolsScenario<CSharpClassTemplate>, IClassFixture<UseCases.TemplateSystemUseCase>
 {
+    private readonly UseCases.TemplateSystemUseCase useCase;
     private ClassData _complexData = null!;
-    private TemplateResult _rendered = null!;
+
+    public SC08_RendersComplexNestedData(UseCases.TemplateSystemUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override CSharpClassTemplate For() => new();
 
@@ -31,20 +37,18 @@ public sealed class SC08_RendersComplexNestedData : TinyToolsScenario<CSharpClas
     protected override void When()
     {
         base.When();
-        _rendered = Sut.Render(_complexData);
+        useCase.Cases["Rendered"] = Sut.Render(_complexData);
     }
-
-    public SC08_RendersComplexNestedData() => ArrangeAndAct();
 
     [Then("the rendered path should be src/App/Models/Domain/ComplexEntity.cs")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_RendersTheNestedPath() => _rendered.Path.Should().Be("src/App/Models/Domain/ComplexEntity.cs");
+    public void UAC01_RendersTheNestedPath() => ((TemplateResult)useCase.Cases["Rendered"]!).Path.Should().Be("src/App/Models/Domain/ComplexEntity.cs");
 
     [Then("the rendered namespace should be App.Models.Domain")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_RendersTheNestedNamespace() => _rendered.Namespace.Should().Be("App.Models.Domain");
+    public void UAC02_RendersTheNestedNamespace() => ((TemplateResult)useCase.Cases["Rendered"]!).Namespace.Should().Be("App.Models.Domain");
 
     [Then("the rendered class should contain the domain namespace")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_RendersTheNestedContent() => _rendered.Content.Should().Contain("namespace App.Models.Domain;");
+    public void UAC03_RendersTheNestedContent() => ((TemplateResult)useCase.Cases["Rendered"]!).Content.Should().Contain("namespace App.Models.Domain;");
 }

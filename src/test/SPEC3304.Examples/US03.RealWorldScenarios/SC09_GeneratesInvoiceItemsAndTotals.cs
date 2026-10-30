@@ -5,12 +5,18 @@ namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "09")]
 [UserStory("03", "Real-world scenarios generate practical output")]
-public sealed class SC09_GeneratesInvoiceItemsAndTotals : UnitScenario
+public sealed class SC09_GeneratesInvoiceItemsAndTotals : UnitScenario, IClassFixture<UseCases.RealWorldScenariosUseCase>
 {
+    private readonly UseCases.RealWorldScenariosUseCase useCase;
     private readonly TinyTemplateEngine _engine = new();
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string _result = null!;
+
+    public SC09_GeneratesInvoiceItemsAndTotals(UseCases.RealWorldScenariosUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     [Given("an invoice template with billing and client data")]
     protected override void Given()
@@ -77,19 +83,17 @@ public sealed class SC09_GeneratesInvoiceItemsAndTotals : UnitScenario
     }
 
     [When("the engine renders the invoice template")]
-    protected override void When() => _result = _engine.Render(_template, _context);
-
-    public SC09_GeneratesInvoiceItemsAndTotals() => ArrangeAndAct();
+    protected override void When() => useCase.Cases["Result"] = _engine.Render(_template, _context);
 
     [Then("the content should contain all line items")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_RendersAllLineItems() => _result.Should().Contain("Web Development Services").And.Contain("UI/UX Design").And.Contain("Project Management");
+    public void UAC04_RendersAllLineItems() => ((string)useCase.Cases["Result"]!).Should().Contain("Web Development Services").And.Contain("UI/UX Design").And.Contain("Project Management");
 
     [Then("the content should contain the totals")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_RendersTheTotals() => _result.Should().Contain("Subtotal:    $9500").And.Contain("TOTAL:       $10260");
+    public void UAC05_RendersTheTotals() => ((string)useCase.Cases["Result"]!).Should().Contain("Subtotal:    $9500").And.Contain("TOTAL:       $10260");
 
     [Then("the content should contain the payment due message")]
     [Trait("UAC", "06"), Fact]
-    public void UAC06_ShowsThePaymentDueMessage() => _result.Should().Contain("Payment due by July 15, 2024").And.NotContain("? PAID");
+    public void UAC06_ShowsThePaymentDueMessage() => ((string)useCase.Cases["Result"]!).Should().Contain("Payment due by July 15, 2024").And.NotContain("? PAID");
 }

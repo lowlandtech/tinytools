@@ -5,12 +5,18 @@ namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "04")]
 [UserStory("03", "Real-world scenarios generate practical output")]
-public sealed class SC04_GeneratesInvoice : UnitScenario
+public sealed class SC04_GeneratesInvoice : UnitScenario, IClassFixture<UseCases.RealWorldScenariosUseCase>
 {
+    private readonly UseCases.RealWorldScenariosUseCase useCase;
     private readonly TinyTemplateEngine _engine = new();
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string _result = null!;
+
+    public SC04_GeneratesInvoice(UseCases.RealWorldScenariosUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     [Given("an invoice template with billing and client data")]
     protected override void Given()
@@ -77,19 +83,17 @@ public sealed class SC04_GeneratesInvoice : UnitScenario
     }
 
     [When("the engine renders the invoice template")]
-    protected override void When() => _result = _engine.Render(_template, _context);
-
-    public SC04_GeneratesInvoice() => ArrangeAndAct();
+    protected override void When() => useCase.Cases["Result"] = _engine.Render(_template, _context);
 
     [Then("the content should contain the invoice header")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_RendersTheInvoiceHeader() => _result.Should().Contain("INVOICE").And.Contain("Invoice #: INV-2024-0042");
+    public void UAC01_RendersTheInvoiceHeader() => ((string)useCase.Cases["Result"]!).Should().Contain("INVOICE").And.Contain("Invoice #: INV-2024-0042");
 
     [Then("the content should contain the company details")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_RendersTheCompanyDetails() => _result.Should().Contain("TechServices LLC").And.Contain("789 Commerce Street, Chicago, IL 60601");
+    public void UAC02_RendersTheCompanyDetails() => ((string)useCase.Cases["Result"]!).Should().Contain("TechServices LLC").And.Contain("789 Commerce Street, Chicago, IL 60601");
 
     [Then("the content should contain the client details")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_RendersTheClientDetails() => _result.Should().Contain("Global Enterprises").And.Contain("Robert Johnson");
+    public void UAC03_RendersTheClientDetails() => ((string)useCase.Cases["Result"]!).Should().Contain("Global Enterprises").And.Contain("Robert Johnson");
 }

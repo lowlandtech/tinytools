@@ -5,12 +5,18 @@ namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "07")]
 [UserStory("03", "Real-world scenarios generate practical output")]
-public sealed class SC07_GeneratesWelcomeEmail : UnitScenario
+public sealed class SC07_GeneratesWelcomeEmail : UnitScenario, IClassFixture<UseCases.RealWorldScenariosUseCase>
 {
+    private readonly UseCases.RealWorldScenariosUseCase useCase;
     private readonly TinyTemplateEngine _engine = new();
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string _result = null!;
+
+    public SC07_GeneratesWelcomeEmail(UseCases.RealWorldScenariosUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     [Given("a welcome email template with a premium recipient")]
     protected override void Given()
@@ -50,23 +56,21 @@ public sealed class SC07_GeneratesWelcomeEmail : UnitScenario
     }
 
     [When("the engine renders the welcome email template")]
-    protected override void When() => _result = _engine.Render(_template, _context);
-
-    public SC07_GeneratesWelcomeEmail() => ArrangeAndAct();
+    protected override void When() => useCase.Cases["Result"] = _engine.Render(_template, _context);
 
     [Then("the content should contain the recipient greeting")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_RendersTheRecipientName() => _result.Should().Contain("Dear John Smith,");
+    public void UAC01_RendersTheRecipientName() => ((string)useCase.Cases["Result"]!).Should().Contain("Dear John Smith,");
 
     [Then("the content should contain the company name")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_RendersTheCompanyName() => _result.Should().Contain("Welcome to TechCorp Solutions!");
+    public void UAC02_RendersTheCompanyName() => ((string)useCase.Cases["Result"]!).Should().Contain("Welcome to TechCorp Solutions!");
 
     [Then("the content should contain the premium message")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_IncludesThePremiumMessage() => _result.Should().Contain("As a Premium member");
+    public void UAC03_IncludesThePremiumMessage() => ((string)useCase.Cases["Result"]!).Should().Contain("As a Premium member");
 
     [Then("the content should contain the sender signature")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_RendersTheSenderSignature() => _result.Should().Contain("Sarah Johnson").And.Contain("Customer Success Manager");
+    public void UAC04_RendersTheSenderSignature() => ((string)useCase.Cases["Result"]!).Should().Contain("Sarah Johnson").And.Contain("Customer Success Manager");
 }

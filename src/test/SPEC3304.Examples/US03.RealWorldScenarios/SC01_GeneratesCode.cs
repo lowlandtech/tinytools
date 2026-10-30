@@ -5,12 +5,18 @@ namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "01")]
 [UserStory("03", "Real-world scenarios generate practical output")]
-public sealed class SC01_GeneratesCode : UnitScenario
+public sealed class SC01_GeneratesCode : UnitScenario, IClassFixture<UseCases.RealWorldScenariosUseCase>
 {
+    private readonly UseCases.RealWorldScenariosUseCase useCase;
     private readonly TinyTemplateEngine _engine = new();
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string _result = null!;
+
+    public SC01_GeneratesCode(UseCases.RealWorldScenariosUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     [Given("a code generation template with a customer model")]
     protected override void Given()
@@ -53,31 +59,29 @@ public sealed class SC01_GeneratesCode : UnitScenario
     }
 
     [When("the engine renders the code generation template")]
-    protected override void When() => _result = _engine.Render(_template, _context);
-
-    public SC01_GeneratesCode() => ArrangeAndAct();
+    protected override void When() => useCase.Cases["Result"] = _engine.Render(_template, _context);
 
     [Then("the content should contain the rendered namespace")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_RendersTheNamespace() => _result.Should().Contain("namespace MyApp.Models;");
+    public void UAC01_RendersTheNamespace() => ((string)useCase.Cases["Result"]!).Should().Contain("namespace MyApp.Models;");
 
     [Then("the content should contain the rendered class name")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_RendersTheClassName() => _result.Should().Contain("public class Customer");
+    public void UAC02_RendersTheClassName() => ((string)useCase.Cases["Result"]!).Should().Contain("public class Customer");
 
     [Then("the content should contain the required properties")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_RendersTheRequiredProperties() => _result.Should().Contain("public required int Id { get; set; }").And.Contain("public required string FirstName { get; set; }");
+    public void UAC03_RendersTheRequiredProperties() => ((string)useCase.Cases["Result"]!).Should().Contain("public required int Id { get; set; }").And.Contain("public required string FirstName { get; set; }");
 
     [Then("the content should contain the optional property")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_RendersTheOptionalProperties() => _result.Should().Contain("public string? Email { get; set; }");
+    public void UAC04_RendersTheOptionalProperties() => ((string)useCase.Cases["Result"]!).Should().Contain("public string? Email { get; set; }");
 
     [Then("the content should contain the validation method")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_IncludesTheValidationMethod() => _result.Should().Contain("public bool IsValid()");
+    public void UAC05_IncludesTheValidationMethod() => ((string)useCase.Cases["Result"]!).Should().Contain("public bool IsValid()");
 
     [Then("the content should not contain the template comment")]
     [Trait("UAC", "06"), Fact]
-    public void UAC06_RemovesTheComments() => _result.Should().NotContain("Auto-generated code");
+    public void UAC06_RemovesTheComments() => ((string)useCase.Cases["Result"]!).Should().NotContain("Auto-generated code");
 }

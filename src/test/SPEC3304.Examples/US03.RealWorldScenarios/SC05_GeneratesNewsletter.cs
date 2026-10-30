@@ -5,12 +5,18 @@ namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "05")]
 [UserStory("03", "Real-world scenarios generate practical output")]
-public sealed class SC05_GeneratesNewsletter : UnitScenario
+public sealed class SC05_GeneratesNewsletter : UnitScenario, IClassFixture<UseCases.RealWorldScenariosUseCase>
 {
+    private readonly UseCases.RealWorldScenariosUseCase useCase;
     private readonly TinyTemplateEngine _engine = new();
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string _result = null!;
+
+    public SC05_GeneratesNewsletter(UseCases.RealWorldScenariosUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     [Given("a newsletter template with three articles and an offer")]
     protected override void Given()
@@ -55,27 +61,25 @@ public sealed class SC05_GeneratesNewsletter : UnitScenario
     }
 
     [When("the engine renders the newsletter template")]
-    protected override void When() => _result = _engine.Render(_template, _context);
-
-    public SC05_GeneratesNewsletter() => ArrangeAndAct();
+    protected override void When() => useCase.Cases["Result"] = _engine.Render(_template, _context);
 
     [Then("the content should contain the newsletter header")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_RendersTheNewsletterHeader() => _result.Should().Contain("Tech Weekly Digest - Issue #42");
+    public void UAC01_RendersTheNewsletterHeader() => ((string)useCase.Cases["Result"]!).Should().Contain("Tech Weekly Digest - Issue #42");
 
     [Then("the content should contain the subscriber greeting")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_RendersTheSubscriberGreeting() => _result.Should().Contain("Hello Alex!");
+    public void UAC02_RendersTheSubscriberGreeting() => ((string)useCase.Cases["Result"]!).Should().Contain("Hello Alex!");
 
     [Then("the content should contain all articles")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_RendersAllArticles() => _result.Should().Contain("AI Breakthroughs in 2024").And.Contain("Cloud Computing Trends").And.Contain("Cybersecurity Best Practices");
+    public void UAC03_RendersAllArticles() => ((string)useCase.Cases["Result"]!).Should().Contain("AI Breakthroughs in 2024").And.Contain("Cloud Computing Trends").And.Contain("Cybersecurity Best Practices");
 
     [Then("the content should contain the article authors")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_RendersTheArticleAuthors() => _result.Should().Contain("By: Dr. Smith").And.Contain("By: Jane Miller").And.Contain("By: Bob Wilson");
+    public void UAC04_RendersTheArticleAuthors() => ((string)useCase.Cases["Result"]!).Should().Contain("By: Dr. Smith").And.Contain("By: Jane Miller").And.Contain("By: Bob Wilson");
 
     [Then("the content should contain the special offer")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_IncludesTheSpecialOffer() => _result.Should().Contain("? SPECIAL OFFER ?").And.Contain("Get 50% off our annual subscription!");
+    public void UAC05_IncludesTheSpecialOffer() => ((string)useCase.Cases["Result"]!).Should().Contain("? SPECIAL OFFER ?").And.Contain("Get 50% off our annual subscription!");
 }

@@ -5,12 +5,18 @@ namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "06")]
 [UserStory("03", "Real-world scenarios generate practical output")]
-public sealed class SC06_GeneratesOrderConfirmation : UnitScenario
+public sealed class SC06_GeneratesOrderConfirmation : UnitScenario, IClassFixture<UseCases.RealWorldScenariosUseCase>
 {
+    private readonly UseCases.RealWorldScenariosUseCase useCase;
     private readonly TinyTemplateEngine _engine = new();
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string _result = null!;
+
+    public SC06_GeneratesOrderConfirmation(UseCases.RealWorldScenariosUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     [Given("an order confirmation template with one customer order")]
     protected override void Given()
@@ -62,23 +68,21 @@ public sealed class SC06_GeneratesOrderConfirmation : UnitScenario
     }
 
     [When("the engine renders the order confirmation template")]
-    protected override void When() => _result = _engine.Render(_template, _context);
-
-    public SC06_GeneratesOrderConfirmation() => ArrangeAndAct();
+    protected override void When() => useCase.Cases["Result"] = _engine.Render(_template, _context);
 
     [Then("the content should contain the customer name")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_RendersTheCustomerName() => _result.Should().Contain("Hi Jane,");
+    public void UAC01_RendersTheCustomerName() => ((string)useCase.Cases["Result"]!).Should().Contain("Hi Jane,");
 
     [Then("the content should contain the order number")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_RendersTheOrderNumber() => _result.Should().Contain("Order #ORD-2024-001");
+    public void UAC02_RendersTheOrderNumber() => ((string)useCase.Cases["Result"]!).Should().Contain("Order #ORD-2024-001");
 
     [Then("the content should contain all order items")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_RendersAllOrderItems() => _result.Should().Contain("Wireless Mouse (Qty: 2)").And.Contain("USB-C Hub (Qty: 1)");
+    public void UAC03_RendersAllOrderItems() => ((string)useCase.Cases["Result"]!).Should().Contain("Wireless Mouse (Qty: 2)").And.Contain("USB-C Hub (Qty: 1)");
 
     [Then("the content should contain the order total")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_RendersTheOrderTotal() => _result.Should().Contain("Total: $149.97");
+    public void UAC04_RendersTheOrderTotal() => ((string)useCase.Cases["Result"]!).Should().Contain("Total: $149.97");
 }
