@@ -17,7 +17,10 @@ public sealed record TemplateSyntaxValidationResult(bool IsValid, IReadOnlyList<
     public IEnumerable<string> Codes => Diagnostics.Select(diagnostic => diagnostic.Code);
 }
 
-/// <summary>A single, stable syntax diagnostic. Coordinates are owned by a later scope.</summary>
+/// <summary>A single, stable syntax diagnostic with its source location.</summary>
 /// <param name="Code">A stable code such as <c>TS001</c>.</param>
 /// <param name="Message">A stable human-readable description.</param>
-public sealed record TemplateSyntaxDiagnostic(string Code, string Message);
+/// <param name="Line">The one-based source line the construct starts on.</param>
+/// <param name="Column">The one-based source column the construct starts on.</param>
+/// <param name="Construct">The offending construct, for example <c>${</c> or <c>@else</c>.</param>
+public sealed record TemplateSyntaxDiagnostic(string Code, string Message, int Line = 0, int Column = 0, string Construct = "");

@@ -45,11 +45,12 @@ public partial class TinyTemplateEngine : ITemplateEngine
     }
 
     /// <summary>
-    /// Validates the supported syntax without rendering. Diagnostics are stable codes:
+    /// Validates the supported syntax without rendering. Diagnostics are stable codes
+    /// carrying a one-based line and column and the offending construct:
     /// TS001 unterminated <c>${</c>, TS002 unterminated comment, TS003 control-flow
     /// statement without a condition, TS004 control-flow statement without an opening
-    /// brace, TS005 control-flow block that is never closed, TS006 closing brace with no
-    /// open block.
+    /// brace, TS005 control-flow block that is never closed, TS007 <c>@else</c> with no
+    /// open <c>@if</c>.
     /// </summary>
     public TemplateSyntaxValidationResult ValidateSyntax(string template)
     {
@@ -64,41 +65,84 @@ public partial class TinyTemplateEngine : ITemplateEngine
         {
             if (text.IndexOf('}', index) < 0)
             {
-                diagnostics.Add(new("TS001", "An interpolation opened with '${' is never closed."));
+                var (line, column) = Locate(text, index);
+                diagnostics.Add(new("TS001", "An interpolation opened with '${' is never closed.", line, column, "${"));
                 break;
             }
         }
 
         var lines = text.Split('\n');
+        var covered = new bool[lines.Length];
         for (var i = 0; i < lines.Length; i++)
         {
-            var line = lines[i].TrimStart();
+            var raw = lines[i];
+            var line = raw.TrimStart();
             var isIf = line.StartsWith("@if", StringComparison.Ordinal);
             var isForeach = line.StartsWith("@foreach", StringComparison.Ordinal);
             if (!isIf && !isForeach) continue;
 
             var keyword = isIf ? "@if" : "@foreach";
+            var column = raw.Length - line.Length + 1;
+
             if (!line.Contains('(') || !line.Contains(')'))
             {
-                diagnostics.Add(new("TS003", $"{keyword} on line {i + 1} has no condition."));
+                diagnostics.Add(new("TS003", $"{keyword} on line {i + 1} has no condition.", i + 1, column, keyword));
                 continue;
             }
 
             if (!line.Contains('{'))
             {
-                diagnostics.Add(new("TS004", $"{keyword} on line {i + 1} has no opening brace."));
+                diagnostics.Add(new("TS004", $"{keyword} on line {i + 1} has no opening brace.", i + 1, column, keyword));
                 continue;
             }
 
-            if (FindBlockEnd(lines, i) < 0)
+            var end = FindBlockEnd(lines, i);
+            if (end < 0)
             {
-                diagnostics.Add(new("TS005", $"{keyword} opened on line {i + 1} is never closed."));
+                diagnostics.Add(new("TS005", $"{keyword} opened on line {i + 1} is never closed.", i + 1, column, keyword));
+                continue;
             }
+
+            for (var coveredLine = i; coveredLine <= end && coveredLine < covered.Length; coveredLine++)
+            {
+                covered[coveredLine] = true;
+            }
+        }
+
+        for (var i = 0; i < lines.Length; i++)
+        {
+            var raw = lines[i];
+            var line = raw.TrimStart();
+            if (!line.StartsWith("@else", StringComparison.Ordinal) || covered[i]) continue;
+            if (i > 0 && covered[i - 1]) continue;
+
+            diagnostics.Add(new("TS007", $"@else on line {i + 1} has no open @if block.", i + 1, raw.Length - line.Length + 1, "@else"));
         }
 
         return diagnostics.Count == 0
             ? TemplateSyntaxValidationResult.Valid
             : new TemplateSyntaxValidationResult(false, diagnostics);
+    }
+
+    /// <summary>Maps an absolute index in the normalized text to a one-based line and column.</summary>
+    private static (int Line, int Column) Locate(string text, int index)
+    {
+        var line = 1;
+        var column = 1;
+        for (var i = 0; i < index && i < text.Length; i++)
+        {
+            if (text[i] == '\n')
+            {
+                line++;
+                column = 1;
+            }
+            else
+            {
+                column++;
+            }
+        }
+
+        return (line, column);
     }
 
     private static string StripComments(string text, List<TemplateSyntaxDiagnostic> diagnostics)
