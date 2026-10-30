@@ -31,6 +31,7 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <Deterministic>true</Deterministic>
+    <!-- CI-only: forcing this outside CI breaks local debugging and pins paths to the agent. -->
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
     
     <!-- NuGet Package Settings -->
@@ -42,12 +43,11 @@
     <IncludeSource>true</IncludeSource>
     <DebugSymbols>true</DebugSymbols>
     
-    <!-- Source Link - Always enabled for local builds -->
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <!-- Source Link: declared once, above. The duplicated block that used to sit here
+         forced ContinuousIntegrationBuild=true on every build, overriding the CI
+         condition and making local packs look like agent builds. -->
     <DebugType>portable</DebugType>
     <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <!-- Ignore unavailable inherited sources; source selection is centralized in NuGet.Config. -->
@@ -62,8 +62,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\README.md" Pack="true" PackagePath="\" />
-    <None Include="..\..\icon.png" Pack="true" PackagePath="\" />
+    <!--
+      The package readme is deliberately src/README.md: it is the short, install-first
+      document for package consumers. The repository root readme.md is the project
+      showcase (badges, feature matrix, long examples) and is not packed. The include is
+      written with the exact on-disk casing so a case-sensitive filesystem selects the
+      same file, and Link pins the packaged name to README.md.
+    -->
+    <None Include="..\README.md" Pack="true" PackagePath="\" Link="README.md" />
+    <None Include="..\..\icon.png" Pack="true" PackagePath="\" Link="icon.png" />
   </ItemGroup>
   
   <Target Name="PreparePackageReleaseNotesFromFile" BeforeTargets="GenerateNuspec">
