@@ -1,89 +1,61 @@
 namespace LowlandTech.TinyTools.Tests.SPEC3301.Registry.US02.Registration;
 
-/// <summary>
-/// Tests TemplateRegistry registration functionality.
-/// </summary>
 [Trait(Spec.SPEC, "3301")]
 [Trait(Spec.SC, "01")]
 [UserStory("02", "Template registry supports manual registration")]
-public class WhenRegisteringTemplatesInRegistry : TinyToolsScenario<TemplateRegistry>
+public sealed class SC01_RegistersAndRetrieves : TinyToolsScenario<TemplateRegistry>
 {
-    private ComponentTemplate? _componentTemplate;
-    private CSharpClassTemplate? _classTemplate;
+    private ComponentTemplate _componentTemplate = null!;
+    private CSharpClassTemplate _classTemplate = null!;
+    private ITemplate? _component;
+    private ITemplate? _class;
+    private ITemplate? _missing;
+    private List<string> _names = [];
+    private List<ITemplate> _all = [];
 
-    protected override TemplateRegistry For()
-    {
-        return new TemplateRegistry();
-    }
+    protected override TemplateRegistry For() => new();
 
-    [Given("Setup test context")]
+    [Given("a component template and a C# class template")]
     protected override void Given()
     {
         _componentTemplate = new ComponentTemplate();
         _classTemplate = new CSharpClassTemplate();
     }
 
-    [When("Execute test action")]
+    [When("both templates are registered and read back")]
     protected override void When()
     {
         base.When();
+
         Sut.Register("component", _componentTemplate);
         Sut.Register("class", _classTemplate);
+
+        _component = Sut.Get("component");
+        _class = Sut.Get("class");
+        _missing = Sut.Get("nonexistent");
+        _names = Sut.GetNames().ToList();
+        _all = Sut.GetAll().ToList();
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Retrieve Component Template")]
-    [Fact]
-    public void ItShouldRetrieveComponentTemplate()
-    {
-        ArrangeAndAct();
-        var retrieved = Sut.Get("component");
-        retrieved.Should().NotBeNull();
-        retrieved.Should().BeSameAs(_componentTemplate);
-    }
+    public SC01_RegistersAndRetrieves() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Retrieve C Sharp Class Template")]
-    [Fact]
-    public void ItShouldRetrieveCSharpClassTemplate()
-    {
-        ArrangeAndAct();
-        var retrieved = Sut.Get("class");
-        retrieved.Should().NotBeNull();
-        retrieved.Should().BeSameAs(_classTemplate);
-    }
+    [Then("the component template should be registered")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_RetrievesComponentTemplate() => _component.Should().BeSameAs(_componentTemplate);
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Return Null For Unregistered Template")]
-    [Fact]
-    public void ItShouldReturnNullForUnregisteredTemplate()
-    {
-        ArrangeAndAct();
-        var retrieved = Sut.Get("nonexistent");
-        retrieved.Should().BeNull();
-    }
+    [Then("the class template should be registered")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_RetrievesCSharpClassTemplate() => _class.Should().BeSameAs(_classTemplate);
 
-    [Trait(Spec.UAC, "04")]
-    [Then("it Should List All Registered Names")]
-    [Fact]
-    public void ItShouldListAllRegisteredNames()
-    {
-        ArrangeAndAct();
-        var names = Sut.GetNames().ToList();
-        names.Should().Contain("component");
-        names.Should().Contain("class");
-        names.Should().HaveCount(2);
-    }
+    [Then("the unregistered template should be null")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_ReturnsNullForUnregisteredTemplate() => _missing.Should().BeNull();
 
-    [Trait(Spec.UAC, "05")]
-    [Then("it Should Get All Templates")]
-    [Fact]
-    public void ItShouldGetAllTemplates()
-    {
-        ArrangeAndAct();
-        var templates = Sut.GetAll().ToList();
-        templates.Should().HaveCount(2);
-        templates.Should().Contain(_componentTemplate);
-        templates.Should().Contain(_classTemplate);
-    }
+    [Then("the registered names should have count 2")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_ListsAllRegisteredNames() => _names.Should().BeEquivalentTo("component", "class");
+
+    [Then("the registered templates should have count 2")]
+    [Trait("UAC", "05"), Fact]
+    public void UAC05_GetsAllTemplates() => _all.Should().BeEquivalentTo(new ITemplate[] { _componentTemplate, _classTemplate });
 }

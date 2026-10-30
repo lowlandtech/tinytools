@@ -1,65 +1,33 @@
 namespace LowlandTech.TinyTools.Tests.SPEC3302.Validation.US01.Validation;
 
-/// <summary>
-/// Tests template validation with partial expectations.
-/// </summary>
 [Trait(Spec.SPEC, "3302")]
 [Trait(Spec.SC, "02")]
 [UserStory("01", "Template validation checks all templates in registry")]
-public class WhenValidatingTemplateWithPartialExpectations : TinyToolsScenario<PartialExpectationTemplate>
+public sealed class SC02_HandlesPartialExpectations : TinyToolsScenario<PartialExpectationTemplate>
 {
-    private TemplateValidationResult? _result;
+    private TemplateValidationResult _result = null!;
 
-    protected override PartialExpectationTemplate For()
+    protected override PartialExpectationTemplate For() => new();
+
+    [Given("a template whose path and namespace expectations are absent")]
+    protected override void Given()
     {
-        return new PartialExpectationTemplate();
     }
 
-    [When("Execute test action")]
+    [When("the template is validated with detail")]
     protected override void When()
     {
         base.When();
         _result = Sut.ValidateDetailed();
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Validate Content Only")]
-    [Fact]
-    public void ItShouldValidateContentOnly()
-    {
-        ArrangeAndAct();
-        _result.Should().NotBeNull();
-        _result!.IsValid.Should().BeTrue();
-    }
+    public SC02_HandlesPartialExpectations() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Not Validate Path Or Namespace")]
-    [Fact]
-    public void ItShouldNotValidatePathOrNamespace()
-    {
-        ArrangeAndAct();
-        // Since ExpectedPath and ExpectedNamespace are null,
-        // they should not be validated
-        _result!.Differences.Should().BeNullOrEmpty();
-    }
-}
+    [Then("the content only validation should be accepted")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_ValidatesContentOnly() => new { _result.IsValid, HasDifferences = _result.Differences is { Count: > 0 } }.Should().BeEquivalentTo(new { IsValid = true, HasDifferences = false });
 
-/// <summary>
-/// Template with partial expectations for testing.
-/// </summary>
-public class PartialExpectationTemplate : TemplateBase
-{
-    public override string TemplatePath => "output/${Context.Name}.txt";
-    public override string TemplateNamespace => "Test.${Context.Name}";
-    public override string TemplateContent => "Value: ${Context.Name}";
-    public override Type DataType => typeof(SimpleData);
-    
-    public override string TestDataJson => @"{ ""Name"": ""Test"" }";
-    public override string ExpectedContent => "Value: Test";
-    // ExpectedPath and ExpectedNamespace are null - should not be validated
-}
-
-public record SimpleData
-{
-    public string Name { get; init; } = "";
+    [Then("the differences should be null")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_DoesNotValidatePathOrNamespace() => _result.Differences.Should().BeNullOrEmpty();
 }

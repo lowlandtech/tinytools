@@ -1,14 +1,11 @@
 namespace LowlandTech.TinyTools.Tests.SPEC3301.Registry.US03.BatchRendering;
 
-/// <summary>
-/// Tests TemplateRegistry batch rendering.
-/// </summary>
 [Trait(Spec.SPEC, "3301")]
 [Trait(Spec.SC, "02")]
 [UserStory("03", "Template registry renders batches of templates")]
-public class WhenRenderingMultipleTemplatesInBatch : TinyToolsScenario<TemplateRegistry>
+public sealed class SC02_RendersMultipleTemplatesBatch : TinyToolsScenario<TemplateRegistry>
 {
-    private Dictionary<string, TemplateResult>? _results;
+    private Dictionary<string, TemplateResult> _results = [];
 
     protected override TemplateRegistry For()
     {
@@ -18,59 +15,47 @@ public class WhenRenderingMultipleTemplatesInBatch : TinyToolsScenario<TemplateR
         return registry;
     }
 
-    [When("Execute test action")]
+    [Given("a registry holding the component and class templates")]
+    protected override void Given()
+    {
+    }
+
+    [When("a component and a class model are rendered in one batch")]
     protected override void When()
     {
         base.When();
+
         var batch = new Dictionary<string, object>
         {
-            ["component1"] = new ComponentData 
-            { 
+            ["component1"] = new ComponentData
+            {
                 ComponentName = "Button",
                 Props = new(),
-                PropsDestructured = "{}"
+                PropsDestructured = "{}",
             },
             ["class1"] = new ClassData
             {
                 Namespace = "Models",
                 ClassName = "User",
-                Description = "User model"
-            }
+                Description = "User model",
+            },
         };
 
-        // Note: RenderBatch expects template names as keys
-        // So we need to adapt this
-        _results = new Dictionary<string, TemplateResult>();
         _results["component1"] = Sut.Render("component", batch["component1"])!;
         _results["class1"] = Sut.Render("class", batch["class1"])!;
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Render Both Templates")]
-    [Fact]
-    public void ItShouldRenderBothTemplates()
-    {
-        ArrangeAndAct();
-        _results.Should().HaveCount(2);
-    }
+    public SC02_RendersMultipleTemplatesBatch() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Render Component Correctly")]
-    [Fact]
-    public void ItShouldRenderComponentCorrectly()
-    {
-        ArrangeAndAct();
-        _results.Should().ContainKey("component1");
-        _results!["component1"].Content.Should().Contain("Button");
-    }
+    [Then("the batch results should have count 2")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_RendersBothTemplates() => _results.Should().HaveCount(2);
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Render Class Correctly")]
-    [Fact]
-    public void ItShouldRenderClassCorrectly()
-    {
-        ArrangeAndAct();
-        _results.Should().ContainKey("class1");
-        _results!["class1"].Content.Should().Contain("class User");
-    }
+    [Then("the component batch entry should contain Button")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_RendersComponentCorrectly() => _results["component1"].Content.Should().Contain("Button");
+
+    [Then("the class batch entry should contain class User")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_RendersClassCorrectly() => _results["class1"].Content.Should().Contain("class User");
 }
