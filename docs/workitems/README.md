@@ -1,6 +1,6 @@
 | Milestone | Title | Gate |
 |---|---|---|
-| M1 | Open correctness issues | Both issue-backed regressions have executable boundary coverage, accepted source and matching issue states. |
+| M1 | Correctness and test foundations | Open correctness regressions, visible use-case test specifications and RazorLight cache compatibility have executable coverage, accepted source and matching issue states. |
 | M2 | Developer experience | Validation, caching, syntax diagnostics, additional helpers and the published performance target have verified acceptance. |
 | M3 | Advanced templating | Includes, macros, asynchronous services and collection helpers meet their contracts. |
 | M4 | Ecosystem and tooling | Editor, source generation, reusable template packs and CLI delivery are accepted. |
@@ -9,6 +9,8 @@
 |---|---|---|---|---|---|---|---|---|
 | M1-001 | SPEC3300-US03-SC02 | [Preserve comparison operator precedence](todo/SPEC3300.US03.SC02.operator-precedence.md) | P1 | tinytools | None | todo | true | [#10](https://github.com/lowlandtech/tinytools/issues/10) |
 | M1-002 | SPEC3300-US03-SC03 | [Compare floating-point values with a tolerance](todo/SPEC3300.US03.SC03.floating-point-equality.md) | P3 | tinytools | None | todo | true | [#12](https://github.com/lowlandtech/tinytools/issues/12) |
+| M1-003 | SPEC3305-US02-SC01 | [Convert existing tests to visible use-case specifications](todo/SPEC3305.US02.SC01.visible-use-case-test-specifications.md) | P0 | tinytools | None | todo | true | [#52](https://github.com/lowlandtech/tinytools/issues/52) |
+| M1-004 | SPEC3300-US11-SC01 | [Restore and fully test RazorLight cache compatibility](todo/SPEC3300.US11.SC01.razorlight-cache-compatibility.md) | P1 | tinytools | None | todo | true | [#53](https://github.com/lowlandtech/tinytools/issues/53) |
 | M2-001 | SPEC3302-US04-SC01 | [Validate template syntax before rendering](todo/SPEC3302.US04.SC01.pre-render-syntax-validation.md) | P1 | tinytools | None | todo | true | [#44](https://github.com/lowlandtech/tinytools/issues/44) |
 | M2-002 | SPEC3300-US07-SC01 | [Compile and reuse templates safely](todo/SPEC3300.US07.SC01.compiled-template-cache.md) | P1 | tinytools | None | todo | false | [#39](https://github.com/lowlandtech/tinytools/issues/39) |
 | M2-003 | SPEC3300-US08-SC01 | [Report template syntax locations](todo/SPEC3300.US08.SC01.syntax-diagnostic-locations.md) | P1 | tinytools | None | todo | true | [#40](https://github.com/lowlandtech/tinytools/issues/40) |
