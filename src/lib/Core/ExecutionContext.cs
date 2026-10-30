@@ -184,6 +184,7 @@ public class ExecutionContext
 
     private record CursorEntry(object? Item, int Index, string? Key);
 
+
     /// <summary>
     /// Gets a variable by key.
     /// </summary>

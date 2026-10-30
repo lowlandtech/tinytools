@@ -25,7 +25,82 @@ public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
         _resolver = new VariableResolver(loggerFactory);
     }
 
-    public string Render(string template, ToolContext context) => RenderInternal(template, context, 0, null, Array.Empty<string>());
+    public string Render(string template, ToolContext context) => Render(template, context, TemplateRenderOptions.Lenient);
+
+    /// <summary>
+    /// Renders with an explicit resolution policy. Strict mode validates every <c>${...}</c> token
+    /// before any output is produced, so a typo fails at its own line and column instead of
+    /// silently rendering an empty string.
+    /// </summary>
+    public string Render(string template, ToolContext context, TemplateRenderOptions options)
+    {
+        if (options.StrictVariables && !string.IsNullOrEmpty(template))
+        {
+            ValidateStrict(template, context, options);
+        }
+
+        return RenderInternal(template, context, 0, null, Array.Empty<string>());
+    }
+
+    private static readonly System.Text.RegularExpressions.Regex StrictTokenPattern = new(
+        @"\$\{([^}]+)\}",
+        System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    private void ValidateStrict(string template, ToolContext context, TemplateRenderOptions options)
+    {
+        foreach (System.Text.RegularExpressions.Match match in StrictTokenPattern.Matches(template))
+        {
+            var (line, column) = LocateToken(template, match.Index);
+            var expression = match.Groups[1].Value;
+            var segments = expression.Split('|');
+
+            foreach (var helper in segments.Skip(1))
+            {
+                var name = helper.Trim();
+                var colon = name.IndexOf(':');
+                if (colon >= 0) name = name[..colon].Trim();
+                if (name.Length == 0) continue;
+                if (!TemplateHelpers.Exists(name))
+                    throw new TemplateResolutionException("TR002", $"Unknown pipe helper '{name}'.", line, column);
+            }
+
+            var path = segments[0].Trim();
+            if (path.StartsWith("Context.", StringComparison.OrdinalIgnoreCase)) path = path["Context.".Length..];
+            if (path.Length == 0 || path[0] is '"' or '\''
+                || path.Contains("??", StringComparison.Ordinal)
+                || path.Contains('?')
+                || path.Contains('('))
+            {
+                continue;
+            }
+
+            var root = path.Split('.')[0];
+            if (!context.Has(root))
+            {
+                throw new TemplateResolutionException(
+                    "TR001", $"Unknown context key '{root}' in '${{{expression}}}'.", line, column);
+            }
+
+            if (options.FailOnNull && _resolver.ResolveExpression(path, context) is null)
+            {
+                throw new TemplateResolutionException(
+                    "TR003", $"'{root}' resolved to null while FailOnNull is set.", line, column);
+            }
+        }
+    }
+
+    private static (int Line, int Column) LocateToken(string template, int index)
+    {
+        var line = 1;
+        var column = 1;
+        for (var cursor = 0; cursor < index && cursor < template.Length; cursor++)
+        {
+            if (template[cursor] == '\n') { line++; column = 1; }
+            else column++;
+        }
+
+        return (line, column);
+    }
 
     private string RenderInternal(string template, ToolContext context, int depth, IReadOnlyDictionary<string, MacroDefinition>? inherited, IReadOnlyList<string> chain)
     {

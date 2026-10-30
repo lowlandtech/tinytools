@@ -1,4 +1,10 @@
 # 2026.10.4
+## Strict rendering
+
+* `TemplateRenderOptions` adds an opt-in strict policy: an unknown context key raises
+  `TemplateResolutionException` with code `TR001`, an unknown pipe helper `TR002`, and a known key
+  that resolved to null `TR003` when `FailOnNull` is set. Each exception carries a one-based line and
+  column. The default stays lenient, so existing templates render exactly as before.
 ## Gates in CI
 
 * CI now runs the behavior-test layout checker and the roadmap validator from `eng/`, vendored with
