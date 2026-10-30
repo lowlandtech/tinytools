@@ -19,6 +19,20 @@
 
 > A lightweight template engine for .NET with minimal dependencies. Designed for data composition, not view rendering.
 
+### Runtime dependencies
+
+The package ships only runtime code. Every target framework declares the same two
+runtime dependencies, and `netstandard2.1` adds `System.Text.Json`:
+
+| Target framework | Dependencies |
+| --- | --- |
+| `net8.0`, `net9.0`, `net10.0` | `Ardalis.GuardClauses`, `Microsoft.Extensions.Logging.Abstractions` |
+| `netstandard2.1` | the same two plus `System.Text.Json` |
+
+No mocking library, test framework or test scaffolding type is part of the shipped
+assembly: the mocking-based logger helper and the legacy `WhenTestingFor<T>` base
+live in the test infrastructure project, not in the package.
+
 ### 🏠 [Homepage](https://tools.lowlandtech.com)
 
 ---
