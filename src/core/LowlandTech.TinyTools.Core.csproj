@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Multi-targeted so the existing net8.0/net9.0/net10.0 test matrix can
+         reference the model; the server hosts themselves target net10.0. -->
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>LowlandTech.TinyTools.Core</RootNamespace>
+    <AssemblyName>LowlandTech.TinyTools.Core</AssemblyName>
+    <IsPackable>true</IsPackable>
+    <PackageId>LowlandTech.TinyTools.Core</PackageId>
+    <!-- Version authority is not settled yet (M5-004); this follows the workspace
+         calendar versioning until that workitem decides the scheme. -->
+    <Version>2026.10.1</Version>
+    <Authors>LowlandTech</Authors>
+    <Company>LowlandTech</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>Shared entity contracts and abstractions for the Tinytools server: Template, TemplateVersion, TemplatePackage, TemplateImport, StepIntent, TemplateFlow and TemplateStep.</Description>
+    <PackageTags>lowlandtech tinytools templates server entity model</PackageTags>
+    <RepositoryUrl>https://github.com/lowlandtech/tinytools</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+</Project>
