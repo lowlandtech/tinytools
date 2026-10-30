@@ -6,8 +6,6 @@ This directory contains the icon source and conversion scripts for the NuGet pac
 
 - **icon.svg** - Source SVG icon (128x128)
 - **icon.png** - Generated PNG icon for NuGet package (created from SVG)
-- **convert-icon.ps1** - PowerShell script to convert SVG to PNG (Windows)
-- **convert-icon.sh** - Bash script to convert SVG to PNG (Linux/macOS)
 
 ## Quick Start
 
@@ -23,19 +21,6 @@ magick convert -background none -resize 128x128 icon.svg icon.png
 convert -background none -resize 128x128 icon.svg icon.png
 # OR
 inkscape -w 128 -h 128 icon.svg -o icon.png
-```
-
-### Using the Scripts
-
-**Windows:**
-```powershell
-.\convert-icon.ps1
-```
-
-**Linux/macOS:**
-```bash
-chmod +x convert-icon.sh
-./convert-icon.sh
 ```
 
 ## Requirements
@@ -95,15 +80,6 @@ sudo apt install inkscape
    - Windows: `C:\Program Files\ImageMagick-[version]`
    - Or run the full path: `"C:\Program Files\ImageMagick-7.x.x\magick.exe" convert ...`
 
-### Script says "No converter found"
-
-The script checks for these tools in order:
-1. ImageMagick (`magick` command)
-2. Inkscape (`inkscape` command)
-3. librsvg (`rsvg-convert` command)
-
-Install at least one of them and restart your terminal.
-
 ## Icon Design Guidelines
 
 The icon.svg follows these design principles:
@@ -121,7 +97,7 @@ The GitHub Actions workflow automatically converts the icon during the build pro
 ## Updating the Icon
 
 1. Edit `icon.svg` with your preferred SVG editor
-2. Run the conversion script
+2. Run the conversion command above
 3. Verify `icon.png` looks correct
 4. Commit both files:
    ```bash

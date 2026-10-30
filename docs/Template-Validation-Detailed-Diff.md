@@ -49,10 +49,10 @@ First difference at position 89:
   Actual char: '\n' (code: 10)
 
 Expected context:
-  ...name:穝tring;\n贩age:穘umber;\n}\n\nexport穋onst稶serCard...
+  ...name:路string;\n路路age:路number;\n}\n\nexport路const路UserCard...
 
 Actual context:
-  ...name:穝tring;\n贩age:穘umber;\n\n}\n\nexport穋onst稶serCard...
+  ...name:路string;\n路路age:路number;\n\n}\n\nexport路const路UserCard...
 
 ===== FULL EXPECTED =====
 import React from 'react';
@@ -125,7 +125,7 @@ The diff escapes special characters for clarity:
 - `\n` ? visible as `\n`
 - `\r` ? visible as `\r`
 - `\t` ? visible as `\t`
-- ` ` (space) ? visible as `穈 (middle dot)
+- ` ` (space) ? visible as `路` (middle dot)
 
 ## Using the Diff to Fix Templates
 
