@@ -48,15 +48,13 @@ jobs:
 
     - name: Verify behavior-test layout
       run: |
-        # The grammar checker is shared workspace tooling, not part of this repository. When it
-        # is absent from the checkout, say so rather than reporting a pass that never ran.
-        CHECKER="$GITHUB_WORKSPACE/eng/verify-test-layout.py"
-        if [ ! -f "$CHECKER" ]; then
-          echo "::warning::Shared layout checker not present in this checkout; the lane records its result in the workitem evidence."
-          exit 0
-        fi
-        python3 "$CHECKER" --root src/test --json > layout.json
+        # Both gates are vendored under eng/ with provenance, so CI enforces exactly what the
+        # lane quotes in its evidence. No warn-and-skip path remains.
+        python3 eng/verify-test-layout.py --root src/test --json > layout.json
         python3 -c "import json,sys; data=json.load(open('layout.json')); v=data.get('violations', []); print('violations=%d' % len(v)); [print('  %s:%s %s: %s' % (i.get('file'), i.get('line'), i.get('code'), i.get('detail'))) for i in v]; sys.exit(1 if v else 0)"
+
+    - name: Verify the roadmap contract
+      run: python3 eng/validate_roadmap.py --repository-root .
 
     - name: Pack the library with the declared version
       run: dotnet pack src/lib/LowlandTech.TinyTools.csproj --configuration Release --output ./artifacts

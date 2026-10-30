@@ -1,4 +1,9 @@
 # 2026.10.4
+## Gates in CI
+
+* CI now runs the behavior-test layout checker and the roadmap validator from `eng/`, vendored with
+  provenance from the workspace tooling. Both previously warned and passed because the shared copies
+  were not in the checkout; they now fail the build on any finding.
 ## Documentation baseline
 
 * Removed 12 superseded test-campaign summaries and moved the five remaining guides plus the feature
