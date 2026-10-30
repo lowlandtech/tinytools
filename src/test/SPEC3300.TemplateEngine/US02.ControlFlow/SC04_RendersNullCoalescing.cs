@@ -5,11 +5,17 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US02.ControlFlow;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "04")]
 [UserStory("02", "Template engine handles null coalescing")]
-public sealed class SC04_RendersNullCoalescing : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC04_RendersNullCoalescing : TinyToolsScenario<TinyTemplateEngine>, IClassFixture<UseCases.ControlFlowUseCase>
 {
+    private readonly UseCases.ControlFlowUseCase useCase;
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string _result = string.Empty;
+
+    public SC04_RendersNullCoalescing(UseCases.ControlFlowUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TinyTemplateEngine For() => new();
 
@@ -35,28 +41,26 @@ public sealed class SC04_RendersNullCoalescing : TinyToolsScenario<TinyTemplateE
     protected override void When()
     {
         base.When();
-        _result = Sut.Render(_template, _context);
+        useCase.Cases["Rendered"] = Sut.Render(_template, _context);
     }
-
-    public SC04_RendersNullCoalescing() => ArrangeAndAct();
 
     [Then("the render should contain Hello, John!")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_UsesActualValueWhenPresent() => _result.Should().Contain("Hello, John!");
+    public void UAC01_UsesActualValueWhenPresent() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Hello, John!");
 
     [Then("the render should contain Nickname: None provided")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_UsesDefaultWhenNull() => _result.Should().Contain("Nickname: None provided");
+    public void UAC02_UsesDefaultWhenNull() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Nickname: None provided");
 
     [Then("the render should contain Title: No title")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_UsesDefaultWhenEmpty() => _result.Should().Contain("Title: No title");
+    public void UAC03_UsesDefaultWhenEmpty() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Title: No title");
 
     [Then("the render should contain Company: Acme Inc")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_UsesActualCompanyValue() => _result.Should().Contain("Company: Acme Inc");
+    public void UAC04_UsesActualCompanyValue() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Company: Acme Inc");
 
     [Then("the render should contain Department: Unassigned")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_UsesDefaultWhenVariableDoesNotExist() => _result.Should().Contain("Department: Unassigned");
+    public void UAC05_UsesDefaultWhenVariableDoesNotExist() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Department: Unassigned");
 }

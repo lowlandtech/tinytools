@@ -4,14 +4,14 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US03.Operators;
 [UserStory("03", "Comparison operators preserve their equality boundary")]
 public sealed class SC02_PreservesComparisonPrecedence : IClassFixture<UseCases.ComparisonBoundaryUseCase>
 {
-    private readonly UseCases.ComparisonBoundaryUseCase _useCase;
+    private readonly UseCases.ComparisonBoundaryUseCase useCase;
     private TinyTemplateEngine _engine = null!;
     private global::LowlandTech.TinyTools.ExecutionContext _context = null!;
     private string[] _operators = [];
 
     public SC02_PreservesComparisonPrecedence(UseCases.ComparisonBoundaryUseCase useCase)
     {
-        _useCase = useCase;
+        this.useCase = useCase;
         useCase.RunOnce(Given, When);
     }
 
@@ -32,22 +32,22 @@ public sealed class SC02_PreservesComparisonPrecedence : IClassFixture<UseCases.
             var outputs = new List<string>();
             foreach (var op in _operators)
                 outputs.Add(_engine.Render($"@if (Context.Left {op} 10) {{\nT\n}}", _context).Trim());
-            _useCase.Cases[left.ToString(System.Globalization.CultureInfo.InvariantCulture)] = outputs.ToArray();
+            useCase.Cases[left.ToString(System.Globalization.CultureInfo.InvariantCulture)] = outputs.ToArray();
         }
-        _useCase.Cases["EqualGreater"] = _useCase.Cases["10"].Take(2).ToArray();
-        _useCase.Cases["EqualLess"] = _useCase.Cases["10"].Skip(2).ToArray();
-        _useCase.Cases["AdjacentBoundaries"] = _useCase.Cases["9"].Concat(_useCase.Cases["11"]).ToArray();
+        useCase.Cases["EqualGreater"] = ((string[])useCase.Cases["10"]!).Take(2).ToArray();
+        useCase.Cases["EqualLess"] = ((string[])useCase.Cases["10"]!).Skip(2).ToArray();
+        useCase.Cases["AdjacentBoundaries"] = ((string[])useCase.Cases["9"]!).Concat((string[])useCase.Cases["11"]!).ToArray();
     }
 
     [Then("Result.EqualGreater should be [T,empty]")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_GreaterEquality() => _useCase.Cases["EqualGreater"].Should().Equal("T", "");
+    public void UAC01_GreaterEquality() => ((string[])useCase.Cases["EqualGreater"]!).Should().Equal("T", "");
 
     [Then("Result.EqualLess should be [T,empty]")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_LessEquality() => _useCase.Cases["EqualLess"].Should().Equal("T", "");
+    public void UAC02_LessEquality() => ((string[])useCase.Cases["EqualLess"]!).Should().Equal("T", "");
 
     [Then("Result.AdjacentBoundaries should be [empty,empty,T,T,T,T,empty,empty]")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_AdjacentBoundaries() => _useCase.Cases["AdjacentBoundaries"].Should().Equal("", "", "T", "T", "T", "T", "", "");
+    public void UAC03_AdjacentBoundaries() => ((string[])useCase.Cases["AdjacentBoundaries"]!).Should().Equal("", "", "T", "T", "T", "T", "", "");
 }

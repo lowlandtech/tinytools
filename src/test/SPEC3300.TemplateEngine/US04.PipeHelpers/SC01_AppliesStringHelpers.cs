@@ -5,11 +5,17 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US04.PipeHelpers;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "01")]
 [UserStory("04", "Template engine applies string pipe helpers")]
-public sealed class SC01_AppliesStringHelpers : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC01_AppliesStringHelpers : TinyToolsScenario<TinyTemplateEngine>, IClassFixture<UseCases.PipeHelpersUseCase>
 {
+    private readonly UseCases.PipeHelpersUseCase useCase;
     private readonly ExecutionContext _context = new();
     private string _template = string.Empty;
-    private string _result = string.Empty;
+
+    public SC01_AppliesStringHelpers(UseCases.PipeHelpersUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TinyTemplateEngine For() => new();
 
@@ -40,44 +46,42 @@ public sealed class SC01_AppliesStringHelpers : TinyToolsScenario<TinyTemplateEn
     protected override void When()
     {
         base.When();
-        _result = Sut.Render(_template, _context);
+        useCase.Cases["Rendered"] = Sut.Render(_template, _context);
     }
-
-    public SC01_AppliesStringHelpers() => ArrangeAndAct();
 
     [Then("the render should contain Upper: JOHN DOE")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_AppliesUpperHelper() => _result.Should().Contain("Upper: JOHN DOE");
+    public void UAC01_AppliesUpperHelper() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Upper: JOHN DOE");
 
     [Then("the render should contain Lower: john doe")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_AppliesLowerHelper() => _result.Should().Contain("Lower: john doe");
+    public void UAC02_AppliesLowerHelper() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Lower: john doe");
 
     [Then("the render should contain Capitalize: John doe")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_AppliesCapitalizeHelper() => _result.Should().Contain("Capitalize: John doe");
+    public void UAC03_AppliesCapitalizeHelper() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Capitalize: John doe");
 
     [Then("the render should contain Trim: [Hello World]")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_AppliesTrimHelper() => _result.Should().Contain("Trim: [Hello World]");
+    public void UAC04_AppliesTrimHelper() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Trim: [Hello World]");
 
     [Then("the render should contain Truncate: This is a very long descrip...")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_AppliesTruncateHelper() => _result.Should().Contain("Truncate: This is a very long descrip...");
+    public void UAC05_AppliesTruncateHelper() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Truncate: This is a very long descrip...");
 
     [Then("the render should contain Replace: new/path/to/file")]
     [Trait("UAC", "06"), Fact]
-    public void UAC06_AppliesReplaceHelper() => _result.Should().Contain("Replace: new/path/to/file");
+    public void UAC06_AppliesReplaceHelper() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Replace: new/path/to/file");
 
     [Then("the render should contain Chained: JOHN DOE")]
     [Trait("UAC", "07"), Fact]
-    public void UAC07_ChainsHelpers() => _result.Should().Contain("Chained: JOHN DOE");
+    public void UAC07_ChainsHelpers() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Chained: JOHN DOE");
 
     [Then("the render should contain CamelCase: userAccountSettings")]
     [Trait("UAC", "08"), Fact]
-    public void UAC08_AppliesCamelCaseHelper() => _result.Should().Contain("CamelCase: userAccountSettings");
+    public void UAC08_AppliesCamelCaseHelper() => ((string)useCase.Cases["Rendered"]!).Should().Contain("CamelCase: userAccountSettings");
 
     [Then("the render should contain PascalCase: UserAccountSettings")]
     [Trait("UAC", "09"), Fact]
-    public void UAC09_AppliesPascalCaseHelper() => _result.Should().Contain("PascalCase: UserAccountSettings");
+    public void UAC09_AppliesPascalCaseHelper() => ((string)useCase.Cases["Rendered"]!).Should().Contain("PascalCase: UserAccountSettings");
 }

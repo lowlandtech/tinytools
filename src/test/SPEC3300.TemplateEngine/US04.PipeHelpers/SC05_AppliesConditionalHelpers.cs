@@ -5,11 +5,17 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US04.PipeHelpers;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "05")]
 [UserStory("04", "Template engine applies conditional pipe helpers")]
-public sealed class SC05_AppliesConditionalHelpers : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC05_AppliesConditionalHelpers : TinyToolsScenario<TinyTemplateEngine>, IClassFixture<UseCases.PipeHelpersUseCase>
 {
+    private readonly UseCases.PipeHelpersUseCase useCase;
     private readonly ExecutionContext _context = new();
     private string _template = string.Empty;
-    private string _result = string.Empty;
+
+    public SC05_AppliesConditionalHelpers(UseCases.PipeHelpersUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TinyTemplateEngine For() => new();
 
@@ -39,40 +45,38 @@ public sealed class SC05_AppliesConditionalHelpers : TinyToolsScenario<TinyTempl
     protected override void When()
     {
         base.When();
-        _result = Sut.Render(_template, _context);
+        useCase.Cases["Rendered"] = Sut.Render(_template, _context);
     }
-
-    public SC05_AppliesConditionalHelpers() => ArrangeAndAct();
 
     [Then("the render should contain Name: Alice")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_KeepsExistingValue() => _result.Should().Contain("Name: Alice");
+    public void UAC01_KeepsExistingValue() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Name: Alice");
 
     [Then("the render should contain Nickname: No nickname")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_UsesDefaultForNull() => _result.Should().Contain("Nickname: No nickname");
+    public void UAC02_UsesDefaultForNull() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Nickname: No nickname");
 
     [Then("the render should contain Empty: N/A")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_UsesIfEmptyForEmptyString() => _result.Should().Contain("Empty: N/A");
+    public void UAC03_UsesIfEmptyForEmptyString() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Empty: N/A");
 
     [Then("the render should contain Missing: Not set")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_UsesDefaultForMissingVariable() => _result.Should().Contain("Missing: Not set");
+    public void UAC04_UsesDefaultForMissingVariable() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Missing: Not set");
 
     [Then("the render should contain Active: Yes")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_ShowsYesForTrue() => _result.Should().Contain("Active: Yes");
+    public void UAC05_ShowsYesForTrue() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Active: Yes");
 
     [Then("the render should contain Disabled: No")]
     [Trait("UAC", "06"), Fact]
-    public void UAC06_ShowsNoForFalse() => _result.Should().Contain("Disabled: No");
+    public void UAC06_ShowsNoForFalse() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Disabled: No");
 
     [Then("the render should contain Custom Yes/No: Enabled")]
     [Trait("UAC", "07"), Fact]
-    public void UAC07_UsesCustomYesNoValues() => _result.Should().Contain("Custom Yes/No: Enabled");
+    public void UAC07_UsesCustomYesNoValues() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Custom Yes/No: Enabled");
 
     [Then("the render should contain Count Status: Empty")]
     [Trait("UAC", "08"), Fact]
-    public void UAC08_TreatsZeroAsFalsy() => _result.Should().Contain("Count Status: Empty");
+    public void UAC08_TreatsZeroAsFalsy() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Count Status: Empty");
 }

@@ -6,11 +6,17 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US04.PipeHelpers;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "02")]
 [UserStory("04", "Template engine applies number pipe helpers")]
-public sealed class SC02_AppliesNumberHelpers : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC02_AppliesNumberHelpers : TinyToolsScenario<TinyTemplateEngine>, IClassFixture<UseCases.PipeHelpersUseCase>
 {
+    private readonly UseCases.PipeHelpersUseCase useCase;
     private readonly ExecutionContext _context = new();
     private string _template = string.Empty;
-    private string _result = string.Empty;
+
+    public SC02_AppliesNumberHelpers(UseCases.PipeHelpersUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TinyTemplateEngine For() => new();
 
@@ -39,32 +45,30 @@ public sealed class SC02_AppliesNumberHelpers : TinyToolsScenario<TinyTemplateEn
     protected override void When()
     {
         base.When();
-        _result = Sut.Render(_template, _context);
+        useCase.Cases["Rendered"] = Sut.Render(_template, _context);
     }
-
-    public SC02_AppliesNumberHelpers() => ArrangeAndAct();
 
     [Then("the render should contain Formatted Number: 1,500")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_FormatsNumber() => _result.Should().Contain("Formatted Number: 1,500");
+    public void UAC01_FormatsNumber() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Formatted Number: 1,500");
 
     [Then("the render should contain Two Decimals: 1,234.57")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_FormatsWithTwoDecimals() => _result.Should().Contain("Two Decimals: 1,234.57");
+    public void UAC02_FormatsWithTwoDecimals() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Two Decimals: 1,234.57");
 
     [Then("the percentage render should contain 86 and a percent sign")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_FormatsAsPercentage() => _result.Should().Contain("Percentage: 86").And.Contain("%");
+    public void UAC03_FormatsAsPercentage() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Percentage: 86").And.Contain("%");
 
     [Then("the render should contain Round 2: 3.14")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_RoundsToTwoDecimals() => _result.Should().Contain("Round 2: 3.14");
+    public void UAC04_RoundsToTwoDecimals() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Round 2: 3.14");
 
     [Then("the render should contain Floor: 1234")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_AppliesFloor() => _result.Should().Contain("Floor: 1234");
+    public void UAC05_AppliesFloor() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Floor: 1234");
 
     [Then("the render should contain Ceiling: 1235")]
     [Trait("UAC", "06"), Fact]
-    public void UAC06_AppliesCeiling() => _result.Should().Contain("Ceiling: 1235");
+    public void UAC06_AppliesCeiling() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Ceiling: 1235");
 }

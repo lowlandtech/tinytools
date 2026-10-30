@@ -5,11 +5,17 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US03.Operators;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "01")]
 [UserStory("03", "Template engine evaluates comparison operators")]
-public sealed class SC01_EvaluatesComparisons : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC01_EvaluatesComparisons : TinyToolsScenario<TinyTemplateEngine>, IClassFixture<UseCases.ComparisonBoundaryUseCase>
 {
+    private readonly UseCases.ComparisonBoundaryUseCase useCase;
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string _result = string.Empty;
+
+    public SC01_EvaluatesComparisons(UseCases.ComparisonBoundaryUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TinyTemplateEngine For() => new();
 
@@ -41,24 +47,22 @@ public sealed class SC01_EvaluatesComparisons : TinyToolsScenario<TinyTemplateEn
     protected override void When()
     {
         base.When();
-        _result = Sut.Render(_template, _context);
+        useCase.Cases["Rendered"] = Sut.Render(_template, _context);
     }
-
-    public SC01_EvaluatesComparisons() => ArrangeAndAct();
 
     [Then("the render should contain You can purchase alcohol.")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_EvaluatesGreaterThanOrEqual() => _result.Should().Contain("You can purchase alcohol.");
+    public void UAC01_EvaluatesGreaterThanOrEqual() => ((string)useCase.Cases["Rendered"]!).Should().Contain("You can purchase alcohol.");
 
     [Then("the render should contain Not yet eligible for senior discount.")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_EvaluatesLessThan() => _result.Should().Contain("Not yet eligible for senior discount.");
+    public void UAC02_EvaluatesLessThan() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Not yet eligible for senior discount.");
 
     [Then("the render should contain Low balance warning.")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_EvaluatesLessThanOrEqual() => _result.Should().Contain("Low balance warning.");
+    public void UAC03_EvaluatesLessThanOrEqual() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Low balance warning.");
 
     [Then("the render should contain Bulk discount applied!")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_EvaluatesGreaterThan() => _result.Should().Contain("Bulk discount applied!");
+    public void UAC04_EvaluatesGreaterThan() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Bulk discount applied!");
 }

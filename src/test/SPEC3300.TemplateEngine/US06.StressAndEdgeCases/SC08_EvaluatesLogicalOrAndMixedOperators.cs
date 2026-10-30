@@ -5,16 +5,19 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US06.StressAndEdge
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "08")]
 [UserStory("06", "Template engine handles stress and edge cases")]
-public sealed class SC08_EvaluatesLogicalOrAndMixedOperators : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC08_EvaluatesLogicalOrAndMixedOperators : TinyToolsScenario<TinyTemplateEngine>, IClassFixture<UseCases.StressAndEdgeCasesUseCase>
 {
+    private readonly UseCases.StressAndEdgeCasesUseCase useCase;
     private readonly ExecutionContext _context33 = new();
     private readonly ExecutionContext _context34 = new();
     private readonly ExecutionContext _context35 = new();
     private readonly ExecutionContext _context36 = new();
-    private string _result33 = string.Empty;
-    private string _result34 = string.Empty;
-    private string _result35 = string.Empty;
-    private string _result36 = string.Empty;
+
+    public SC08_EvaluatesLogicalOrAndMixedOperators(UseCases.StressAndEdgeCasesUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TinyTemplateEngine For() => new();
 
@@ -37,7 +40,7 @@ public sealed class SC08_EvaluatesLogicalOrAndMixedOperators : TinyToolsScenario
     {
         base.When();
 
-        _result33 = Sut.Render("""
+        useCase.Cases["LogicalOrBothFalse"] = Sut.Render("""
             @if (Context.HasItems || Context.ShowEmpty) {
             Show Container
             } else {
@@ -45,40 +48,38 @@ public sealed class SC08_EvaluatesLogicalOrAndMixedOperators : TinyToolsScenario
             }
             """, _context33);
 
-        _result34 = Sut.Render("""
+        useCase.Cases["MixedOperators"] = Sut.Render("""
             @if (Context.IsAdmin || Context.IsModerator && Context.IsOwner) {
             Has Access
             }
             """, _context34);
 
-        _result35 = Sut.Render("""
+        useCase.Cases["ComparisonsWithLogicalOperators"] = Sut.Render("""
             @if (Context.Age >= 18 && Context.HasLicense) {
             Can Drive
             }
             """, _context35);
 
-        _result36 = Sut.Render("""
+        useCase.Cases["LogicalOperatorsWithNegation"] = Sut.Render("""
             @if (!Context.IsBlocked && Context.IsVerified) {
             Account Active
             }
             """, _context36);
     }
 
-    public SC08_EvaluatesLogicalOrAndMixedOperators() => ArrangeAndAct();
-
     [Then("the render should contain Hidden")]
     [Trait("UAC", "33"), Fact]
-    public void UAC33_HandlesLogicalOrBothFalse() => _result33.Should().Contain("Hidden").And.NotContain("Show Container");
+    public void UAC33_HandlesLogicalOrBothFalse() => ((string)useCase.Cases["LogicalOrBothFalse"]!).Should().Contain("Hidden").And.NotContain("Show Container");
 
     [Then("the render should contain Has Access")]
     [Trait("UAC", "34"), Fact]
-    public void UAC34_HandlesMixedLogicalOperators() => _result34.Should().Contain("Has Access");
+    public void UAC34_HandlesMixedLogicalOperators() => ((string)useCase.Cases["MixedOperators"]!).Should().Contain("Has Access");
 
     [Then("the render should contain Can Drive")]
     [Trait("UAC", "35"), Fact]
-    public void UAC35_HandlesLogicalOperatorsWithComparisons() => _result35.Should().Contain("Can Drive");
+    public void UAC35_HandlesLogicalOperatorsWithComparisons() => ((string)useCase.Cases["ComparisonsWithLogicalOperators"]!).Should().Contain("Can Drive");
 
     [Then("the render should contain Account Active")]
     [Trait("UAC", "36"), Fact]
-    public void UAC36_HandlesLogicalOperatorsWithNegation() => _result36.Should().Contain("Account Active");
+    public void UAC36_HandlesLogicalOperatorsWithNegation() => ((string)useCase.Cases["LogicalOperatorsWithNegation"]!).Should().Contain("Account Active");
 }

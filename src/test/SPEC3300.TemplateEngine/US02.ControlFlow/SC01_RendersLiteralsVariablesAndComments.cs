@@ -5,17 +5,16 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US02.ControlFlow;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "01")]
 [UserStory("02", "Template engine renders literals, variables and strips comments")]
-public sealed class SC01_RendersLiteralsVariablesAndComments : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC01_RendersLiteralsVariablesAndComments : TinyToolsScenario<TinyTemplateEngine>, IClassFixture<UseCases.ControlFlowUseCase>
 {
+    private readonly UseCases.ControlFlowUseCase useCase;
     private ExecutionContext _context = null!;
-    private string _empty = string.Empty;
-    private string? _nullTemplate;
-    private string _plain = string.Empty;
-    private string _greeting = string.Empty;
-    private string _introduction = string.Empty;
-    private string _singleComment = string.Empty;
-    private string _multiLineComment = string.Empty;
-    private string _multipleComments = string.Empty;
+
+    public SC01_RendersLiteralsVariablesAndComments(UseCases.ControlFlowUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TinyTemplateEngine For() => new();
 
@@ -34,47 +33,45 @@ public sealed class SC01_RendersLiteralsVariablesAndComments : TinyToolsScenario
     {
         base.When();
 
-        _empty = Sut.Render("", _context);
-        _nullTemplate = Sut.Render(null!, _context);
-        _plain = Sut.Render("Hello, World!", _context);
-        _greeting = Sut.Render("Hello, ${Context.Name}!", _context);
-        _introduction = Sut.Render("${Context.FirstName} ${Context.LastName} is ${Context.Age} years old.", _context);
-        _singleComment = Sut.Render("Before @* comment *@ After", _context);
-        _multiLineComment = Sut.Render("Before\n@* \nThis is a\nmulti-line comment\n*@\nAfter", _context);
-        _multipleComments = Sut.Render("A @* comment1 *@ B @* comment2 *@ C", _context);
+        useCase.Cases["Empty"] = Sut.Render("", _context);
+        useCase.Cases["NullTemplate"] = Sut.Render(null!, _context);
+        useCase.Cases["Plain"] = Sut.Render("Hello, World!", _context);
+        useCase.Cases["Greeting"] = Sut.Render("Hello, ${Context.Name}!", _context);
+        useCase.Cases["Introduction"] = Sut.Render("${Context.FirstName} ${Context.LastName} is ${Context.Age} years old.", _context);
+        useCase.Cases["SingleComment"] = Sut.Render("Before @* comment *@ After", _context);
+        useCase.Cases["MultiLineComment"] = Sut.Render("Before\n@* \nThis is a\nmulti-line comment\n*@\nAfter", _context);
+        useCase.Cases["MultipleComments"] = Sut.Render("A @* comment1 *@ B @* comment2 *@ C", _context);
     }
-
-    public SC01_RendersLiteralsVariablesAndComments() => ArrangeAndAct();
 
     [Then("the empty template output should be empty")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_RendersEmptyTemplate() => _empty.Should().Be("");
+    public void UAC01_RendersEmptyTemplate() => ((string)useCase.Cases["Empty"]!).Should().Be("");
 
     [Then("the null template output should be null")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_RendersNullTemplate() => _nullTemplate.Should().BeNull();
+    public void UAC02_RendersNullTemplate() => ((string?)useCase.Cases["NullTemplate"]).Should().BeNull();
 
     [Then("the literal template output should be exact")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_RendersTemplateWithoutVariables() => _plain.Should().Be("Hello, World!");
+    public void UAC03_RendersTemplateWithoutVariables() => ((string)useCase.Cases["Plain"]!).Should().Be("Hello, World!");
 
     [Then("the variable template output should be exact")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_RendersTemplateWithSimpleVariable() => _greeting.Should().Be("Hello, John!");
+    public void UAC04_RendersTemplateWithSimpleVariable() => ((string)useCase.Cases["Greeting"]!).Should().Be("Hello, John!");
 
     [Then("the multi-variable template output should be exact")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_RendersTemplateWithMultipleVariables() => _introduction.Should().Be("John Doe is 30 years old.");
+    public void UAC05_RendersTemplateWithMultipleVariables() => ((string)useCase.Cases["Introduction"]!).Should().Be("John Doe is 30 years old.");
 
     [Then("the commented template output should be exact")]
     [Trait("UAC", "06"), Fact]
-    public void UAC06_RemovesSingleLineComment() => _singleComment.Should().Be("Before  After");
+    public void UAC06_RemovesSingleLineComment() => ((string)useCase.Cases["SingleComment"]!).Should().Be("Before  After");
 
     [Then("the multi-line comment output should contain both surrounding lines")]
     [Trait("UAC", "07"), Fact]
-    public void UAC07_RemovesMultiLineComment() => _multiLineComment.Should().Contain("Before").And.Contain("After").And.NotContain("multi-line comment");
+    public void UAC07_RemovesMultiLineComment() => ((string)useCase.Cases["MultiLineComment"]!).Should().Contain("Before").And.Contain("After").And.NotContain("multi-line comment");
 
     [Then("the twice commented template output should be exact")]
     [Trait("UAC", "08"), Fact]
-    public void UAC08_RemovesMultipleComments() => _multipleComments.Should().Be("A  B  C");
+    public void UAC08_RemovesMultipleComments() => ((string)useCase.Cases["MultipleComments"]!).Should().Be("A  B  C");
 }

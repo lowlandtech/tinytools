@@ -5,7 +5,7 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US02.ControlFlow;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "09")]
 [UserStory("02", "Template engine renders a report that combines every feature")]
-public sealed class SC09_RendersReportAndHelpers : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC09_RendersReportAndHelpers : TinyToolsScenario<TinyTemplateEngine>, IClassFixture<UseCases.ControlFlowUseCase>
 {
     private const string Report = """
         ${Context.Title}
@@ -31,10 +31,14 @@ public sealed class SC09_RendersReportAndHelpers : TinyToolsScenario<TinyTemplat
         End of Report
         """;
 
+    private readonly UseCases.ControlFlowUseCase useCase;
     private ExecutionContext _context = null!;
-    private string _report = string.Empty;
-    private string _uppercased = string.Empty;
-    private string _products = string.Empty;
+
+    public SC09_RendersReportAndHelpers(UseCases.ControlFlowUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TinyTemplateEngine For() => new();
 
@@ -62,22 +66,20 @@ public sealed class SC09_RendersReportAndHelpers : TinyToolsScenario<TinyTemplat
     protected override void When()
     {
         base.When();
-        _report = Sut.Render(Report, _context);
-        _uppercased = Sut.Render("Hello, ${Context.Name | upper}!", _context);
-        _products = Sut.Render("Available Products:\n@foreach(var product in Context.Products) {\n@if(product.InStock) {\n- ${product.Name}: $${product.Price}\n}\n}", _context);
+        useCase.Cases["Report"] = Sut.Render(Report, _context);
+        useCase.Cases["Uppercased"] = Sut.Render("Hello, ${Context.Name | upper}!", _context);
+        useCase.Cases["Products"] = Sut.Render("Available Products:\n@foreach(var product in Context.Products) {\n@if(product.InStock) {\n- ${product.Name}: $${product.Price}\n}\n}", _context);
     }
-
-    public SC09_RendersReportAndHelpers() => ArrangeAndAct();
 
     [Then("the customer report should contain every rendered section")]
     [Trait("UAC", "47"), Fact]
-    public void UAC47_HandlesComplexTemplateWithAllFeatures() => _report.Should().Contain("Customer Report").And.Contain("Customer: John").And.Contain("Customer: Jane").And.Contain("Customer: Bob").And.Contain("Status: ACTIVE").And.Contain("Status: INACTIVE").And.Contain("Category: Senior").And.Contain("Category: Junior").And.Contain("End of Report");
+    public void UAC47_HandlesComplexTemplateWithAllFeatures() => ((string)useCase.Cases["Report"]!).Should().Contain("Customer Report").And.Contain("Customer: John").And.Contain("Customer: Jane").And.Contain("Customer: Bob").And.Contain("Status: ACTIVE").And.Contain("Status: INACTIVE").And.Contain("Category: Senior").And.Contain("Category: Junior").And.Contain("End of Report");
 
     [Then("the upper helper output should be exact")]
     [Trait("UAC", "48"), Fact]
-    public void UAC48_HandlesTemplateWithVariablesAndHelpers() => _uppercased.Should().Be("Hello, JOHN DOE!");
+    public void UAC48_HandlesTemplateWithVariablesAndHelpers() => ((string)useCase.Cases["Uppercased"]!).Should().Be("Hello, JOHN DOE!");
 
     [Then("the in-stock products should contain the available lines")]
     [Trait("UAC", "49"), Fact]
-    public void UAC49_HandlesForeachWithConditionalRendering() => _products.Should().Contain("Product A: $10").And.Contain("Product C: $15").And.NotContain("Product B");
+    public void UAC49_HandlesForeachWithConditionalRendering() => ((string)useCase.Cases["Products"]!).Should().Contain("Product A: $10").And.Contain("Product C: $15").And.NotContain("Product B");
 }

@@ -5,16 +5,19 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US06.StressAndEdge
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "05")]
 [UserStory("06", "Template engine handles stress and edge cases")]
-public sealed class SC05_RemovesCommentsAndSelectsBranches : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC05_RemovesCommentsAndSelectsBranches : TinyToolsScenario<TinyTemplateEngine>, IClassFixture<UseCases.StressAndEdgeCasesUseCase>
 {
+    private readonly UseCases.StressAndEdgeCasesUseCase useCase;
     private readonly ExecutionContext _context20 = new();
     private readonly ExecutionContext _context21 = new();
     private readonly ExecutionContext _context22 = new();
     private readonly ExecutionContext _context23 = new();
-    private string _result20 = string.Empty;
-    private string _result21 = string.Empty;
-    private string _result22 = string.Empty;
-    private string _result23 = string.Empty;
+
+    public SC05_RemovesCommentsAndSelectsBranches(UseCases.StressAndEdgeCasesUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TinyTemplateEngine For() => new();
 
@@ -32,9 +35,9 @@ public sealed class SC05_RemovesCommentsAndSelectsBranches : TinyToolsScenario<T
     {
         base.When();
 
-        _result20 = Sut.Render("Hello @* this is a comment *@ ${Context.Name}!", _context20);
+        useCase.Cases["SingleLineComment"] = Sut.Render("Hello @* this is a comment *@ ${Context.Name}!", _context20);
 
-        _result21 = Sut.Render("""
+        useCase.Cases["MultiLineComment"] = Sut.Render("""
             Before
             @* This is a
             multi-line
@@ -42,7 +45,7 @@ public sealed class SC05_RemovesCommentsAndSelectsBranches : TinyToolsScenario<T
             After: ${Context.Value}
             """, _context21);
 
-        _result22 = Sut.Render("""
+        useCase.Cases["Grade"] = Sut.Render("""
             @if (Context.Score >= 90) {
             Grade: A
             } else if (Context.Score >= 80) {
@@ -54,7 +57,7 @@ public sealed class SC05_RemovesCommentsAndSelectsBranches : TinyToolsScenario<T
             }
             """, _context22);
 
-        _result23 = Sut.Render("""
+        useCase.Cases["LoginBranch"] = Sut.Render("""
             @if (Context.IsLoggedIn) {
             Welcome back!
             } else {
@@ -63,21 +66,19 @@ public sealed class SC05_RemovesCommentsAndSelectsBranches : TinyToolsScenario<T
             """, _context23);
     }
 
-    public SC05_RemovesCommentsAndSelectsBranches() => ArrangeAndAct();
-
     [Then("the render should not contain comment")]
     [Trait("UAC", "20"), Fact]
-    public void UAC20_RemovesComments() => _result20.Should().Contain("Hello").And.Contain("World!").And.NotContain("comment");
+    public void UAC20_RemovesComments() => ((string)useCase.Cases["SingleLineComment"]!).Should().Contain("Hello").And.Contain("World!").And.NotContain("comment");
 
     [Then("the render should contain After: Test")]
     [Trait("UAC", "21"), Fact]
-    public void UAC21_RemovesMultiLineComments() => _result21.Should().Contain("Before").And.Contain("After: Test").And.NotContain("multi-line");
+    public void UAC21_RemovesMultiLineComments() => ((string)useCase.Cases["MultiLineComment"]!).Should().Contain("Before").And.Contain("After: Test").And.NotContain("multi-line");
 
     [Then("the render should contain Grade: C")]
     [Trait("UAC", "22"), Fact]
-    public void UAC22_HandlesElseIfChain() => _result22.Should().Contain("Grade: C").And.NotContain("Grade: A").And.NotContain("Grade: B").And.NotContain("Grade: F");
+    public void UAC22_HandlesElseIfChain() => ((string)useCase.Cases["Grade"]!).Should().Contain("Grade: C").And.NotContain("Grade: A").And.NotContain("Grade: B").And.NotContain("Grade: F");
 
     [Then("the render should contain Please log in.")]
     [Trait("UAC", "23"), Fact]
-    public void UAC23_HandlesElseBlock() => _result23.Should().Contain("Please log in.").And.NotContain("Welcome back!");
+    public void UAC23_HandlesElseBlock() => ((string)useCase.Cases["LoginBranch"]!).Should().Contain("Please log in.").And.NotContain("Welcome back!");
 }

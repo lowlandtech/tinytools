@@ -5,11 +5,17 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US02.ControlFlow;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "02")]
 [UserStory("02", "Template engine handles else-if chains")]
-public sealed class SC02_RendersElseIfChains : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC02_RendersElseIfChains : TinyToolsScenario<TinyTemplateEngine>, IClassFixture<UseCases.ControlFlowUseCase>
 {
+    private readonly UseCases.ControlFlowUseCase useCase;
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string _result = string.Empty;
+
+    public SC02_RendersElseIfChains(UseCases.ControlFlowUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TinyTemplateEngine For() => new();
 
@@ -51,24 +57,22 @@ public sealed class SC02_RendersElseIfChains : TinyToolsScenario<TinyTemplateEng
     protected override void When()
     {
         base.When();
-        _result = Sut.Render(_template, _context);
+        useCase.Cases["Rendered"] = Sut.Render(_template, _context);
     }
-
-    public SC02_RendersElseIfChains() => ArrangeAndAct();
 
     [Then("the grade should contain C - Satisfactory")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_SelectsCorrectGrade() => _result.Should().Contain("C - Satisfactory");
+    public void UAC01_SelectsCorrectGrade() => ((string)useCase.Cases["Rendered"]!).Should().Contain("C - Satisfactory");
 
     [Then("the grade should not contain A - Excellent")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_DoesNotShowOtherGrades() => _result.Should().NotContain("A - Excellent").And.NotContain("B - Good job").And.NotContain("D - Needs improvement").And.NotContain("F - Failed");
+    public void UAC02_DoesNotShowOtherGrades() => ((string)useCase.Cases["Rendered"]!).Should().NotContain("A - Excellent").And.NotContain("B - Good job").And.NotContain("D - Needs improvement").And.NotContain("F - Failed");
 
     [Then("the access level should contain Edit access granted")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_SelectsCorrectAccessLevel() => _result.Should().Contain("Edit access granted");
+    public void UAC03_SelectsCorrectAccessLevel() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Edit access granted");
 
     [Then("the access level should not contain Guest access")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_DoesNotShowOtherAccessLevels() => _result.Should().NotContain("Full access granted").And.NotContain("Read-only access").And.NotContain("Guest access");
+    public void UAC04_DoesNotShowOtherAccessLevels() => ((string)useCase.Cases["Rendered"]!).Should().NotContain("Full access granted").And.NotContain("Read-only access").And.NotContain("Guest access");
 }

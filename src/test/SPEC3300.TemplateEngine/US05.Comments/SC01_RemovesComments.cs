@@ -5,11 +5,17 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US05.Comments;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "01")]
 [UserStory("05", "Template engine removes comment blocks")]
-public sealed class SC01_RemovesComments : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC01_RemovesComments : TinyToolsScenario<TinyTemplateEngine>, IClassFixture<UseCases.CommentsUseCase>
 {
+    private readonly UseCases.CommentsUseCase useCase;
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string _result = string.Empty;
+
+    public SC01_RemovesComments(UseCases.CommentsUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TinyTemplateEngine For() => new();
 
@@ -35,24 +41,22 @@ public sealed class SC01_RemovesComments : TinyToolsScenario<TinyTemplateEngine>
     protected override void When()
     {
         base.When();
-        _result = Sut.Render(_template, _context);
+        useCase.Cases["Rendered"] = Sut.Render(_template, _context);
     }
-
-    public SC01_RemovesComments() => ArrangeAndAct();
 
     [Then("the render should not contain This is a single-line comment")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_RemovesSingleLineComments() => _result.Should().NotContain("This is a single-line comment");
+    public void UAC01_RemovesSingleLineComments() => ((string)useCase.Cases["Rendered"]!).Should().NotContain("This is a single-line comment");
 
     [Then("the render should not contain multi-line comment")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_RemovesMultiLineComments() => _result.Should().NotContain("multi-line comment");
+    public void UAC02_RemovesMultiLineComments() => ((string)useCase.Cases["Rendered"]!).Should().NotContain("multi-line comment");
 
     [Then("the render should not contain TODO:")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_RemovesTodoComments() => _result.Should().NotContain("TODO:");
+    public void UAC03_RemovesTodoComments() => ((string)useCase.Cases["Rendered"]!).Should().NotContain("TODO:");
 
     [Then("the render should contain Hello, Alice!")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_KeepsActualContent() => _result.Should().Contain("Hello, Alice!").And.Contain("Welcome to our platform.");
+    public void UAC04_KeepsActualContent() => ((string)useCase.Cases["Rendered"]!).Should().Contain("Hello, Alice!").And.Contain("Welcome to our platform.");
 }

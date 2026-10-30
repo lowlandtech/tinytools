@@ -5,14 +5,18 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US06.StressAndEdge
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "01")]
 [UserStory("06", "Template engine handles stress and edge cases")]
-public sealed class SC01_HandlesNestedControlFlow : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC01_HandlesNestedControlFlow : TinyToolsScenario<TinyTemplateEngine>, IClassFixture<UseCases.StressAndEdgeCasesUseCase>
 {
+    private readonly UseCases.StressAndEdgeCasesUseCase useCase;
     private readonly ExecutionContext _context01 = new();
     private readonly ExecutionContext _context02 = new();
     private readonly ExecutionContext _context03 = new();
-    private string _result01 = string.Empty;
-    private string _result02 = string.Empty;
-    private string _result03 = string.Empty;
+
+    public SC01_HandlesNestedControlFlow(UseCases.StressAndEdgeCasesUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TinyTemplateEngine For() => new();
 
@@ -49,7 +53,7 @@ public sealed class SC01_HandlesNestedControlFlow : TinyToolsScenario<TinyTempla
     {
         base.When();
 
-        _result01 = Sut.Render("""
+        useCase.Cases["NestedForeach"] = Sut.Render("""
             @if (Context.ShowList) {
             List:
             @foreach (var item in Context.Items) {
@@ -58,7 +62,7 @@ public sealed class SC01_HandlesNestedControlFlow : TinyToolsScenario<TinyTempla
             }
             """, _context01);
 
-        _result02 = Sut.Render("""
+        useCase.Cases["NestedIf"] = Sut.Render("""
             @foreach (var item in Context.Items) {
             @if (item.Active) {
             Active: ${item.Name}
@@ -66,7 +70,7 @@ public sealed class SC01_HandlesNestedControlFlow : TinyToolsScenario<TinyTempla
             }
             """, _context02);
 
-        _result03 = Sut.Render("""
+        useCase.Cases["DeepNested"] = Sut.Render("""
             @if (Context.ShowAll) {
             @foreach (var cat in Context.Categories) {
             Category: ${cat.Name}
@@ -80,17 +84,15 @@ public sealed class SC01_HandlesNestedControlFlow : TinyToolsScenario<TinyTempla
             """, _context03);
     }
 
-    public SC01_HandlesNestedControlFlow() => ArrangeAndAct();
-
     [Then("the nested render should contain - A")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_HandlesNestedForeachInsideIf() => _result01.Should().Contain("List:").And.Contain("- A").And.Contain("- B").And.Contain("- C");
+    public void UAC01_HandlesNestedForeachInsideIf() => ((string)useCase.Cases["NestedForeach"]!).Should().Contain("List:").And.Contain("- A").And.Contain("- B").And.Contain("- C");
 
     [Then("the render should contain Active: Item1")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_HandlesNestedIfInsideForeach() => _result02.Should().Contain("Active: Item1").And.NotContain("Item2").And.Contain("Active: Item3");
+    public void UAC02_HandlesNestedIfInsideForeach() => ((string)useCase.Cases["NestedIf"]!).Should().Contain("Active: Item1").And.NotContain("Item2").And.Contain("Active: Item3");
 
     [Then("the deep render should contain Category: Category1")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_HandlesDeepNestedControlFlow() => _result03.Should().Contain("Category: Category1").And.Contain("- SubA").And.NotContain("SubB");
+    public void UAC03_HandlesDeepNestedControlFlow() => ((string)useCase.Cases["DeepNested"]!).Should().Contain("Category: Category1").And.Contain("- SubA").And.NotContain("SubB");
 }

@@ -5,16 +5,19 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US06.StressAndEdge
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "09")]
 [UserStory("06", "Template engine handles stress and edge cases")]
-public sealed class SC09_EvaluatesParenthesizedAndShortCircuitLogic : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC09_EvaluatesParenthesizedAndShortCircuitLogic : TinyToolsScenario<TinyTemplateEngine>, IClassFixture<UseCases.StressAndEdgeCasesUseCase>
 {
+    private readonly UseCases.StressAndEdgeCasesUseCase useCase;
     private readonly ExecutionContext _context37 = new();
     private readonly ExecutionContext _context38 = new();
     private readonly ExecutionContext _context39 = new();
     private readonly ExecutionContext _context40 = new();
-    private string _result37 = string.Empty;
-    private string _result38 = string.Empty;
-    private string _result39 = string.Empty;
-    private string _result40 = string.Empty;
+
+    public SC09_EvaluatesParenthesizedAndShortCircuitLogic(UseCases.StressAndEdgeCasesUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TinyTemplateEngine For() => new();
 
@@ -34,19 +37,19 @@ public sealed class SC09_EvaluatesParenthesizedAndShortCircuitLogic : TinyToolsS
     {
         base.When();
 
-        _result37 = Sut.Render("""
+        useCase.Cases["Parenthesized"] = Sut.Render("""
             @if ((Context.A && Context.B) || Context.C) {
             Result True
             }
             """, _context37);
 
-        _result38 = Sut.Render("""
+        useCase.Cases["MultipleOr"] = Sut.Render("""
             @if (Context.Status == "active" || Context.Status == "pending" || Context.Status == "approved") {
             In Progress
             }
             """, _context38);
 
-        _result39 = Sut.Render("""
+        useCase.Cases["ShortCircuitAnd"] = Sut.Render("""
             @if (Context.HasValue && Context.Value) {
             Has Value
             } else {
@@ -54,28 +57,26 @@ public sealed class SC09_EvaluatesParenthesizedAndShortCircuitLogic : TinyToolsS
             }
             """, _context39);
 
-        _result40 = Sut.Render("""
+        useCase.Cases["ShortCircuitOr"] = Sut.Render("""
             @if (Context.HasDefault || Context.ComputedValue) {
             Has Something
             }
             """, _context40);
     }
 
-    public SC09_EvaluatesParenthesizedAndShortCircuitLogic() => ArrangeAndAct();
-
     [Then("the render should contain Result True")]
     [Trait("UAC", "37"), Fact]
-    public void UAC37_HandlesParenthesizedLogicalExpressions() => _result37.Should().Contain("Result True");
+    public void UAC37_HandlesParenthesizedLogicalExpressions() => ((string)useCase.Cases["Parenthesized"]!).Should().Contain("Result True");
 
     [Then("the render should contain In Progress")]
     [Trait("UAC", "38"), Fact]
-    public void UAC38_HandlesMultipleOrConditions() => _result38.Should().Contain("In Progress");
+    public void UAC38_HandlesMultipleOrConditions() => ((string)useCase.Cases["MultipleOr"]!).Should().Contain("In Progress");
 
     [Then("the render should contain No Value")]
     [Trait("UAC", "39"), Fact]
-    public void UAC39_ShortCircuitsLogicalAnd() => _result39.Should().Contain("No Value");
+    public void UAC39_ShortCircuitsLogicalAnd() => ((string)useCase.Cases["ShortCircuitAnd"]!).Should().Contain("No Value");
 
     [Then("the render should contain Has Something")]
     [Trait("UAC", "40"), Fact]
-    public void UAC40_ShortCircuitsLogicalOr() => _result40.Should().Contain("Has Something");
+    public void UAC40_ShortCircuitsLogicalOr() => ((string)useCase.Cases["ShortCircuitOr"]!).Should().Contain("Has Something");
 }

@@ -4,13 +4,13 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US03.Operators;
 [UserStory("03", "Numeric tolerance keeps materially different operands unequal")]
 public sealed class SC03_ComparesFloatingPointValues : IClassFixture<UseCases.ComparisonBoundaryUseCase>
 {
-    private readonly UseCases.ComparisonBoundaryUseCase _useCase;
+    private readonly UseCases.ComparisonBoundaryUseCase useCase;
     private TinyTemplateEngine _engine = null!;
     private (string Name, object Left, object Right)[] _cases = [];
 
     public SC03_ComparesFloatingPointValues(UseCases.ComparisonBoundaryUseCase useCase)
     {
-        _useCase = useCase;
+        this.useCase = useCase;
         useCase.RunOnce(Given, When);
     }
 
@@ -31,21 +31,21 @@ public sealed class SC03_ComparesFloatingPointValues : IClassFixture<UseCases.Co
             var context = new global::LowlandTech.TinyTools.ExecutionContext();
             context.Set("Left", item.Left);
             context.Set("Right", item.Right);
-            _useCase.Cases[item.Name] = [_engine.Render("@if (Context.Left == Context.Right) {\nT\n}", context).Trim()];
+            useCase.Cases[item.Name] = new[] { _engine.Render("@if (Context.Left == Context.Right) {\nT\n}", context).Trim() };
         }
-        _useCase.Cases["ToleranceBoundary"] = _useCase.Cases["inside"].Concat(_useCase.Cases["boundary"]).Concat(_useCase.Cases["outside"]).ToArray();
-        _useCase.Cases["Controls"] = _useCase.Cases["integer"].Concat(_useCase.Cases["string"]).ToArray();
+        useCase.Cases["ToleranceBoundary"] = ((string[])useCase.Cases["inside"]!).Concat((string[])useCase.Cases["boundary"]!).Concat((string[])useCase.Cases["outside"]!).ToArray();
+        useCase.Cases["Controls"] = ((string[])useCase.Cases["integer"]!).Concat((string[])useCase.Cases["string"]!).ToArray();
     }
 
     [Then("Result.Roundoff should be T")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_Roundoff() => _useCase.Cases["roundoff"].Should().Equal("T");
+    public void UAC01_Roundoff() => ((string[])useCase.Cases["roundoff"]!).Should().Equal("T");
 
     [Then("Result.ToleranceBoundary should be [T,empty,empty]")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_ToleranceBoundary() => _useCase.Cases["ToleranceBoundary"].Should().Equal("T", "", "");
+    public void UAC02_ToleranceBoundary() => ((string[])useCase.Cases["ToleranceBoundary"]!).Should().Equal("T", "", "");
 
     [Then("Result.Controls should be [T,T]")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_Controls() => _useCase.Cases["Controls"].Should().Equal("T", "T");
+    public void UAC03_Controls() => ((string[])useCase.Cases["Controls"]!).Should().Equal("T", "T");
 }
