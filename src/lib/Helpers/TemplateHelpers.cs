@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Text.RegularExpressions;
 using System.Globalization;
 
 namespace LowlandTech.TinyTools;
@@ -47,6 +48,12 @@ public static class TemplateHelpers
         ["default"] = (value, arg) => IsEmpty(value) ? arg : value,
         ["ifempty"] = (value, arg) => IsEmpty(value) ? arg : value,
         ["yesno"] = (value, arg) => YesNo(value, arg),
+
+        // Text helper
+        ["slice"] = (value, arg) => Slice(value, arg),
+        ["match"] = (value, arg) => Matches(value, arg),
+        ["contains"] = (value, arg) => Contains(value, arg),
+        ["split"] = (value, arg) => Split(value, arg),
     };
 
     /// <summary>
@@ -351,6 +358,106 @@ public static class TemplateHelpers
         };
 
         return isTruthy ? yesValue : noValue;
+    }
+
+    #endregion
+
+    #region Text Helpers
+
+    /// <summary>
+    /// slice:start,end - zero-based UTF-16 range with an inclusive start and an
+    /// exclusive end. Equal in-range indexes yield the empty string.
+    /// </summary>
+    private static string? Slice(object? value, string? argument)
+    {
+        if (value is null) return null;
+
+        if (string.IsNullOrWhiteSpace(argument))
+            throw new ArgumentException("slice requires a start,end argument.", nameof(argument));
+
+        var parts = argument.Split(',');
+        if (parts.Length != 2
+            || !int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var start)
+            || !int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var end))
+        {
+            throw new ArgumentException($"slice requires a start,end pair of integers, not '{argument}'.", nameof(argument));
+        }
+
+        var text = value.ToString() ?? string.Empty;
+        if (start < 0 || end < start || end > text.Length)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(argument), argument, $"slice bounds '{argument}' are outside the range 0..{text.Length}.");
+        }
+
+        return text[start..end];
+    }
+
+    /// <summary>
+    /// match:pattern - .NET regular-expression match with case-sensitive defaults
+    /// and a fixed one second timeout. A timeout is never reported as false.
+    /// </summary>
+    private static bool Matches(object? value, string? argument)
+    {
+        if (value is null) return false;
+
+        if (string.IsNullOrEmpty(argument))
+            throw new ArgumentException("match requires a regular expression.", nameof(argument));
+
+        Regex expression;
+        try
+        {
+            expression = new Regex(argument, RegexOptions.None, TimeSpan.FromSeconds(1));
+        }
+        catch (RegexParseException error)
+        {
+            // One named refusal for a malformed pattern, so the parser's own
+            // subtype is normalized to ArgumentException.
+            throw new ArgumentException($"match received a malformed pattern: {error.Message}", nameof(argument), error);
+        }
+
+        return expression.IsMatch(value.ToString() ?? string.Empty);
+    }
+
+    /// <summary>
+    /// contains:value - ordinal case-sensitive substring match for strings, and
+    /// element equality for other enumerables. Values are never coerced to text.
+    /// </summary>
+    private static bool Contains(object? value, string? argument)
+    {
+        if (argument is null)
+            throw new ArgumentException("contains requires a value.", nameof(argument));
+
+        if (value is null) return false;
+
+        if (value is string text)
+            return text.Contains(argument, StringComparison.Ordinal);
+
+        if (value is IEnumerable sequence)
+        {
+            foreach (var item in sequence)
+            {
+                if (Equals(item, argument)) return true;
+            }
+
+            return false;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// split:separator - literal separator with leading, adjacent and trailing
+    /// empty entries preserved. A null input yields an empty array.
+    /// </summary>
+    private static string[] Split(object? value, string? argument)
+    {
+        if (value is null) return [];
+
+        if (string.IsNullOrEmpty(argument))
+            throw new ArgumentException("split requires a separator.", nameof(argument));
+
+        return (value.ToString() ?? string.Empty).Split([argument], StringSplitOptions.None);
     }
 
     #endregion
