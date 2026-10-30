@@ -25,15 +25,27 @@ public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
         _resolver = new VariableResolver(loggerFactory);
     }
 
-    public string Render(string template, ToolContext context)
+    public string Render(string template, ToolContext context) => RenderInternal(template, context, 0, null);
+
+    private string RenderInternal(string template, ToolContext context, int depth, IReadOnlyDictionary<string, MacroDefinition>? inherited)
     {
         if (string.IsNullOrEmpty(template)) return template;
+
+        if (depth > MacroRecursionLimit)
+        {
+            throw new InvalidOperationException(
+                $"Macro recursion limit exceeded ({MacroRecursionLimit} nested expansions).");
+        }
 
         _logger.LogTrace("Render called, template length: {Length}", template.Length);
 
         // Includes expand first: a fragment is plain template source, so the control-flow
         // and variable passes then run over the composed text in one go.
         var composed = ExpandIncludes(template, Array.Empty<string>());
+
+        // Macros then expand their bodies eagerly, binding arguments as context values, so a
+        // macro body keeps the full renderer (interpolation and control flow) inside it.
+        composed = ExpandMacros(composed, context, depth, inherited);
 
         // First, process control flow (@if, @foreach)
         var processed = ProcessControlFlow(composed, context);
@@ -77,6 +89,131 @@ public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
 
     /// <summary>The fragments registered on this engine, exposed read-only.</summary>
     public IReadOnlyDictionary<string, string> Fragments => _fragments;
+
+    private const int MacroRecursionLimit = 32;
+
+    private static readonly System.Text.RegularExpressions.Regex MacroDefinitionPattern = new(
+        @"@macro\s+(?<name>[A-Za-z_]\w*)\s*\((?<params>[^)]*)\)\s*\{",
+        System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    private static readonly System.Text.RegularExpressions.Regex MacroCallPattern = new(
+        @"@(?<name>[A-Za-z_]\w*)\s*\((?<args>[^)]*)\)",
+        System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    private static readonly HashSet<string> DirectiveKeywords = new(StringComparer.Ordinal)
+    {
+        "if", "else", "elseif", "foreach", "include", "macro", "end", "endif", "model",
+    };
+
+    /// <summary>A macro declared in the template source: its parameter names and body.</summary>
+    private sealed record MacroDefinition(string Name, string[] Parameters, string Body);
+
+    /// <summary>
+    /// Removes <c>@macro name(p1, p2) { body }</c> definitions from the source and expands
+    /// <c>@name(args)</c> calls into the rendered body.
+    ///
+    /// The body is the balanced brace block after the parameter list, so it may contain any
+    /// renderer construct. A call renders its body with the arguments bound as context values
+    /// in a child context, which is why two calls with different arguments cannot share state.
+    /// Arity mismatches and unknown names are named refusals; expansion is cut off at
+    /// <see cref="MacroRecursionLimit"/> so a self-invoking macro terminates instead of
+    /// overflowing the stack. A call is only treated as a macro call when the same template
+    /// declares at least one macro, so text that merely looks like <c>@name(...)</c> is left
+    /// alone.
+    /// </summary>
+    private string ExpandMacros(string source, ToolContext context, int depth, IReadOnlyDictionary<string, MacroDefinition>? inherited)
+    {
+        var definitions = new Dictionary<string, MacroDefinition>(StringComparer.Ordinal);
+        var remaining = RemoveMacroDefinitions(source, definitions);
+        if (inherited is not null)
+        {
+            foreach (var pair in inherited) definitions.TryAdd(pair.Key, pair.Value);
+        }
+        if (definitions.Count == 0) return remaining;
+
+        return MacroCallPattern.Replace(remaining, match =>
+        {
+            var name = match.Groups["name"].Value;
+            if (DirectiveKeywords.Contains(name)) return match.Value;
+            if (!definitions.TryGetValue(name, out var macro))
+            {
+                throw new InvalidOperationException($"Macro '{name}' is not defined in this template.");
+            }
+
+            var arguments = SplitArguments(match.Groups["args"].Value);
+            if (arguments.Count != macro.Parameters.Length)
+            {
+                throw new InvalidOperationException(
+                    $"Macro '{name}' expects {macro.Parameters.Length} argument(s) but received {arguments.Count}.");
+            }
+
+            var child = context.CreateChild($"macro:{name}");
+            for (var index = 0; index < arguments.Count; index++)
+            {
+                child.Set(macro.Parameters[index], EvaluateArgument(arguments[index], context));
+            }
+
+            return RenderInternal(macro.Body, child, depth + 1, definitions);
+        });
+    }
+
+    private string RemoveMacroDefinitions(string source, Dictionary<string, MacroDefinition> definitions)
+    {
+        var output = new System.Text.StringBuilder(source.Length);
+        var index = 0;
+        while (index < source.Length)
+        {
+            var match = MacroDefinitionPattern.Match(source, index);
+            if (!match.Success)
+            {
+                output.Append(source, index, source.Length - index);
+                break;
+            }
+
+            output.Append(source, index, match.Index - index);
+
+            var bodyStart = match.Index + match.Length;
+            var depth = 1;
+            var cursor = bodyStart;
+            while (cursor < source.Length && depth > 0)
+            {
+                if (source[cursor] == '{') depth++;
+                else if (source[cursor] == '}') depth--;
+                cursor++;
+            }
+
+            if (depth != 0)
+            {
+                throw new InvalidOperationException(
+                    $"Macro '{match.Groups["name"].Value}' has an unbalanced body.");
+            }
+
+            var parameters = match.Groups["params"].Value
+                .Split(',', StringSplitOptions.RemoveEmptyEntries).Select(part => part.Trim()).ToArray();
+            var name = match.Groups["name"].Value;
+            definitions[name] = new MacroDefinition(name, parameters, source[bodyStart..(cursor - 1)]);
+            index = cursor;
+        }
+
+        return output.ToString();
+    }
+
+    private static List<string> SplitArguments(string arguments) =>
+        arguments.Trim().Length == 0
+            ? []
+            : arguments.Split(',').Select(part => part.Trim()).ToList();
+
+    private object? EvaluateArgument(string expression, ToolContext context)
+    {
+        var trimmed = expression.Trim();
+        if (trimmed.Length >= 2
+            && ((trimmed[0] == '"' && trimmed[^1] == '"') || (trimmed[0] == '\'' && trimmed[^1] == '\'')))
+        {
+            return trimmed[1..^1];
+        }
+
+        return _resolver.ResolveExpression(trimmed, context);
+    }
 
     /// <summary>
     /// Replaces every <c>@include("name")</c> with the named fragment's source, recursively.
