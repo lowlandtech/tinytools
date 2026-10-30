@@ -8,39 +8,36 @@ namespace LowlandTech.TinyTools.Tests.SPEC3316.Templates.US01.TemplateApi;
 [Trait(Spec.SPEC, "3316")]
 [Trait(Spec.SC, "02")]
 [UserStory("01", "Template API CRUD operations")]
-public class SC02_CreateTemplate : TemplateApiScenario
+public sealed class SC02_CreateTemplate : TemplateApiScenario
 {
     private HttpResponseMessage _response = null!;
+    private bool _persisted;
+
+    [Given("a template library seeded with two templates")]
+    private Task GivenAsync() => SeedLibraryAsync();
 
     [When("POST /api/templates is called with a new template")]
-    protected override async Task WhenAsync()
+    private async Task WhenAsync()
     {
-        _response = await Client.PostAsJsonAsync("/api/templates", new
-        {
-            Name = "ServiceClass",
-            IsActive = true,
-        });
-    }
-
-    [Fact(DisplayName = "UAC01: Response is 201 Created")]
-    [Trait(Spec.UAC, "01")]
-    [Then("the response status code is 201")]
-    public async Task UAC01_ResponseIs201()
-    {
-        await ArrangeAndActAsync();
-        _response.StatusCode.Should().Be(HttpStatusCode.Created);
-    }
-
-    [Fact(DisplayName = "UAC02: Template persisted in database")]
-    [Trait(Spec.UAC, "02")]
-    [Then("the database contains a template named ServiceClass")]
-    public async Task UAC02_PersistedInDatabase()
-    {
-        await ArrangeAndActAsync();
+        _response = await Client.PostAsJsonAsync("/api/templates", new { Name = "ServiceClass", IsActive = true });
 
         await using var database = CreateDbContext();
-        var template = await database.Templates.FirstOrDefaultAsync(row => row.Name == "ServiceClass");
-        template.Should().NotBeNull();
+        _persisted = await database.Templates.AnyAsync(row => row.Name == "ServiceClass");
     }
+
+    public override async ValueTask InitializeAsync()
+    {
+        await base.InitializeAsync();
+        await GivenAsync();
+        await WhenAsync();
+    }
+
+    [Then("the response status should be Created")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_ResponseIs201() => _response.StatusCode.Should().Be(HttpStatusCode.Created);
+
+    [Then("the template should be persisted")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_PersistedInDatabase() => _persisted.Should().BeTrue();
 }
 #endif

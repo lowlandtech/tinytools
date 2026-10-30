@@ -1,5 +1,6 @@
 #if NET10_0_OR_GREATER
 using System.Net;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3316.Templates.US01.TemplateApi;
@@ -7,48 +8,43 @@ namespace LowlandTech.TinyTools.Tests.SPEC3316.Templates.US01.TemplateApi;
 [Trait(Spec.SPEC, "3316")]
 [Trait(Spec.SC, "05")]
 [UserStory("01", "Template API CRUD operations")]
-public class SC05_ValidateVersion : TemplateApiScenario
+public sealed class SC05_ValidateVersion : TemplateApiScenario
 {
     private HttpResponseMessage _response = null!;
+    private bool _valid;
+    private HttpStatusCode _unknownStatus;
+    private HttpStatusCode _missingDataStatus;
+
+    [Given("a template library seeded with two templates")]
+    private Task GivenAsync() => SeedLibraryAsync();
 
     [When("POST /api/templates/versions/{id}/validate is called with EntityClass v1")]
-    protected override async Task WhenAsync()
+    private async Task WhenAsync()
     {
         _response = await Client.PostAsync($"/api/templates/versions/{EntityClassV1Id}/validate", null);
+        _valid = (await _response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("valid").GetBoolean();
+
+        _unknownStatus = (await Client.PostAsync($"/api/templates/versions/{Guid.NewGuid()}/validate", null)).StatusCode;
+        _missingDataStatus = (await Client.PostAsync($"/api/templates/versions/{DbContextClassV1Id}/validate", null)).StatusCode;
     }
 
-    [Fact(DisplayName = "UAC01: Response is 200 OK with valid=true")]
-    [Trait(Spec.UAC, "01")]
-    [Then("the response is 200 with valid=true")]
-    public async Task UAC01_ResponseIsValid()
+    public override async ValueTask InitializeAsync()
     {
-        await ArrangeAndActAsync();
-        _response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        using var document = JsonDocument.Parse(await _response.Content.ReadAsStringAsync());
-        document.RootElement.GetProperty("valid").GetBoolean().Should().BeTrue();
+        await base.InitializeAsync();
+        await GivenAsync();
+        await WhenAsync();
     }
 
-    [Fact(DisplayName = "UAC02: Unknown version ID returns 404")]
-    [Trait(Spec.UAC, "02")]
-    [Then("the response status code is 404 for an unknown version ID")]
-    public async Task UAC02_UnknownVersionReturns404()
-    {
-        await ArrangeAndActAsync();
+    [Then("the version should be valid")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_ResponseIsValid() => _valid.Should().BeTrue();
 
-        var notFound = await Client.PostAsync($"/api/templates/versions/{Guid.NewGuid()}/validate", null);
-        notFound.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
+    [Then("the unknown version should be NotFound")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_UnknownVersionReturns404() => _unknownStatus.Should().Be(HttpStatusCode.NotFound);
 
-    [Fact(DisplayName = "UAC03: Version without Json/Text returns 400")]
-    [Trait(Spec.UAC, "03")]
-    [Then("the response status code is 400 for a version without test data")]
-    public async Task UAC03_MissingTestDataReturns400()
-    {
-        await ArrangeAndActAsync();
-
-        var badRequest = await Client.PostAsync($"/api/templates/versions/{DbContextClassV1Id}/validate", null);
-        badRequest.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-    }
+    [Then("the version without test data should be rejected")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_MissingTestDataReturns400() => _missingDataStatus.Should().Be(HttpStatusCode.BadRequest);
 }
 #endif

@@ -7,46 +7,43 @@ namespace LowlandTech.TinyTools.Tests.SPEC3316.Templates.US01.TemplateApi;
 [Trait(Spec.SPEC, "3316")]
 [Trait(Spec.SC, "03")]
 [UserStory("01", "Template API CRUD operations")]
-public class SC03_DeleteTemplate : TemplateApiScenario
+public sealed class SC03_DeleteTemplate : TemplateApiScenario
 {
     private HttpResponseMessage _response = null!;
+    private bool _remaining;
+    private HttpStatusCode _unknownStatus;
+
+    [Given("a template library seeded with two templates")]
+    private Task GivenAsync() => SeedLibraryAsync();
 
     [When("DELETE /api/templates/{id} is called with the EntityClass ID")]
-    protected override async Task WhenAsync()
+    private async Task WhenAsync()
     {
         _response = await Client.DeleteAsync($"/api/templates/{EntityClassId}");
-    }
-
-    [Fact(DisplayName = "UAC01: Response is 204 NoContent")]
-    [Trait(Spec.UAC, "01")]
-    [Then("the response status code is 204")]
-    public async Task UAC01_ResponseIs204()
-    {
-        await ArrangeAndActAsync();
-        _response.StatusCode.Should().Be(HttpStatusCode.NoContent);
-    }
-
-    [Fact(DisplayName = "UAC02: Template no longer in database")]
-    [Trait(Spec.UAC, "02")]
-    [Then("the database contains 0 templates with EntityClass ID")]
-    public async Task UAC02_TemplateRemoved()
-    {
-        await ArrangeAndActAsync();
 
         await using var database = CreateDbContext();
-        var exists = await database.Templates.AnyAsync(row => row.Id == EntityClassId);
-        exists.Should().BeFalse();
+        _remaining = await database.Templates.AnyAsync(row => row.Id == EntityClassId);
+
+        _unknownStatus = (await Client.DeleteAsync($"/api/templates/{Guid.NewGuid()}")).StatusCode;
     }
 
-    [Fact(DisplayName = "UAC03: DELETE unknown ID returns 404")]
-    [Trait(Spec.UAC, "03")]
-    [Then("the response status code is 404 for an unknown ID")]
-    public async Task UAC03_UnknownIdReturns404()
+    public override async ValueTask InitializeAsync()
     {
-        await ArrangeAndActAsync();
-
-        var notFound = await Client.DeleteAsync($"/api/templates/{Guid.NewGuid()}");
-        notFound.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        await base.InitializeAsync();
+        await GivenAsync();
+        await WhenAsync();
     }
+
+    [Then("the response status should be NoContent")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_ResponseIs204() => _response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+
+    [Then("the deleted template should be gone")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_TemplateRemoved() => _remaining.Should().BeFalse();
+
+    [Then("the unknown delete should be NotFound")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_UnknownIdReturns404() => _unknownStatus.Should().Be(HttpStatusCode.NotFound);
 }
 #endif

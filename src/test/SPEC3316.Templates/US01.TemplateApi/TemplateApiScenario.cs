@@ -1,5 +1,4 @@
 #if NET10_0_OR_GREATER
-using System.Net.Http.Json;
 using LowlandTech.TinyTools.Api.Domain;
 using LowlandTech.TinyTools.Core.Entities;
 using LowlandTech.TinyTools.Tests.SPEC3315.Server.US02.TemplateApi;
@@ -9,13 +8,12 @@ using Microsoft.Extensions.DependencyInjection;
 namespace LowlandTech.TinyTools.Tests.SPEC3316.Templates.US01.TemplateApi;
 
 /// <summary>
-/// Hosts the API and seeds the library the imported specifications expect: one
-/// template whose only version carries test data, and one whose version does
-/// not, so the validation refusal has a subject.
+/// Shared plumbing for the imported template API specifications: it hosts the API
+/// and exposes the seeded library, while each scenario keeps its own Given and
+/// When in its own source.
 ///
-/// The Foundry base derived its ids from <c>GuidV5</c>; here the seed owns the
-/// ids and exposes them, which keeps the same assertions without porting a
-/// hashing helper.
+/// Foundry's base derived ids from <c>GuidV5</c>; here the seed owns the ids and
+/// exposes them, which keeps the same assertions without porting a hashing helper.
 /// </summary>
 public abstract class TemplateApiScenario : IAsyncLifetime
 {
@@ -27,11 +25,20 @@ public abstract class TemplateApiScenario : IAsyncLifetime
     protected Guid DbContextClassId { get; private set; }
     protected Guid DbContextClassV1Id { get; private set; }
 
-    public async ValueTask InitializeAsync()
+    /// <summary>Hosts the API. The library itself is seeded by the scenario's Given.</summary>
+    public virtual ValueTask InitializeAsync()
     {
         _factory = new TemplateApiFactory();
         Client = _factory.CreateClient();
+        return ValueTask.CompletedTask;
+    }
 
+    /// <summary>
+    /// Seeds one template whose only version carries test data and one whose
+    /// version does not, so the validation refusal has a subject.
+    /// </summary>
+    protected async Task SeedLibraryAsync()
+    {
         EntityClassId = Guid.NewGuid();
         EntityClassV1Id = Guid.NewGuid();
         DbContextClassId = Guid.NewGuid();
@@ -73,12 +80,6 @@ public abstract class TemplateApiScenario : IAsyncLifetime
 
         await database.SaveChangesAsync();
     }
-
-    /// <summary>The scenario action the imported facts run once.</summary>
-    protected virtual Task WhenAsync() => Task.CompletedTask;
-
-    /// <summary>Runs the scenario action; the Given half happened in the seed.</summary>
-    protected Task ArrangeAndActAsync() => WhenAsync();
 
     protected TinyToolsDbContext CreateDbContext() => _factory.CreateDbContext();
 

@@ -1,5 +1,6 @@
 #if NET10_0_OR_GREATER
 using System.Net;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3316.Templates.US01.TemplateApi;
@@ -7,34 +8,34 @@ namespace LowlandTech.TinyTools.Tests.SPEC3316.Templates.US01.TemplateApi;
 [Trait(Spec.SPEC, "3316")]
 [Trait(Spec.SC, "01")]
 [UserStory("01", "Template API CRUD operations")]
-public class SC01_ListTemplates : TemplateApiScenario
+public sealed class SC01_ListTemplates : TemplateApiScenario
 {
     private HttpResponseMessage _response = null!;
+    private int _listedCount;
+
+    [Given("a template library seeded with two templates")]
+    private Task GivenAsync() => SeedLibraryAsync();
 
     [When("GET /api/templates is called")]
-    protected override async Task WhenAsync()
+    private async Task WhenAsync()
     {
         _response = await Client.GetAsync("/api/templates");
+        _listedCount = (await _response.Content.ReadFromJsonAsync<JsonElement>()).GetArrayLength();
     }
 
-    [Fact(DisplayName = "UAC01: Response is 200 OK")]
-    [Trait(Spec.UAC, "01")]
-    [Then("the response status code is 200")]
-    public async Task UAC01_ResponseIs200()
+    public override async ValueTask InitializeAsync()
     {
-        await ArrangeAndActAsync();
-        _response.StatusCode.Should().Be(HttpStatusCode.OK);
+        await base.InitializeAsync();
+        await GivenAsync();
+        await WhenAsync();
     }
 
-    [Fact(DisplayName = "UAC02: Returns 2 templates")]
-    [Trait(Spec.UAC, "02")]
-    [Then("the response contains 2 templates")]
-    public async Task UAC02_Returns2Templates()
-    {
-        await ArrangeAndActAsync();
+    [Then("the response status should be OK")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_ResponseIs200() => _response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        using var document = JsonDocument.Parse(await _response.Content.ReadAsStringAsync());
-        document.RootElement.GetArrayLength().Should().Be(2);
-    }
+    [Then("the listed templates should have count 2")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_Returns2Templates() => _listedCount.Should().Be(2);
 }
 #endif
