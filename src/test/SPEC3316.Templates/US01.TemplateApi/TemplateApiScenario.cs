@@ -1,0 +1,92 @@
+#if NET10_0_OR_GREATER
+using System.Net.Http.Json;
+using LowlandTech.TinyTools.Api.Domain;
+using LowlandTech.TinyTools.Core.Entities;
+using LowlandTech.TinyTools.Tests.SPEC3315.Server.US02.TemplateApi;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace LowlandTech.TinyTools.Tests.SPEC3316.Templates.US01.TemplateApi;
+
+/// <summary>
+/// Hosts the API and seeds the library the imported specifications expect: one
+/// template whose only version carries test data, and one whose version does
+/// not, so the validation refusal has a subject.
+///
+/// The Foundry base derived its ids from <c>GuidV5</c>; here the seed owns the
+/// ids and exposes them, which keeps the same assertions without porting a
+/// hashing helper.
+/// </summary>
+public abstract class TemplateApiScenario : IAsyncLifetime
+{
+    private TemplateApiFactory _factory = null!;
+
+    protected HttpClient Client { get; private set; } = null!;
+    protected Guid EntityClassId { get; private set; }
+    protected Guid EntityClassV1Id { get; private set; }
+    protected Guid DbContextClassId { get; private set; }
+    protected Guid DbContextClassV1Id { get; private set; }
+
+    public async ValueTask InitializeAsync()
+    {
+        _factory = new TemplateApiFactory();
+        Client = _factory.CreateClient();
+
+        EntityClassId = Guid.NewGuid();
+        EntityClassV1Id = Guid.NewGuid();
+        DbContextClassId = Guid.NewGuid();
+        DbContextClassV1Id = Guid.NewGuid();
+
+        await using var database = CreateDbContext();
+        database.Templates.Add(new Template
+        {
+            Id = EntityClassId,
+            Name = "EntityClass",
+            Versions =
+            [
+                new TemplateVersion
+                {
+                    Id = EntityClassV1Id,
+                    Name = "v1",
+                    Content = "Hello ${Context.Name}",
+                    Json = """{"Name":"World"}""",
+                    Text = "Hello World",
+                    TemplateId = EntityClassId,
+                },
+            ],
+        });
+        database.Templates.Add(new Template
+        {
+            Id = DbContextClassId,
+            Name = "DbContextClass",
+            Versions =
+            [
+                new TemplateVersion
+                {
+                    Id = DbContextClassV1Id,
+                    Name = "v1",
+                    Content = "class ${Context.Name} { }",
+                    TemplateId = DbContextClassId,
+                },
+            ],
+        });
+
+        await database.SaveChangesAsync();
+    }
+
+    /// <summary>The scenario action the imported facts run once.</summary>
+    protected virtual Task WhenAsync() => Task.CompletedTask;
+
+    /// <summary>Runs the scenario action; the Given half happened in the seed.</summary>
+    protected Task ArrangeAndActAsync() => WhenAsync();
+
+    protected TinyToolsDbContext CreateDbContext() => _factory.CreateDbContext();
+
+    public ValueTask DisposeAsync()
+    {
+        Client?.Dispose();
+        _factory?.Dispose();
+        return ValueTask.CompletedTask;
+    }
+}
+#endif
