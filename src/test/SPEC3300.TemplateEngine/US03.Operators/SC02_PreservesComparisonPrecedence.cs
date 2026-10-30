@@ -40,14 +40,14 @@ public sealed class SC02_PreservesComparisonPrecedence : IClassFixture<UseCases.
     }
 
     [Then("Result.EqualGreater should be [T,empty]")]
-    [Trait("UAC", "01"), Fact(Skip = "TODO: SPEC3300-US03-SC02 worker must execute the public-engine inclusive/strict equality regression and record target-framework evidence.")]
+    [Trait("UAC", "01"), Fact]
     public void UAC01_GreaterEquality() => _useCase.Cases["EqualGreater"].Should().Equal("T", "");
 
     [Then("Result.EqualLess should be [T,empty]")]
-    [Trait("UAC", "02"), Fact(Skip = "TODO: SPEC3300-US03-SC02 worker must execute the public-engine less-than equality regression and record target-framework evidence.")]
+    [Trait("UAC", "02"), Fact]
     public void UAC02_LessEquality() => _useCase.Cases["EqualLess"].Should().Equal("T", "");
 
     [Then("Result.AdjacentBoundaries should be [empty,empty,T,T,T,T,empty,empty]")]
-    [Trait("UAC", "03"), Fact(Skip = "TODO: SPEC3300-US03-SC02 worker must execute both adjacent values with all four operators and record target-framework evidence.")]
+    [Trait("UAC", "03"), Fact]
     public void UAC03_AdjacentBoundaries() => _useCase.Cases["AdjacentBoundaries"].Should().Equal("", "", "T", "T", "T", "T", "", "");
 }

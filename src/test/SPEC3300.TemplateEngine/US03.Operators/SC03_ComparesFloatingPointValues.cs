@@ -38,14 +38,14 @@ public sealed class SC03_ComparesFloatingPointValues : IClassFixture<UseCases.Co
     }
 
     [Then("Result.Roundoff should be T")]
-    [Trait("UAC", "01"), Fact(Skip = "TODO: SPEC3300-US03-SC03 worker must execute the common floating-point roundoff case through Render and record framework evidence.")]
+    [Trait("UAC", "01"), Fact]
     public void UAC01_Roundoff() => _useCase.Cases["roundoff"].Should().Equal("T");
 
     [Then("Result.ToleranceBoundary should be [T,empty,empty]")]
-    [Trait("UAC", "02"), Fact(Skip = "TODO: SPEC3300-US03-SC03 worker must execute the adjacent representable, exact and outside tolerance inputs and record framework evidence.")]
+    [Trait("UAC", "02"), Fact]
     public void UAC02_ToleranceBoundary() => _useCase.Cases["ToleranceBoundary"].Should().Equal("T", "", "");
 
     [Then("Result.Controls should be [T,T]")]
-    [Trait("UAC", "03"), Fact(Skip = "TODO: SPEC3300-US03-SC03 worker must execute unchanged integer and case-insensitive string equality and record framework evidence.")]
+    [Trait("UAC", "03"), Fact]
     public void UAC03_Controls() => _useCase.Cases["Controls"].Should().Equal("T", "T");
 }
