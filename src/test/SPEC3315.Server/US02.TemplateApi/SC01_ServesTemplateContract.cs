@@ -27,6 +27,15 @@ public sealed class TemplateApiFactory(string environment = "Development", strin
             builder.UseSetting("Tinytools:ApiKey", apiKey);
     }
 
+    /// <summary>
+    /// Opens the scenario database outside the host's own scope, for facts that
+    /// assert on persisted state instead of the response.
+    /// </summary>
+    public TinyToolsDbContext CreateDbContext() =>
+        new(new DbContextOptionsBuilder<TinyToolsDbContext>()
+            .UseSqlite($"Data Source={_database}")
+            .Options);
+
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
