@@ -3,107 +3,66 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "14")]
 [UserStory("01", "String interpolation processes files without tags")]
-public class WhenInterpolatingFilesUntaggedTest : TinyToolsScenario<List<string>>
+public sealed class SC14_InterpolatesFilesUntagged : TinyToolsScenario<List<string>>
 {
     private string _root = null!;
     private string _folder = null!;
+    private int _folderMatches;
+    private (int CodeFile1, int CodeFile2) _nameMatches;
+    private int _extensionMatches;
+    private string _textPath = null!;
 
     protected override void SetupData()
     {
         var codeBaseUrl = new Uri(Assembly.GetExecutingAssembly().Location);
-        var codeBasePath = Uri.UnescapeDataString(codeBaseUrl.AbsolutePath);
-        _root = Path.GetDirectoryName(codeBasePath)!;
+        _root = Path.GetDirectoryName(Uri.UnescapeDataString(codeBaseUrl.AbsolutePath))!;
         _folder = Path.Combine(_root, Path.GetFileNameWithoutExtension(Path.GetRandomFileName()));
         ZipFile.ExtractToDirectory(Path.Combine(_root, "files.zip"), _folder);
     }
 
-    protected override List<string> For()
-    {
-        return Directory.GetFiles(_folder, "*.*", SearchOption.AllDirectories).ToList();
-    }
+    protected override List<string> For() => Directory.GetFiles(_folder, "*.*", SearchOption.AllDirectories).ToList();
 
-    [When("Execute test action")]
+    [Given("an extracted file template folder holding eight files")]
+    protected override void Given() => base.Given();
+
+    [When("the file names and texts are interpolated without tags once per case")]
     protected override void When()
     {
         base.When();
-        Sut.Count.Should().Be(8);
-    }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Interpolate File Folder")]
-    [Fact]
-    public void ItShouldInterpolateFileFolder()
-    {
-        ArrangeAndAct();
-        var replacements = new Dictionary<string, string>()
-        {
-            { "subfolder1","src" },
-            { "subfolder2","lowlandtech" }
-        };
-        Sut.Interpolate(replacements)
-           .Count(file => file.Contains(Path.Combine("src", "lowlandtech")))
-           .Should()
-           .Be(2);
-    }
+        _folderMatches = Sut.Interpolate(new Dictionary<string, string> { { "subfolder1", "src" }, { "subfolder2", "lowlandtech" } })
+            .Count(file => file.Contains(Path.Combine("src", "lowlandtech")));
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Interpolate File Name")]
-    [Fact]
-    public void ItShouldInterpolateFileName()
-    {
-        ArrangeAndAct();
-        var replacements = new Dictionary<string, string>()
-        {
-            { "file1","codefile1" },
-            { "file2","codefile2" }
-        };
-        Sut.Interpolate(replacements)
-            .Count(file => file.Contains("codefile1"))
-            .Should()
-            .Be(3);
+        var names = new Dictionary<string, string> { { "file1", "codefile1" }, { "file2", "codefile2" } };
+        _nameMatches = (
+            Sut.Interpolate(names).Count(file => file.Contains("codefile1")),
+            Sut.Interpolate(names).Count(file => file.Contains("codefile2")));
 
-        Sut.Interpolate(replacements)
-            .Count(file => file.Contains("codefile2"))
-            .Should()
-            .Be(3);
-    }
+        _extensionMatches = Sut.Interpolate(new Dictionary<string, string> { { ".txt", ".cs" } })
+            .Count(file => file.Contains(".cs"));
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Interpolate File Extension")]
-    [Fact]
-    public void ItShouldInterpolateFileExtension()
-    {
-        ArrangeAndAct();
-        var replacements = new Dictionary<string, string>()
-        {
-            { ".txt",".cs" },
-        };
-        Sut.Interpolate(replacements)
-            .Count(file => file.Contains(".cs"))
-            .Should()
-            .Be(7);
-    }
-
-    [Trait(Spec.UAC, "04")]
-    [Then("it Should Interpolate File Text")]
-    [Fact]
-    public void ItShouldInterpolateFileText()
-    {
-        ArrangeAndAct();
-        var replacements = new Dictionary<string, string>()
-        {
-            { "file3","updated" },
-            { "fileText","Hello world"}
-        };
-
-        var result = Sut.Interpolate(replacements, hasTags: false, isFile: true)
+        _textPath = Sut
+            .Interpolate(new Dictionary<string, string> { { "file3", "updated" }, { "fileText", "Hello world" } }, hasTags: false, isFile: true)
             .Single(file => file.Contains("updated"));
-
-        result.Should().NotBeNullOrEmpty();
-
-        File.ReadAllText(result)
-            .Should().Be("Hello world");
     }
+
+    public SC14_InterpolatesFilesUntagged() => ArrangeAndAct();
+
+    [Then("the interpolated subfolder count should be 2")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_InterpolatesFileFolder() => _folderMatches.Should().Be(2);
+
+    [Then("the interpolated name pair should be exact")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_InterpolatesFileName() => _nameMatches.Should().Be((3, 3));
+
+    [Then("the interpolated extension count should be 7")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_InterpolatesFileExtension() => _extensionMatches.Should().Be(7);
+
+    [Then("the interpolated file text should be exact")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_InterpolatesFileText() => File.ReadAllText(_textPath).Should().NotBeNullOrEmpty().And.Be("Hello world");
 
     public override void Dispose()
     {
