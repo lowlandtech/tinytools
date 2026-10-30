@@ -1,0 +1,11 @@
+@using LowlandTech.TinyTools.Frontend.Features.Templates
+
+<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout)" />
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <p role="alert">No page is registered at this address.</p>
+    </NotFound>
+</Router>

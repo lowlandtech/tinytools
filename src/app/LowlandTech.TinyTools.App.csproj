@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>LowlandTech.TinyTools.App</RootNamespace>
+    <AssemblyName>LowlandTech.TinyTools.App</AssemblyName>
+    <!-- The development host. The packaged contribution is the Razor frontend
+         package, so this project is never packed. -->
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LowlandTech.Components" Version="2026.10.2-202610242" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\core\LowlandTech.TinyTools.Core.csproj" />
+    <ProjectReference Include="..\frontend\LowlandTech.TinyTools.Frontend.csproj" />
+  </ItemGroup>
+
+</Project>
