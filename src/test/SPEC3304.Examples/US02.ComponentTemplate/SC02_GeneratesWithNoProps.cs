@@ -1,58 +1,36 @@
 namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US02.ComponentTemplate;
 
-/// <summary>
-/// Tests template with empty props list.
-/// </summary>
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "02")]
 [UserStory("02", "Component template generates React components")]
-public class WhenRenderingComponentTemplateWithNoProps : TinyToolsScenario<Shared.Examples.ComponentTemplate>
+public sealed class SC02_GeneratesWithNoProps : UnitScenario
 {
-    private TemplateResult? _result;
+    private readonly Shared.Examples.ComponentTemplate _component = new();
+    private ComponentData _data = null!;
+    private TemplateResult _result = null!;
 
-    protected override Shared.Examples.ComponentTemplate For()
+    [Given("a component definition with no props")]
+    protected override void Given() => _data = new ComponentData
     {
-        return new Shared.Examples.ComponentTemplate();
-    }
+        ComponentName = "EmptyComponent",
+        Props = new(),
+        PropsDestructured = "{}"
+    };
 
-    [When("Execute test action")]
-    protected override void When()
-    {
-        base.When();
-        var data = new ComponentData
-        {
-            ComponentName = "EmptyComponent",
-            Props = new(),
-            PropsDestructured = "{}"
-        };
-        _result = Sut.Render(data);
-    }
+    [When("the component template renders the definition")]
+    protected override void When() => _result = _component.Render(_data);
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Generate Empty Props Interface")]
-    [Fact]
-    public void ItShouldGenerateEmptyPropsInterface()
-    {
-        ArrangeAndAct();
-        _result!.Content.Should().Contain("export interface EmptyComponentProps");
-    }
+    public SC02_GeneratesWithNoProps() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Not Have Props In Interface")]
-    [Fact]
-    public void ItShouldNotHavePropsInInterface()
-    {
-        ArrangeAndAct();
-        // Interface should be empty (only has braces)
-        _result!.Content.Should().MatchRegex(@"interface EmptyComponentProps \{\s*\}");
-    }
+    [Then("the content should contain export interface EmptyComponentProps")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_GeneratesTheEmptyPropsInterface() => _result.Content.Should().Contain("export interface EmptyComponentProps");
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Have Empty Destructuring")]
-    [Fact]
-    public void ItShouldHaveEmptyDestructuring()
-    {
-        ArrangeAndAct();
-        _result!.Content.Should().Contain("({})");
-    }
+    [Then("the props interface should be empty")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_LeavesThePropsInterfaceEmpty() => _result.Content.Should().MatchRegex(@"interface EmptyComponentProps \{\s*\}");
+
+    [Then("the content should contain the empty destructuring")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_UsesEmptyDestructuring() => _result.Content.Should().Contain("({})");
 }

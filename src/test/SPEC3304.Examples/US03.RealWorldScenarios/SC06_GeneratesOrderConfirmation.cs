@@ -5,18 +5,14 @@ namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "06")]
 [UserStory("03", "Real-world scenarios generate practical output")]
-public class WhenRenderingOrderConfirmationEmailTest : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC06_GeneratesOrderConfirmation : UnitScenario
 {
+    private readonly TinyTemplateEngine _engine = new();
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string? _result;
+    private string _result = null!;
 
-    protected override TinyTemplateEngine For()
-    {
-        return new TinyTemplateEngine();
-    }
-
-    [Given("Setup test context")]
+    [Given("an order confirmation template with one customer order")]
     protected override void Given()
     {
         var customer = new Customer
@@ -50,12 +46,12 @@ public class WhenRenderingOrderConfirmationEmailTest : TinyToolsScenario<TinyTem
             Order Details:
             @foreach (var order in Context.Model.Orders) {
             Order #${order.OrderNumber}
-            
+
             Items:
             @foreach (var item in order.Items) {
             - ${item.ProductName} (Qty: ${item.Quantity}) - $${item.Price}
             }
-            
+
             Total: $${order.Total}
             }
 
@@ -65,47 +61,24 @@ public class WhenRenderingOrderConfirmationEmailTest : TinyToolsScenario<TinyTem
             """;
     }
 
-    [When("Execute test action")]
-    protected override void When()
-    {
-        base.When();
-        _result = Sut.Render(_template, _context);
-    }
+    [When("the engine renders the order confirmation template")]
+    protected override void When() => _result = _engine.Render(_template, _context);
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Render Customer Name")]
-    [Fact]
-    public void ItShouldRenderCustomerName()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Hi Jane,");
-    }
+    public SC06_GeneratesOrderConfirmation() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Render Order Number")]
-    [Fact]
-    public void ItShouldRenderOrderNumber()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Order #ORD-2024-001");
-    }
+    [Then("the content should contain the customer name")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_RendersTheCustomerName() => _result.Should().Contain("Hi Jane,");
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Render All Order Items")]
-    [Fact]
-    public void ItShouldRenderAllOrderItems()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Wireless Mouse (Qty: 2)");
-        _result.Should().Contain("USB-C Hub (Qty: 1)");
-    }
+    [Then("the content should contain the order number")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_RendersTheOrderNumber() => _result.Should().Contain("Order #ORD-2024-001");
 
-    [Trait(Spec.UAC, "04")]
-    [Then("it Should Render Order Total")]
-    [Fact]
-    public void ItShouldRenderOrderTotal()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Total: $149.97");
-    }
+    [Then("the content should contain all order items")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_RendersAllOrderItems() => _result.Should().Contain("Wireless Mouse (Qty: 2)").And.Contain("USB-C Hub (Qty: 1)");
+
+    [Then("the content should contain the order total")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_RendersTheOrderTotal() => _result.Should().Contain("Total: $149.97");
 }

@@ -1,57 +1,37 @@
 namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 
-/// <summary>
-/// Tests TemplateBase with JSON string data.
-/// </summary>
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "08")]
 [UserStory("03", "Real-world scenarios generate practical output")]
-public class WhenRenderingTemplateFromJsonString : TinyToolsScenario<ComponentTemplate>
+public sealed class SC08_RendersFromJsonString : UnitScenario
 {
-    private TemplateResult? _result;
-    private string? _jsonData;
+    private readonly ComponentTemplate _component = new();
+    private ComponentData _data = null!;
+    private TemplateResult _result = null!;
 
-    protected override ComponentTemplate For()
-    {
-        return new ComponentTemplate();
-    }
-
-    [Given("Setup test context")]
-    protected override void Given()
-    {
-        _jsonData = @"{
+    [Given("component data deserialized from a JSON string")]
+    protected override void Given() => _data = JsonSerializer.Deserialize<ComponentData>(@"{
             ""ComponentName"": ""JsonComponent"",
             ""Props"": [
                 { ""Name"": ""value"", ""Type"": ""number"" }
             ],
             ""PropsDestructured"": ""{ value }""
-        }";
-    }
+        }")!;
 
-    [When("Execute test action")]
-    protected override void When()
-    {
-        base.When();
-        var data = JsonSerializer.Deserialize<ComponentData>(_jsonData!);
-        _result = Sut.Render(data!);
-    }
+    [When("the component template renders the deserialized data")]
+    protected override void When() => _result = _component.Render(_data);
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Deserialize And Render Correctly")]
-    [Fact]
-    public void ItShouldDeserializeAndRenderCorrectly()
-    {
-        ArrangeAndAct();
-        _result.Should().NotBeNull();
-        _result!.Content.Should().Contain("JsonComponent");
-    }
+    public SC08_RendersFromJsonString() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Contain Deserialized Prop")]
-    [Fact]
-    public void ItShouldContainDeserializedProp()
-    {
-        ArrangeAndAct();
-        _result!.Content.Should().Contain("value: number");
-    }
+    [Then("the result should not be null")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_DeserializesTheJsonData() => _result.Should().NotBeNull();
+
+    [Then("the content should contain JsonComponent")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_RendersTheDeserializedComponentName() => _result.Content.Should().Contain("JsonComponent");
+
+    [Then("the content should contain the deserialized prop")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_RendersTheDeserializedProp() => _result.Content.Should().Contain("value: number");
 }

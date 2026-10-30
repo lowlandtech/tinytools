@@ -5,18 +5,14 @@ namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "07")]
 [UserStory("03", "Real-world scenarios generate practical output")]
-public class WhenRenderingWelcomeEmailTest : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC07_GeneratesWelcomeEmail : UnitScenario
 {
+    private readonly TinyTemplateEngine _engine = new();
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string? _result;
+    private string _result = null!;
 
-    protected override TinyTemplateEngine For()
-    {
-        return new TinyTemplateEngine();
-    }
-
-    [Given("Setup test context")]
+    [Given("a welcome email template with a premium recipient")]
     protected override void Given()
     {
         _context = new ExecutionContext
@@ -53,47 +49,24 @@ public class WhenRenderingWelcomeEmailTest : TinyToolsScenario<TinyTemplateEngin
             """;
     }
 
-    [When("Execute test action")]
-    protected override void When()
-    {
-        base.When();
-        _result = Sut.Render(_template, _context);
-    }
+    [When("the engine renders the welcome email template")]
+    protected override void When() => _result = _engine.Render(_template, _context);
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Render Recipient Name")]
-    [Fact]
-    public void ItShouldRenderRecipientName()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Dear John Smith,");
-    }
+    public SC07_GeneratesWelcomeEmail() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Render Company Name")]
-    [Fact]
-    public void ItShouldRenderCompanyName()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Welcome to TechCorp Solutions!");
-    }
+    [Then("the content should contain the recipient greeting")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_RendersTheRecipientName() => _result.Should().Contain("Dear John Smith,");
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Include Premium Message")]
-    [Fact]
-    public void ItShouldIncludePremiumMessage()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("As a Premium member");
-    }
+    [Then("the content should contain the company name")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_RendersTheCompanyName() => _result.Should().Contain("Welcome to TechCorp Solutions!");
 
-    [Trait(Spec.UAC, "04")]
-    [Then("it Should Render Sender Signature")]
-    [Fact]
-    public void ItShouldRenderSenderSignature()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Sarah Johnson");
-        _result.Should().Contain("Customer Success Manager");
-    }
+    [Then("the content should contain the premium message")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_IncludesThePremiumMessage() => _result.Should().Contain("As a Premium member");
+
+    [Then("the content should contain the sender signature")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_RendersTheSenderSignature() => _result.Should().Contain("Sarah Johnson").And.Contain("Customer Success Manager");
 }

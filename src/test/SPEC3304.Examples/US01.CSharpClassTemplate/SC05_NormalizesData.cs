@@ -1,68 +1,39 @@
 namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US01.CSharpClassTemplate;
 
-/// <summary>
-/// Tests TemplateBase data normalization.
-/// </summary>
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "05")]
 [UserStory("01", "CSharp class template generates class code")]
-public class WhenNormalizingDataInTemplateBase : TinyToolsScenario<ComponentTemplate>
+public sealed class SC05_NormalizesData : UnitScenario
 {
-    private TemplateResult? _result;
-    private object? _anonymousData;
+    private readonly ComponentTemplate _component = new();
+    private object _anonymousData = null!;
+    private TemplateResult _result = null!;
 
-    protected override ComponentTemplate For()
+    [Given("anonymous data shaped like the component data")]
+    protected override void Given() => _anonymousData = new
     {
-        return new ComponentTemplate();
-    }
-
-    [Given("Setup test context")]
-    protected override void Given()
-    {
-        // Create anonymous object that matches ComponentData structure
-        _anonymousData = new
+        ComponentName = "TestComponent",
+        Props = new object[]
         {
-            ComponentName = "TestComponent",
-            Props = new object[]
-            {
-                new { Name = "prop1", Type = "string" }
-            },
-            PropsDestructured = "{ prop1 }"
-        };
-    }
+            new { Name = "prop1", Type = "string" }
+        },
+        PropsDestructured = "{ prop1 }"
+    };
 
-    [When("Execute test action")]
-    protected override void When()
-    {
-        base.When();
-        _result = Sut.Render(_anonymousData!);
-    }
+    [When("the component template renders the anonymous data")]
+    protected override void When() => _result = _component.Render(_anonymousData);
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Normalize Anonymous Data Successfully")]
-    [Fact]
-    public void ItShouldNormalizeAnonymousDataSuccessfully()
-    {
-        ArrangeAndAct();
-        _result.Should().NotBeNull();
-    }
+    public SC05_NormalizesData() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Render With Normalized Data")]
-    [Fact]
-    public void ItShouldRenderWithNormalizedData()
-    {
-        ArrangeAndAct();
-        _result!.Content.Should().Contain("TestComponent");
-        _result.Content.Should().Contain("prop1");
-    }
+    [Then("the result should not be null")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_NormalizesTheAnonymousData() => _result.Should().NotBeNull();
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Generate Correct Path")]
-    [Fact]
-    public void ItShouldGenerateCorrectPath()
-    {
-        ArrangeAndAct();
-        _result!.Path.Should().Be("src/components/TestComponent.tsx");
-    }
+    [Then("the content should contain the normalized component and prop")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_RendersWithTheNormalizedData() => _result.Content.Should().Contain("TestComponent").And.Contain("prop1");
+
+    [Then("the generated path should be src/components/TestComponent.tsx")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_GeneratesTheComponentPath() => _result.Path.Should().Be("src/components/TestComponent.tsx");
 }

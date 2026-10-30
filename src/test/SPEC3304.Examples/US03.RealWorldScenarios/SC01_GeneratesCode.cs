@@ -5,18 +5,14 @@ namespace LowlandTech.TinyTools.Tests.SPEC3304.Examples.US03.RealWorldScenarios;
 [Trait(Spec.SPEC, "3304")]
 [Trait(Spec.SC, "01")]
 [UserStory("03", "Real-world scenarios generate practical output")]
-public class WhenRenderingCodeGenerationTest : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC01_GeneratesCode : UnitScenario
 {
+    private readonly TinyTemplateEngine _engine = new();
     private ExecutionContext _context = null!;
     private string _template = null!;
-    private string? _result;
+    private string _result = null!;
 
-    protected override TinyTemplateEngine For()
-    {
-        return new TinyTemplateEngine();
-    }
-
-    [Given("Setup test context")]
+    [Given("a code generation template with a customer model")]
     protected override void Given()
     {
         _context = new ExecutionContext();
@@ -56,65 +52,32 @@ public class WhenRenderingCodeGenerationTest : TinyToolsScenario<TinyTemplateEng
             """;
     }
 
-    [When("Execute test action")]
-    protected override void When()
-    {
-        base.When();
-        _result = Sut.Render(_template, _context);
-    }
+    [When("the engine renders the code generation template")]
+    protected override void When() => _result = _engine.Render(_template, _context);
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Render Namespace")]
-    [Fact]
-    public void ItShouldRenderNamespace()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("namespace MyApp.Models;");
-    }
+    public SC01_GeneratesCode() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Render Class Name")]
-    [Fact]
-    public void ItShouldRenderClassName()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("public class Customer");
-    }
+    [Then("the content should contain the rendered namespace")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_RendersTheNamespace() => _result.Should().Contain("namespace MyApp.Models;");
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Render Required Properties")]
-    [Fact]
-    public void ItShouldRenderRequiredProperties()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("public required int Id { get; set; }");
-        _result.Should().Contain("public required string FirstName { get; set; }");
-    }
+    [Then("the content should contain the rendered class name")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_RendersTheClassName() => _result.Should().Contain("public class Customer");
 
-    [Trait(Spec.UAC, "04")]
-    [Then("it Should Render Optional Properties")]
-    [Fact]
-    public void ItShouldRenderOptionalProperties()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("public string? Email { get; set; }");
-    }
+    [Then("the content should contain the required properties")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_RendersTheRequiredProperties() => _result.Should().Contain("public required int Id { get; set; }").And.Contain("public required string FirstName { get; set; }");
 
-    [Trait(Spec.UAC, "05")]
-    [Then("it Should Include Validation Method")]
-    [Fact]
-    public void ItShouldIncludeValidationMethod()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("public bool IsValid()");
-    }
+    [Then("the content should contain the optional property")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_RendersTheOptionalProperties() => _result.Should().Contain("public string? Email { get; set; }");
 
-    [Trait(Spec.UAC, "06")]
-    [Then("it Should Remove Comments")]
-    [Fact]
-    public void ItShouldRemoveComments()
-    {
-        ArrangeAndAct();
-        _result.Should().NotContain("Auto-generated code");
-    }
+    [Then("the content should contain the validation method")]
+    [Trait("UAC", "05"), Fact]
+    public void UAC05_IncludesTheValidationMethod() => _result.Should().Contain("public bool IsValid()");
+
+    [Then("the content should not contain the template comment")]
+    [Trait("UAC", "06"), Fact]
+    public void UAC06_RemovesTheComments() => _result.Should().NotContain("Auto-generated code");
 }
