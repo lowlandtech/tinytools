@@ -8,10 +8,22 @@
     <AssemblyName>LowlandTech.TinyTools.Api</AssemblyName>
     <!-- The host is a development entry point until the plugin packaging item
          makes it a served package. -->
-    <IsPackable>false</IsPackable>
+    <IsPackable>true</IsPackable>
+    <PackageId>LowlandTech.TinyTools.Api</PackageId>
+    <Authors>LowlandTech</Authors>
+    <Company>LowlandTech</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>The template API of the Tinytools application: the DbContext and the resource-based /api/templates endpoints a Harness deployment composes.</Description>
+    <PackageTags>lowlandtech tinytools templates backend</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="lowlandtech\plugin.json" Pack="true" PackagePath="lowlandtech\" />
+    <EmbeddedResource Include="lowlandtech\plugin.json" LogicalName="lowlandtech/plugin.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LowlandTech.Plugins.Domain" Version="2026.10.1-20261030063217803391801" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />

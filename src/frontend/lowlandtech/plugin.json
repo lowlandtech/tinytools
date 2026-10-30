@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "key": "tinytools",
+  "name": "Tinytools",
+  "description": "The Templates surface of the Tinytools application: the store, the page and the client assets a Harness deployment composes.",
+  "target": "blazor",
+  "dependencies": [],
+  "slots": [],
+  "placements": [],
+  "routes": [
+    {
+      "path": "templates",
+      "component": "TemplatesPage",
+      "children": [],
+      "policies": []
+    }
+  ],
+  "contributions": {
+    "components": [
+      "TemplatesPage"
+    ],
+    "pages": [
+      "TemplatesPage"
+    ]
+  },
+  "assets": {
+    "stylesheets": [
+      "_content/LowlandTech.TinyTools.Frontend/app.css"
+    ],
+    "scripts": []
+  }
+}

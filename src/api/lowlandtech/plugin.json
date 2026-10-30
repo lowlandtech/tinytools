@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "key": "tinytools",
+  "name": "Tinytools",
+  "description": "The template API of the Tinytools application, installed against the connection of the host.",
+  "target": "backend",
+  "dependencies": [],
+  "slots": [],
+  "placements": [],
+  "routes": [],
+  "contributions": {}
+}
