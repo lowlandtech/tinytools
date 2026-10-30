@@ -1,3 +1,15 @@
+# 2026.10.4
+
+## Interpolation is locale independent
+
+### Changed
+
+* Every `${...}` interpolation formats numbers and dates with the invariant culture, matching what
+  `format` and `number` already did. A template can no longer render `3.14` on one machine and
+  `3,14` on another, which mattered most for generated source and data files.
+* `round`, `floor` and `ceiling` results now print with a dot decimal separator everywhere.
+* The readme's caveat that `round` followed the current culture is removed because it is no longer
+  true.
 # 2026.10.3
 
 ## Included and parameterized templates, asynchronous services, collection helpers

@@ -44,8 +44,8 @@ public sealed class SC01_ExposesImmutableHelpers : IClassFixture<UseCases.Helper
             }
         });
 
-        // The round helper formats with the current culture, so the expectation follows it.
-        useCase.Cases["Expected"] = $"S: ADA; C: 3; J: a-b-c; R: {2.345.ToString("F1")}";
+        // Interpolation is invariant, so round always renders a dot decimal separator.
+        useCase.Cases["Expected"] = "S: ADA; C: 3; J: a-b-c; R: 2.3";
         useCase.Cases["Failures"] = failures;
         useCase.Cases["DistinctOutputs"] = outputs.Distinct().Count();
         useCase.Cases["Sample"] = outputs.FirstOrDefault() ?? string.Empty;

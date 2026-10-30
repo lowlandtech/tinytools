@@ -1,3 +1,4 @@
+using System.Globalization;
 namespace LowlandTech.TinyTools;
 
 /// <summary>
@@ -77,7 +78,11 @@ public partial class VariableResolver
             }
 
             var result = ResolveExpressionWithPipes(expression, context);
-            var resultStr = result?.ToString() ?? string.Empty;
+
+            // One rule for every resolved value: numbers and dates become text with the
+            // invariant culture, so a template renders the same bytes on every machine.
+            // Strings and booleans are unaffected because they are not IFormattable.
+            var resultStr = ToInvariantText(result);
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug("${{{Expression}}} → \"{Result}\"", expression,
@@ -90,6 +95,18 @@ public partial class VariableResolver
     /// <summary>
     /// Checks if an expression is a ternary expression.
     /// </summary>
+    /// <summary>
+    /// Formats a resolved value for interpolation. Numbers and dates use the invariant culture so
+    /// the rendered text cannot change with the machine's locale; strings and booleans pass
+    /// through unchanged.
+    /// </summary>
+    private static string ToInvariantText(object? value) => value switch
+    {
+        null => string.Empty,
+        IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture) ?? string.Empty,
+        _ => value.ToString() ?? string.Empty,
+    };
+
     private static bool IsTernaryExpression(string expression)
     {
         // Must contain ? and : but not be a method call or null coalescing

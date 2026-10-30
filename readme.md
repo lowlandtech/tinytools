@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="Version" src="https://img.shields.io/badge/version-2026.10.3-blue.svg?cacheSeconds=2592000" />
+  <img alt="Version" src="https://img.shields.io/badge/version-2026.10.4-blue.svg?cacheSeconds=2592000" />
     <a href="https://github.com/lowlandtech/tinytools/actions/workflows/main.yml" target="_blank">
         <img alt="Build Status" src="https://github.com/lowlandtech/tinytools/actions/workflows/main.yml/badge.svg?branch=develop" />
   </a>
@@ -315,12 +315,12 @@ Transform values using the pipe syntax: `${Context.Value | helper}` or `${Contex
 | `format:N2` | `${Context.Price \| format:N2}` | `1,234.57` |
 | `format:C` | `${Context.Price \| format:C}` | `¤1,234.57` |
 | `format:P0` | `${Context.Rate \| format:P0}` | `86 %` |
-| `round:N` | `${Context.Pi \| round:2}` | `3.14` on an invariant culture |
+| `round:N` | `${Context.Pi \| round:2}` | `3.14` |
 
-`format` and `number` format with the **invariant culture**, so `1,234.57` and the
-invariant currency symbol `¤` are what you get regardless of the machine's locale, and the
-invariant percent pattern carries a space (`86 %`). `round` is the exception: it truncates
-with the **current culture**, so the same `round:2` renders `3,14` on a Dutch machine.
+Every helper and every interpolation formats with the **invariant culture**, so `1,234.57`, the
+invariant currency symbol `¤` and the invariant percent pattern (`86 %`) are what you get
+regardless of the machine's locale. `round:2` therefore always renders `3.14`: a template cannot
+change its text, or the files it generates, with the developer's regional settings.
 
 | `floor` | `${Context.Value \| floor}` | `3` |
 | `ceiling` | `${Context.Value \| ceiling}` | `4` |

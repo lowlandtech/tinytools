@@ -71,5 +71,5 @@ public sealed class SC05_RoundsNumericValues : IClassFixture<UseCases.TemplateHe
 
     [Then("Result.RoundPipe should be 3.14")]
     [Trait("UAC", "09"), Fact]
-    public void UAC09_RoundPipe() => double.Parse((string)useCase.Cases["RoundPipe"]!, System.Globalization.CultureInfo.CurrentCulture).Should().BeApproximately(3.14, 0.001);
+    public void UAC09_RoundPipe() => double.Parse((string)useCase.Cases["RoundPipe"]!, System.Globalization.CultureInfo.InvariantCulture).Should().BeApproximately(3.14, 0.001);
 }
