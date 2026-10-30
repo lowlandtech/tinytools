@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>LowlandTech.TinyTools.Frontend</RootNamespace>
+    <AssemblyName>LowlandTech.TinyTools.Frontend</AssemblyName>
+    <!-- The Razor frontend package the Harness composes. It is packable from the
+         start so the store, the page and the assets live in the package that
+         ships them, not in the development host. -->
+    <IsPackable>true</IsPackable>
+    <PackageId>LowlandTech.TinyTools.Frontend</PackageId>
+    <Version>2026.10.1</Version>
+    <Authors>LowlandTech</Authors>
+    <Company>LowlandTech</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>The Templates surface of the Tinytools application: the store, the page and the assets a Harness deployment composes.</Description>
+    <PackageTags>lowlandtech tinytools templates blazor frontend</PackageTags>
+    <RepositoryUrl>https://github.com/lowlandtech/tinytools</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\core\LowlandTech.TinyTools.Core.csproj" />
+  </ItemGroup>
+
+</Project>
