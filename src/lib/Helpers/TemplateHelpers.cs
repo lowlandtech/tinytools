@@ -65,6 +65,10 @@ public static class TemplateHelpers
         Registry["match"] = (value, arg) => Matches(value, arg);
         Registry["contains"] = (value, arg) => Contains(value, arg);
         Registry["split"] = (value, arg) => Split(value, arg);
+        Registry["where"] = (value, arg) => Where(value, arg);
+        Registry["orderby"] = (value, arg) => OrderBy(value, arg);
+        Registry["groupby"] = (value, arg) => GroupBy(value, arg);
+        Registry["distinct"] = (value, _) => Distinct(value);
     }
 
     /// <summary>
@@ -348,6 +352,137 @@ public static class TemplateHelpers
 
     #endregion
 
+    private static IEnumerable<object?> Items(object? value) =>
+        value is IEnumerable enumerable and not string
+            ? enumerable.Cast<object?>()
+            : [];
+
+    private static object? ReadMember(object? item, string name)
+    {
+        if (item is null) return null;
+        if (item is IDictionary<string, object?> map)
+        {
+            foreach (var pair in map)
+            {
+                if (string.Equals(pair.Key, name, StringComparison.OrdinalIgnoreCase)) return pair.Value;
+            }
+
+            return null;
+        }
+
+        var property = item.GetType().GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+        return property?.GetValue(item);
+    }
+
+    private static bool TryReadMember(object? item, string name, out object? value)
+    {
+        if (item is IDictionary<string, object?>)
+        {
+            value = ReadMember(item, name);
+            return item is IDictionary<string, object?> map
+                && map.Keys.Any(key => string.Equals(key, name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        var property = item?.GetType().GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+        value = property?.GetValue(item);
+        return property is not null;
+    }
+
+    private static bool MatchesPredicate(object? item, string predicate)
+    {
+        var negate = predicate.Contains("!=", StringComparison.Ordinal);
+        var parts = predicate.Split(negate ? "!=" : "==", 2, StringSplitOptions.None);
+        if (parts.Length != 2) throw new ArgumentException($"where expects 'path==value', received '{predicate}'.");
+
+        var actual = ReadMember(item, parts[0].Trim());
+        var expected = parts[1].Trim().Trim('"', '\'');
+        var equal = string.Equals(Text(actual), expected, StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(Convert.ToString(actual, CultureInfo.InvariantCulture), expected, StringComparison.OrdinalIgnoreCase);
+        return negate ? !equal : equal;
+    }
+
+    private static string Text(object? value) => value switch
+    {
+        null => string.Empty,
+        bool flag => flag ? "true" : "false",
+        _ => Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty,
+    };
+
+    private static List<object?> Where(object? value, string? argument)
+    {
+        if (string.IsNullOrWhiteSpace(argument))
+            throw new ArgumentException("where requires a 'path==value' predicate.", nameof(argument));
+
+        return Items(value).Where(item => MatchesPredicate(item, argument)).ToList();
+    }
+
+    private static List<object?> OrderBy(object? value, string? argument)
+    {
+        if (string.IsNullOrWhiteSpace(argument))
+            throw new ArgumentException("orderby requires a member path.", nameof(argument));
+
+        var path = argument.Trim();
+        var items = Items(value).ToList();
+        foreach (var item in items)
+        {
+            if (!TryReadMember(item, path, out _))
+            {
+                throw new ArgumentException($"orderby: '{path}' is not a member of every item.");
+            }
+        }
+
+        // LINQ ordering is stable, so equal keys keep their source order.
+        return items
+            .OrderBy(item => ReadMember(item, path), Comparer<object?>.Create(Compare))
+            .ToList();
+    }
+
+    private static int Compare(object? left, object? right)
+    {
+        if (left is null && right is null) return 0;
+        if (left is null) return -1;
+        if (right is null) return 1;
+
+        if (left is IComparable comparable && left.GetType() == right.GetType())
+        {
+            return comparable.CompareTo(right);
+        }
+
+        return string.CompareOrdinal(Text(left), Text(right));
+    }
+
+    private static List<IGrouping<object?, object?>> GroupBy(object? value, string? argument)
+    {
+        if (string.IsNullOrWhiteSpace(argument))
+            throw new ArgumentException("groupby requires a member path.", nameof(argument));
+
+        var path = argument.Trim();
+        var items = Items(value).ToList();
+        foreach (var item in items)
+        {
+            if (!TryReadMember(item, path, out _))
+            {
+                throw new ArgumentException($"groupby: '{path}' is not a member of every item.");
+            }
+        }
+
+        // Grouping keeps the first-seen key order and the source order inside each group.
+        return items
+            .GroupBy(item => ReadMember(item, path))
+            .Select(group => (IGrouping<object?, object?>)group)
+            .ToList();
+    }
+
+    private static List<object?> Distinct(object? value)
+    {
+        var seen = new List<object?>();
+        foreach (var item in Items(value))
+        {
+            if (!seen.Any(existing => Equals(existing, item))) seen.Add(item);
+        }
+
+        return seen;
+    }
     #region Conditional Helpers
 
     private static bool IsEmpty(object? value)

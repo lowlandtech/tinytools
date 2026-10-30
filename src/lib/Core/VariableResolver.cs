@@ -380,6 +380,12 @@ public partial class VariableResolver
     /// </summary>
     public object? ResolveExpression(string expression, ToolContext context)
     {
+        // An expression may chain pipe helpers, exactly as a ${...} token does.
+        if (expression.Contains('|'))
+        {
+            return ResolveExpressionWithPipes(expression, context);
+        }
+
         // Handle Context.Get("key") syntax
         if (expression.StartsWith("Context.Get(", StringComparison.OrdinalIgnoreCase))
         {
