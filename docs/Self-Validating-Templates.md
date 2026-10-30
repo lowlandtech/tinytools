@@ -2,7 +2,7 @@
 
 ## Why Templates Validate Themselves
 
-The `ITemplate` interface has a unique design: **each template carries its own test case**. This isn't just for convenience—it's a deliberate architectural decision that solves real problems in large-scale code generation.
+The `ITemplate` interface has a unique design: **each template carries its own test case**. This isn't just for convenienceâ€”it's a deliberate architectural decision that solves real problems in large-scale code generation.
 
 ### The Problem
 
@@ -182,7 +182,7 @@ var result = template.ValidateDetailed();
 
 ### 5. **Graceful Error Handling**
 
-The validation never throws—it catches all exceptions and returns a result:
+The validation never throwsâ€”it catches all exceptions and returns a result:
 
 ```csharp
 // Even with invalid JSON, you get a proper result

@@ -74,7 +74,7 @@ Set `ExpectedContent` to `string.Empty` to disable strict content matching while
 
 ## Test Results
 
-**Before:** 192 failures (64 per framework × 3 frameworks)
+**Before:** 192 failures (64 per framework Ã— 3 frameworks)
 **After:** Should be 0 failures
 
 ## What Tests Now Validate
