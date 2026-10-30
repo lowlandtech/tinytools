@@ -1,63 +1,43 @@
 namespace LowlandTech.TinyTools.Tests.SPEC3302.Validation.US03.Examples;
 
-/// <summary>
-/// Tests template self-validation with CSharpClassTemplate.
-/// </summary>
 [Trait(Spec.SPEC, "3302")]
 [Trait(Spec.SC, "01")]
 [UserStory("03", "Template validation validates example templates")]
-public class WhenValidatingCSharpClassTemplate : TinyToolsScenario<CSharpClassTemplate>
+public sealed class SC01_ValidatesCSharpClassTemplate : TinyToolsScenario<CSharpClassTemplate>
 {
-    private bool _validationResult;
-    private TemplateValidationResult? _detailedResult;
+    private bool _validation;
+    private TemplateValidationResult _detailed = null!;
 
-    protected override CSharpClassTemplate For()
+    protected override CSharpClassTemplate For() => new();
+
+    [Given("the example C# class template")]
+    protected override void Given()
     {
-        return new CSharpClassTemplate();
     }
 
-    [When("Execute test action")]
+    [When("the template is validated and then validated with detail")]
     protected override void When()
     {
         base.When();
-        _validationResult = Sut.Validate();
-        _detailedResult = Sut.ValidateDetailed();
+        _validation = Sut.Validate();
+        _detailed = Sut.ValidateDetailed();
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Pass Validation")]
-    [Fact]
-    public void ItShouldPassValidation()
-    {
-        ArrangeAndAct();
-        _validationResult.Should().BeTrue();
-    }
+    public SC01_ValidatesCSharpClassTemplate() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Have Valid Detailed Result")]
-    [Fact]
-    public void ItShouldHaveValidDetailedResult()
-    {
-        ArrangeAndAct();
-        _detailedResult.Should().NotBeNull();
-        _detailedResult!.IsValid.Should().BeTrue();
-    }
+    [Then("the validation should be accepted")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_PassesValidation() => _validation.Should().BeTrue();
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Have No Errors")]
-    [Fact]
-    public void ItShouldHaveNoErrors()
-    {
-        ArrangeAndAct();
-        _detailedResult!.ErrorMessage.Should().BeNullOrEmpty();
-    }
+    [Then("the detailed validation should be accepted")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_HasValidDetailedResult() => new { Present = _detailed is not null, IsValid = _detailed!.IsValid }.Should().BeEquivalentTo(new { Present = true, IsValid = true });
 
-    [Trait(Spec.UAC, "04")]
-    [Then("it Should Have No Differences")]
-    [Fact]
-    public void ItShouldHaveNoDifferences()
-    {
-        ArrangeAndAct();
-        _detailedResult!.Differences.Should().BeNullOrEmpty();
-    }
+    [Then("the validation error should be null")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_HasNoErrors() => _detailed!.ErrorMessage.Should().BeNullOrEmpty();
+
+    [Then("the validation differences should be null")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_HasNoDifferences() => _detailed!.Differences.Should().BeNullOrEmpty();
 }
