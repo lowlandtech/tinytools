@@ -10,17 +10,19 @@ namespace LowlandTech.TinyTools.Tests.SPEC3308.Documentation.US01.PublicApi;
 [Trait(Spec.SPEC, "3308")]
 [Trait(Spec.SC, "01")]
 [UserStory("01", "The documented API is the API a consumer gets")]
-public sealed class WhenReadingTheDocumentedApi : IAsyncLifetime
+public sealed class SC01_DocumentedSamplesCompile : IAsyncLifetime
 {
     private string _renderOutput = string.Empty;
     private int _missingHelpers;
     private int _documentsNamingToolContext;
+    private IReadOnlyList<string> _documented = [];
 
     [Given("the repository documentation and the engine's registered helpers")]
     private void Given()
     {
         _documentsNamingToolContext = Documents()
             .Count(file => File.ReadAllText(file).Contains("ToolContext", StringComparison.Ordinal));
+        _documented = DocumentedHelpers().ToList();
     }
 
     [When("the documented samples run and the helper table is compared with the registry")]
@@ -32,7 +34,7 @@ public sealed class WhenReadingTheDocumentedApi : IAsyncLifetime
         _renderOutput = new TinyTemplateEngine().Render("Hello ${FirstName} ${LastName}!", context);
 
         var registered = TemplateHelpers.Helpers.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
-        _missingHelpers = DocumentedHelpers().Count(helper => !registered.Contains(helper));
+        _missingHelpers = _documented.Count(helper => !registered.Contains(helper));
     }
 
     public ValueTask InitializeAsync()
@@ -44,25 +46,21 @@ public sealed class WhenReadingTheDocumentedApi : IAsyncLifetime
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
-    [Then("the documents should not contain tool context")]
-    [Trait("UAC", "01")]
-    [Fact]
-    public void ItShouldNotNameToolContextAnywhere() => _documentsNamingToolContext.Should().Be(0);
+    [Then("the tool context mentions should have count 0")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_NoDocumentMentionsToolContext() => _documentsNamingToolContext.Should().Be(0);
 
-    [Then("the quick start should be Hello John Smith")]
-    [Trait("UAC", "02")]
-    [Fact]
-    public void ItShouldRenderTheQuickStartAsDocumented() => _renderOutput.Should().Be("Hello John Smith!");
+    [Then("the quick start should contain Hello John Smith")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_QuickStartRendersAsDocumented() => _renderOutput.Should().Contain("Hello John Smith");
 
-    [Then("the documented helpers should have count 27")]
-    [Trait("UAC", "03")]
-    [Fact]
-    public void ItShouldDocumentEveryRegisteredHelper() => _missingHelpers.Should().Be(0);
+    [Then("the missing helpers should have count 0")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_EveryDocumentedHelperIsRegistered() => _missingHelpers.Should().Be(0);
 
     [Then("the readme should contain kebabcase")]
-    [Trait("UAC", "04")]
-    [Fact]
-    public void ItShouldDocumentTheThreeAddedHelpers() => DocumentedHelpers().Should().Contain(["kebabcase", "snakecase", "titlecase"]);
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_TheThreeAddedHelpersAreDocumented() => _documented.Should().Contain(["kebabcase", "snakecase", "titlecase"]);
 
     private static IEnumerable<string> Documents()
     {
