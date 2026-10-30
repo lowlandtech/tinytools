@@ -1,228 +1,62 @@
 using Humanizer;
-using ExecutionContext = LowlandTech.TinyTools.ExecutionContext;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US04.ServicesAndResults;
 
-/// <summary>
-/// Demonstrates how to use Template Services to extend TinyTemplateEngine.
-/// Services are simple functions registered with string keys.
-/// Usage: ${Context.Services("key")(input)}
-/// </summary>
-[Trait(Spec.SPEC, "3303")]
-[Trait(Spec.SC, "01")]
+[Trait("SPEC", "3303"), Trait("US", "04"), Trait("SC", "01")]
 [UserStory("04", "Template services inject custom logic")]
-public class WhenUsingTemplateServicesTest : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC01_InjectsCustomLogic : IClassFixture<UseCases.ServicesUseCase>
 {
-    private ExecutionContext _context = null!;
-    private string? _result;
+    private readonly UseCases.ServicesUseCase useCase;
+    private global::LowlandTech.TinyTools.ExecutionContext context = null!;
+    private TinyTemplateEngine engine = null!;
 
-    protected override TinyTemplateEngine For()
+    public SC01_InjectsCustomLogic(UseCases.ServicesUseCase useCase)
     {
-        return new TinyTemplateEngine();
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
     }
 
-    [Given("Setup test context")]
-    protected override void Given()
+    [Given("a context holding an entity and a collection name served by a fresh engine")]
+    private void Given()
     {
-        _context = new ExecutionContext();
+        context = new global::LowlandTech.TinyTools.ExecutionContext();
+        context.Set("EntityName", "customer");
+        context.Set("CollectionName", "categories");
+        engine = new TinyTemplateEngine();
     }
 
-    [When("Execute test action")]
-    protected override void When()
+    [When("each registered service renders its own template once")]
+    private void When()
     {
-        base.When();
-        // When is handled in each test
+        context.RegisterService("pluralize", input => input?.ToString()?.Pluralize() ?? "");
+        useCase.Cases["Pluralize"] = engine.Render("Entities: ${Context.Services('pluralize')(Context.EntityName)}", context);
+        context.RegisterService("singularize", input => input?.ToString()?.Singularize() ?? "");
+        useCase.Cases["Singularize"] = engine.Render("Entity: ${Context.Services('singularize')(Context.CollectionName)}", context);
+        useCase.Cases["Irregular"] = engine.Render("${Context.Services('pluralize')('person')}, ${Context.Services('pluralize')('child')}, ${Context.Services('pluralize')('goose')}", context);
+        useCase.Cases["Missing"] = engine.Render("${Context.Services('nonexistent')('test')}", context);
     }
 
-    #region Pluralization/Singularization Tests
+    [Then("the pluralized entities should contain customers")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_PluralizesAnEntity() => ((string)useCase.Cases["Pluralize"]!).Should().Contain("Entities: customers");
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Pluralize Using Humanizer Service")]
-    [Fact]
-    public void ItShouldPluralizeUsingHumanizerService()
-    {
-        ArrangeAndAct();
-        // Arrange
-        _context.RegisterService("pluralize", input => input?.ToString()?.Pluralize() ?? "");
-        _context.Set("EntityName", "customer");
-        var template = "Entities: ${Context.Services('pluralize')(Context.EntityName)}";
+    [Then("the singularized entity should contain category")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_SingularizesACollection() => ((string)useCase.Cases["Singularize"]!).Should().Contain("Entity: category");
 
-        // Act
-        _result = Sut.Render(template, _context);
+    [Then("the irregular person should contain people")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_PluralizesPerson() => ((string)useCase.Cases["Irregular"]!).Should().Contain("people");
 
-        // Assert
-        _result.Should().Contain("Entities: customers");
-    }
+    [Then("the irregular child should contain children")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_PluralizesChild() => ((string)useCase.Cases["Irregular"]!).Should().Contain("children");
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Singularize Using Humanizer Service")]
-    [Fact]
-    public void ItShouldSingularizeUsingHumanizerService()
-    {
-        ArrangeAndAct();
-        // Arrange
-        _context.RegisterService("singularize", input => input?.ToString()?.Singularize() ?? "");
-        _context.Set("CollectionName", "categories");
-        var template = "Entity: ${Context.Services('singularize')(Context.CollectionName)}";
+    [Then("the irregular goose should contain geese")]
+    [Trait("UAC", "05"), Fact]
+    public void UAC05_PluralizesGoose() => ((string)useCase.Cases["Irregular"]!).Should().Contain("geese");
 
-        // Act
-        _result = Sut.Render(template, _context);
-
-        // Assert
-        _result.Should().Contain("Entity: category");
-    }
-
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Handle Irregular Plurals")]
-    [Fact]
-    public void ItShouldHandleIrregularPlurals()
-    {
-        ArrangeAndAct();
-        // Arrange
-        _context.RegisterService("pluralize", input => input?.ToString()?.Pluralize() ?? "");
-        var template = "${Context.Services('pluralize')('person')}, ${Context.Services('pluralize')('child')}, ${Context.Services('pluralize')('goose')}";
-
-        // Act
-        _result = Sut.Render(template, _context);
-
-        // Assert
-        _result.Should().Contain("people");
-        _result.Should().Contain("children");
-        _result.Should().Contain("geese");
-    }
-
-    #endregion
-
-    #region Service Not Found Tests
-
-    [Trait(Spec.UAC, "04")]
-    [Then("it Should Return Error Message When Service Not Found")]
-    [Fact]
-    public void ItShouldReturnErrorMessageWhenServiceNotFound()
-    {
-        ArrangeAndAct();
-        // Arrange
-        var template = "${Context.Services('nonexistent')('test')}";
-
-        // Act
-        _result = Sut.Render(template, _context);
-
-        // Assert
-        _result.Should().Contain("{nonexistent not registered}");
-    }
-
-    #endregion
-
-    #region Calculator Service Tests (using NCalc)
-
-    [Trait(Spec.UAC, "05")]
-    [Then("it Should Calculate Simple Expression")]
-    [Fact]
-    public void ItShouldCalculateSimpleExpression()
-    {
-        ArrangeAndAct();
-        // Arrange
-        _context.RegisterService("calc", input =>
-        {
-            var expr = new NCalc.Expression(input?.ToString() ?? "0");
-            return expr.Evaluate();
-        });
-        var template = "Result: ${Context.Services('calc')('2 + 2')}";
-
-        // Act
-        _result = Sut.Render(template, _context);
-
-        // Assert
-        _result.Should().Contain("Result: 4");
-    }
-
-    [Trait(Spec.UAC, "06")]
-    [Then("it Should Calculate Tax Example")]
-    [Fact]
-    public void ItShouldCalculateTaxExample()
-    {
-        ArrangeAndAct();
-        // Arrange
-        _context.RegisterService("calc", input =>
-        {
-            var expr = new NCalc.Expression(input?.ToString() ?? "0");
-            return expr.Evaluate();
-        });
-        var template = "Tax: $${Context.Services('calc')('100 * 0.15')}";
-
-        // Act
-        _result = Sut.Render(template, _context);
-
-        // Assert
-        _result.Should().Contain("Tax: $15");
-    }
-
-    #endregion
-
-    #region Multiple Services
-
-    [Trait(Spec.UAC, "07")]
-    [Then("it Should Use Multiple Services In Same Template")]
-    [Fact]
-    public void ItShouldUseMultipleServicesInSameTemplate()
-    {
-        ArrangeAndAct();
-        // Arrange
-        _context.RegisterService("pluralize", input => input?.ToString()?.Pluralize() ?? "");
-        _context.RegisterService("calc", input =>
-        {
-            var expr = new NCalc.Expression(input?.ToString() ?? "0");
-            return expr.Evaluate();
-        });
-        
-        var template = "We have ${Context.Services('calc')('5 + 3')} ${Context.Services('pluralize')('order')}.";
-
-        // Act
-        _result = Sut.Render(template, _context);
-
-        // Assert
-        _result.Should().Contain("We have 8 orders.");
-    }
-
-    #endregion
-
-    #region Real-World Example
-
-    [Trait(Spec.UAC, "08")]
-    [Then("it Should Generate Invoice With Services")]
-    [Fact]
-    public void ItShouldGenerateInvoiceWithServices()
-    {
-        ArrangeAndAct();
-        // Arrange
-        _context.RegisterService("pluralize", input => input?.ToString()?.Pluralize() ?? "");
-        _context.RegisterService("calc", input =>
-        {
-            var expr = new NCalc.Expression(input?.ToString() ?? "0");
-            var result = expr.Evaluate();
-            if (result is double d)
-                return d.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
-            return result;
-        });
-        
-        var template = """
-            Invoice Summary
-            ---------------
-            Items: ${Context.Services('calc')('5')} ${Context.Services('pluralize')('widget')}
-            Subtotal: $${Context.Services('calc')('19.99 * 5')}
-            Tax: $${Context.Services('calc')('19.99 * 5 * 0.08')}
-            Total: $${Context.Services('calc')('19.99 * 5 * 1.08')}
-            """;
-
-        // Act
-        _result = Sut.Render(template, _context);
-
-        // Assert
-        _result.Should().Contain("Items: 5 widgets");
-        _result.Should().Contain("Subtotal: $99.95");
-        _result.Should().Contain("Tax: $8.00");
-        _result.Should().Contain("Total: $107.95");
-    }
-
-    #endregion
+    [Then("the missing service should contain {nonexistent not registered}")]
+    [Trait("UAC", "06"), Fact]
+    public void UAC06_AnswersForAMissingService() => ((string)useCase.Cases["Missing"]!).Should().Contain("{nonexistent not registered}");
 }

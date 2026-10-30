@@ -1,55 +1,39 @@
 namespace LowlandTech.TinyTools.Tests.SPEC3303.Infrastructure.US04.ServicesAndResults;
 
-/// <summary>
-/// Tests template base with custom engine.
-/// </summary>
-[Trait(Spec.SPEC, "3303")]
-[Trait(Spec.SC, "03")]
+[Trait("SPEC", "3303"), Trait("US", "04"), Trait("SC", "03")]
 [UserStory("04", "Template services support custom engines")]
-public class WhenUsingTemplateWithCustomEngine : TinyToolsScenario<CustomEngineTemplate>
+public sealed class SC03_SupportsCustomEngines : IClassFixture<UseCases.ServicesUseCase>
 {
-    private TemplateResult? _result;
+    private readonly UseCases.ServicesUseCase useCase;
+    private CustomEngineTemplate template = null!;
+    private SimpleData data = null!;
 
-    protected override CustomEngineTemplate For()
+    public SC03_SupportsCustomEngines(UseCases.ServicesUseCase useCase)
     {
-        var customEngine = new TinyTemplateEngine();
-        return new CustomEngineTemplate(customEngine);
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
     }
 
-    [When("Execute test action")]
-    protected override void When()
+    [Given("a template constructed with an explicit engine and a named data object")]
+    private void Given()
     {
-        base.When();
-        _result = Sut.Render(new SimpleData { Name = "Custom" });
+        template = new CustomEngineTemplate(new TinyTemplateEngine());
+        data = new SimpleData { Name = "Custom" };
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Render With Custom Engine")]
-    [Fact]
-    public void ItShouldRenderWithCustomEngine()
+    [When("the template renders the data once through its custom engine")]
+    private void When()
     {
-        ArrangeAndAct();
-        _result.Should().NotBeNull();
-        _result!.Content.Should().Contain("Custom");
-    }
-}
-
-/// <summary>
-/// Template that accepts custom engine for testing.
-/// </summary>
-public class CustomEngineTemplate : TemplateBase
-{
-    public CustomEngineTemplate(ITemplateEngine engine) : base(engine)
-    {
+        var rendered = template.Render(data);
+        useCase.Cases["Result"] = rendered;
+        useCase.Cases["Content"] = rendered.Content;
     }
 
-    public override string TemplatePath => "test.txt";
-    public override string TemplateNamespace => "Test";
-    public override string TemplateContent => "Name: ${Context.Name}";
-    public override Type DataType => typeof(SimpleData);
-}
+    [Then("the rendered result should not be null")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_RendersAResult() => useCase.Cases["Result"].Should().NotBeNull();
 
-public record SimpleData
-{
-    public string Name { get; set; } = string.Empty;
+    [Then("the rendered content should contain Custom")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_RendersTheCustomName() => ((string)useCase.Cases["Content"]!).Should().Contain("Custom");
 }
