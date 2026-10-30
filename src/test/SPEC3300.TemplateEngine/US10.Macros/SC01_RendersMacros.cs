@@ -40,23 +40,27 @@ public sealed class SC01_RendersMacros : IClassFixture<UseCases.MacrosUseCase>
         useCase.Cases["TooFew"] = Thrown(engine, "@macro pair(a, b) { ${a}${b} }\n@pair(\"x\")", context);
         useCase.Cases["TooMany"] = Thrown(engine, "@macro one(a) { ${a} }\n@one(\"x\", \"y\")", context);
         useCase.Cases["Unknown"] = Thrown(engine, "@macro known(a) { ${a} }\n@missing(\"x\")", context);
-        useCase.Cases["Recursion"] = Thrown(engine, "@macro loop(a) { @loop(\"x\") }\n@loop(\"x\")", context);
-        useCase.Cases["Indirect"] = Thrown(engine, "@macro ping(a) { @pong(\"x\") }\n@macro pong(a) { @ping(\"x\") }\n@ping(\"x\")", context);
+        useCase.Cases["Recursion"] = Capture(engine, "@macro loop(a) { @loop(\"x\") }\n@loop(\"x\")", context);
+        useCase.Cases["Indirect"] = Capture(engine, "@macro ping(a) { @pong(\"x\") }\n@macro pong(a) { @ping(\"x\") }\n@ping(\"x\")", context);
     }
 
     private static string Thrown(TinyTemplateEngine engine, string template, ExecutionContext context)
     {
-        try
-        {
-            engine.Render(template, context);
-            return "no-throw";
-        }
-        catch (InvalidOperationException error)
-        {
-            return error.Message;
-        }
+        try { engine.Render(template, context); return "no-throw"; }
+        catch (InvalidOperationException error) { return error.Message; }
     }
 
+    private static UseCases.RecursionCapture Capture(TinyTemplateEngine engine, string template, ExecutionContext context)
+    {
+        try { engine.Render(template, context); return new("no-throw", 0, false, false, false); }
+        catch (InvalidOperationException error)
+        {
+            var message = error.Message; var chain = message[(message.IndexOf(':') + 1)..].Trim();
+            return new(error.GetType().Name, chain.Split(" -> ", StringSplitOptions.RemoveEmptyEntries).Length,
+                message.Contains("Macro recursion limit exceeded", StringComparison.Ordinal),
+                chain.Contains("loop -> loop", StringComparison.Ordinal), chain.Contains("ping -> pong -> ping", StringComparison.Ordinal));
+        }
+    }
     [Then("the macro output should be exact")]
     [Trait("UAC", "01"), Fact]
     public void UAC01_SubstitutesEachParameter() => ((string)useCase.Cases["Macro"]!).Should().Be("\n Hello Ada! ");
@@ -81,11 +85,7 @@ public sealed class SC01_RendersMacros : IClassFixture<UseCases.MacrosUseCase>
     [Trait("UAC", "05"), Fact]
     public void UAC05_NamesTheUnknownMacro() => ((string)useCase.Cases["Unknown"]!).Should().Contain("Macro 'missing' is not defined");
 
-    [Then("the recursion message should contain the direct chain")]
+    [Then("the recursion result should be exact")]
     [Trait("UAC", "07"), Fact]
-    public void UAC07_StopsDirectRecursion() => ((string)useCase.Cases["Recursion"]!).Should().Contain("loop -> loop");
-
-    [Then("the indirect message should contain the full chain")]
-    [Trait("UAC", "08"), Fact]
-    public void UAC08_StopsIndirectRecursion() => ((string)useCase.Cases["Indirect"]!).Should().Contain("ping -> pong -> ping");
+    public void UAC07_StopsRecursionAtTheDocumentedLimit() => $"{useCase.Cases["Recursion"]}|{useCase.Cases["Indirect"]}".Should().Be("InvalidOperationException:32:True:True:False|InvalidOperationException:32:True:False:True");
 }

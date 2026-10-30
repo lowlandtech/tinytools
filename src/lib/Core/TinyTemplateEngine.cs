@@ -249,12 +249,14 @@ public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
                     $"Macro '{name}' expects {macro.Parameters.Length} argument(s) but received {arguments.Count}.");
             }
 
-            // The chain records the macros currently expanding, in order, so a repeat is a
-            // named cycle naming the whole path rather than a bare depth-limit message.
-            if (chain.Contains(name, StringComparer.Ordinal))
+            // The chain records the macros currently expanding, in order. The refusal fires at
+            // the documented active-call limit and reports the whole chain, so a caller learns
+            // both why it stopped and which macros were looping.
+            if (chain.Count >= MacroRecursionLimit)
             {
-                var cycle = string.Join(" -> ", chain.Concat([name]));
-                throw new InvalidOperationException($"Macro recursion cycle detected: {cycle}");
+                var active = string.Join(" -> ", chain);
+                throw new InvalidOperationException(
+                    $"Macro recursion limit exceeded ({MacroRecursionLimit} active calls): {active}");
             }
 
             var child = context.CreateChild($"macro:{name}");
