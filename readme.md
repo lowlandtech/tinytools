@@ -313,9 +313,15 @@ Transform values using the pipe syntax: `${Context.Value | helper}` or `${Contex
 |--------|---------|--------|
 | `number` | `${Context.Value \| number}` | `1,234` |
 | `format:N2` | `${Context.Price \| format:N2}` | `1,234.57` |
-| `format:C` | `${Context.Price \| format:C}` | `$1,234.57` |
-| `format:P0` | `${Context.Rate \| format:P0}` | `86%` |
-| `round:N` | `${Context.Pi \| round:2}` | `3.14` |
+| `format:C` | `${Context.Price \| format:C}` | `¤1,234.57` |
+| `format:P0` | `${Context.Rate \| format:P0}` | `86 %` |
+| `round:N` | `${Context.Pi \| round:2}` | `3.14` on an invariant culture |
+
+`format` and `number` format with the **invariant culture**, so `1,234.57` and the
+invariant currency symbol `¤` are what you get regardless of the machine's locale, and the
+invariant percent pattern carries a space (`86 %`). `round` is the exception: it truncates
+with the **current culture**, so the same `round:2` renders `3,14` on a Dutch machine.
+
 | `floor` | `${Context.Value \| floor}` | `3` |
 | `ceiling` | `${Context.Value \| ceiling}` | `4` |
 
