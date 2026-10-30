@@ -42,8 +42,10 @@ public sealed class SC01_ValidatesTemplateSyntax : IClassFixture<UseCases.PreRen
     private void When()
     {
         // The counting helper only exists to prove validation never runs it, so the
-        // shared registry is left exactly as this scenario found it.
-        TemplateHelpers.Helpers.Remove("scratchcount");
+        // shared registry is left exactly as this scenario found it. Unregister is the
+        // supported way to undo a process-wide registration now that the registry is
+        // read-only, and per-render behavior belongs in ExecutionContext.RegisterService.
+        TemplateHelpers.Unregister("scratchcount");
     }
 
     [Then("the valid template result should be true")]

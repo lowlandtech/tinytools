@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using System.Globalization;
 
@@ -10,51 +11,61 @@ namespace LowlandTech.TinyTools;
 /// </summary>
 public static class TemplateHelpers
 {
-    public static readonly Dictionary<string, Func<object?, string?, object?>> Helpers = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly ConcurrentDictionary<string, Func<object?, string?, object?>> Registry = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// The registered helpers, exposed read-only so a template cannot mutate
+    /// process-wide helper state while other renders run. Extend behavior per render
+    /// through <see cref="ExecutionContext.RegisterService"/>; <see cref="Register"/>
+    /// stays for process-wide additions and <see cref="Unregister"/> undoes one.
+    /// </summary>
+    public static IReadOnlyDictionary<string, Func<object?, string?, object?>> Helpers => Registry;
+
+    static TemplateHelpers()
     {
         // String helpers
-        ["upper"] = (value, _) => value?.ToString()?.ToUpperInvariant(),
-        ["lower"] = (value, _) => value?.ToString()?.ToLowerInvariant(),
-        ["trim"] = (value, _) => value?.ToString()?.Trim(),
-        ["capitalize"] = (value, _) => Capitalize(value?.ToString()),
-        ["camelcase"] = (value, _) => ToCamelCase(value?.ToString()),
-        ["pascalcase"] = (value, _) => ToPascalCase(value?.ToString()),
-        ["kebabcase"] = (value, _) => ToKebabCase(value?.ToString()),
-        ["snakecase"] = (value, _) => ToSnakeCase(value?.ToString()),
-        ["titlecase"] = (value, _) => ToTitleCase(value?.ToString()),
-        ["truncate"] = (value, arg) => Truncate(value?.ToString(), arg),
-        ["replace"] = (value, arg) => Replace(value?.ToString(), arg),
-        ["padleft"] = (value, arg) => PadLeft(value?.ToString(), arg),
-        ["padright"] = (value, arg) => PadRight(value?.ToString(), arg),
+        Registry["upper"] = (value, _) => value?.ToString()?.ToUpperInvariant();
+        Registry["lower"] = (value, _) => value?.ToString()?.ToLowerInvariant();
+        Registry["trim"] = (value, _) => value?.ToString()?.Trim();
+        Registry["capitalize"] = (value, _) => Capitalize(value?.ToString());
+        Registry["camelcase"] = (value, _) => ToCamelCase(value?.ToString());
+        Registry["pascalcase"] = (value, _) => ToPascalCase(value?.ToString());
+        Registry["kebabcase"] = (value, _) => ToKebabCase(value?.ToString());
+        Registry["snakecase"] = (value, _) => ToSnakeCase(value?.ToString());
+        Registry["titlecase"] = (value, _) => ToTitleCase(value?.ToString());
+        Registry["truncate"] = (value, arg) => Truncate(value?.ToString(), arg);
+        Registry["replace"] = (value, arg) => Replace(value?.ToString(), arg);
+        Registry["padleft"] = (value, arg) => PadLeft(value?.ToString(), arg);
+        Registry["padright"] = (value, arg) => PadRight(value?.ToString(), arg);
 
         // Date helpers
-        ["format"] = (value, arg) => Format(value, arg),
-        ["date"] = (value, arg) => FormatDate(value, arg),
+        Registry["format"] = (value, arg) => Format(value, arg);
+        Registry["date"] = (value, arg) => FormatDate(value, arg);
 
         // Number helpers
-        ["number"] = (value, arg) => FormatNumber(value, arg),
-        ["round"] = (value, arg) => Round(value, arg),
-        ["floor"] = (value, _) => Floor(value),
-        ["ceiling"] = (value, _) => Ceiling(value),
+        Registry["number"] = (value, arg) => FormatNumber(value, arg);
+        Registry["round"] = (value, arg) => Round(value, arg);
+        Registry["floor"] = (value, _) => Floor(value);
+        Registry["ceiling"] = (value, _) => Ceiling(value);
 
         // Collection helpers
-        ["count"] = (value, _) => Count(value),
-        ["first"] = (value, _) => First(value),
-        ["last"] = (value, _) => Last(value),
-        ["join"] = (value, arg) => Join(value, arg),
-        ["reverse"] = (value, _) => Reverse(value),
+        Registry["count"] = (value, _) => Count(value);
+        Registry["first"] = (value, _) => First(value);
+        Registry["last"] = (value, _) => Last(value);
+        Registry["join"] = (value, arg) => Join(value, arg);
+        Registry["reverse"] = (value, _) => Reverse(value);
 
         // Conditional helpers
-        ["default"] = (value, arg) => IsEmpty(value) ? arg : value,
-        ["ifempty"] = (value, arg) => IsEmpty(value) ? arg : value,
-        ["yesno"] = (value, arg) => YesNo(value, arg),
+        Registry["default"] = (value, arg) => IsEmpty(value) ? arg : value;
+        Registry["ifempty"] = (value, arg) => IsEmpty(value) ? arg : value;
+        Registry["yesno"] = (value, arg) => YesNo(value, arg);
 
-        // Text helper
-        ["slice"] = (value, arg) => Slice(value, arg),
-        ["match"] = (value, arg) => Matches(value, arg),
-        ["contains"] = (value, arg) => Contains(value, arg),
-        ["split"] = (value, arg) => Split(value, arg),
-    };
+        // Text helpers
+        Registry["slice"] = (value, arg) => Slice(value, arg);
+        Registry["match"] = (value, arg) => Matches(value, arg);
+        Registry["contains"] = (value, arg) => Contains(value, arg);
+        Registry["split"] = (value, arg) => Split(value, arg);
+    }
 
     /// <summary>
     /// Applies a helper to a value.
@@ -65,7 +76,7 @@ public static class TemplateHelpers
     /// <returns>The transformed value.</returns>
     public static object? Apply(object? value, string helperName, string? argument = null)
     {
-        if (Helpers.TryGetValue(helperName, out var helper))
+        if (Registry.TryGetValue(helperName, out var helper))
         {
             return helper(value, argument);
         }
@@ -75,17 +86,26 @@ public static class TemplateHelpers
     }
 
     /// <summary>
-    /// Registers a custom helper.
+    /// Registers a process-wide custom helper. Prefer
+    /// <see cref="ExecutionContext.RegisterService"/> for per-render behavior, which
+    /// cannot change what other renders see.
+    /// </summary>
+    public static void Unregister(string name) => Registry.TryRemove(name, out _);
+
+    /// <summary>
+    /// Registers a process-wide custom helper. Prefer
+    /// <see cref="ExecutionContext.RegisterService"/> for per-render behavior, which
+    /// cannot change what other renders in the process see.
     /// </summary>
     public static void Register(string name, Func<object?, string?, object?> helper)
     {
-        Helpers[name] = helper;
+        Registry[name] = helper;
     }
 
     /// <summary>
     /// Checks if a helper exists.
     /// </summary>
-    public static bool Exists(string name) => Helpers.ContainsKey(name);
+    public static bool Exists(string name) => Registry.ContainsKey(name);
 
     #region String Helpers
 

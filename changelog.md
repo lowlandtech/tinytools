@@ -1,3 +1,36 @@
+# Helper registry is read-only
+
+## Breaking Changes
+
+* `TemplateHelpers.Helpers` is now an `IReadOnlyDictionary<string, Func<object?, string?, object?>>`
+  instead of a mutable `Dictionary`.
+  - Assignments such as `TemplateHelpers.Helpers["name"] = helper` no longer compile.
+  - The registry itself is a `ConcurrentDictionary` internally, so concurrent renders
+    can no longer observe a helper table being mutated mid-render.
+
+## Migration Guide
+
+**Process-wide helper (same behavior as before):**
+
+```csharp
+TemplateHelpers.Register("shout", (value, _) => value?.ToString()?.ToUpperInvariant() + "!");
+// ...and undo it if it was only needed for one test:
+TemplateHelpers.Unregister("shout");
+```
+
+**Per-render helper (preferred):** register the transformation on the execution
+context so it cannot change what other renders in the process see.
+
+```csharp
+var context = new ExecutionContext();
+context.RegisterService("shout", input => input?.ToString()?.ToUpperInvariant() + "!");
+var text = engine.Render("${Context.Services('shout')('hi')}", context); // HI!
+```
+
+Reading the registry is unchanged: `TemplateHelpers.Helpers.ContainsKey("upper")` and
+`TemplateHelpers.Helpers.Keys` still work.
+
+---
 # 2026.5.31
 ## Variable Syntax Update
 
