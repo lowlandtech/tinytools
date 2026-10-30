@@ -3,9 +3,15 @@ namespace LowlandTech.TinyTools.Tests.SPEC3302.Validation.US01.Validation;
 [Trait(Spec.SPEC, "3302")]
 [Trait(Spec.SC, "02")]
 [UserStory("01", "Template validation checks all templates in registry")]
-public sealed class SC02_HandlesPartialExpectations : TinyToolsScenario<PartialExpectationTemplate>
+public sealed class SC02_HandlesPartialExpectations : TinyToolsScenario<PartialExpectationTemplate>, IClassFixture<UseCases.ValidationUseCase>
 {
-    private TemplateValidationResult _result = null!;
+    private readonly UseCases.ValidationUseCase useCase;
+
+    public SC02_HandlesPartialExpectations(UseCases.ValidationUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override PartialExpectationTemplate For() => new();
 
@@ -18,16 +24,14 @@ public sealed class SC02_HandlesPartialExpectations : TinyToolsScenario<PartialE
     protected override void When()
     {
         base.When();
-        _result = Sut.ValidateDetailed();
+        useCase.Cases["Result"] = Sut.ValidateDetailed();
     }
-
-    public SC02_HandlesPartialExpectations() => ArrangeAndAct();
 
     [Then("the content only validation should be accepted")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_ValidatesContentOnly() => new { _result.IsValid, HasDifferences = _result.Differences is { Count: > 0 } }.Should().BeEquivalentTo(new { IsValid = true, HasDifferences = false });
+    public void UAC01_ValidatesContentOnly() => new { IsValid = ((TemplateValidationResult)useCase.Cases["Result"]!).IsValid, HasDifferences = ((TemplateValidationResult)useCase.Cases["Result"]!).Differences is { Count: > 0 } }.Should().BeEquivalentTo(new { IsValid = true, HasDifferences = false });
 
     [Then("the differences should be null")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_DoesNotValidatePathOrNamespace() => _result.Differences.Should().BeNullOrEmpty();
+    public void UAC02_DoesNotValidatePathOrNamespace() => ((TemplateValidationResult)useCase.Cases["Result"]!).Differences.Should().BeNullOrEmpty();
 }

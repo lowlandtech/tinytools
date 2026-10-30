@@ -3,11 +3,16 @@ namespace LowlandTech.TinyTools.Tests.SPEC3301.Registry.US01.Discovery;
 [Trait(Spec.SPEC, "3301")]
 [Trait(Spec.SC, "06")]
 [UserStory("01", "Template registry discovers templates from assemblies")]
-public sealed class SC06_DiscoversAfterManualRegistration : TinyToolsScenario<TemplateRegistry>
+public sealed class SC06_DiscoversAfterManualRegistration : TinyToolsScenario<TemplateRegistry>, IClassFixture<UseCases.DiscoveryUseCase>
 {
+    private readonly UseCases.DiscoveryUseCase useCase;
     private ComponentTemplate _manualTemplate = null!;
-    private ITemplate? _discovered;
-    private List<string> _componentNames = [];
+
+    public SC06_DiscoversAfterManualRegistration(UseCases.DiscoveryUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TemplateRegistry For()
     {
@@ -30,17 +35,16 @@ public sealed class SC06_DiscoversAfterManualRegistration : TinyToolsScenario<Te
 
         Sut.DiscoverFromAssembly(typeof(ComponentTemplate).Assembly);
 
-        _discovered = Sut.Get("Component");
-        _componentNames = Sut.GetNames().Where(name => name == "Component").ToList();
+        useCase.Cases["ManualTemplate"] = _manualTemplate;
+        useCase.Cases["Discovered"] = Sut.Get("Component");
+        useCase.Cases["ComponentNames"] = Sut.GetNames().Where(name => name == "Component").ToList();
     }
-
-    public SC06_DiscoversAfterManualRegistration() => ArrangeAndAct();
 
     [Then("the manual component registration should be replaced")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_OverwritesManualRegistration() => _discovered.Should().NotBeNull().And.NotBeSameAs(_manualTemplate);
+    public void UAC01_OverwritesManualRegistration() => useCase.Cases["Discovered"].Should().NotBeNull().And.NotBeSameAs(useCase.Cases["ManualTemplate"]);
 
     [Then("the component registration should have count 1")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_KeepsOnlyOneComponentRegistration() => _componentNames.Should().HaveCount(1);
+    public void UAC02_KeepsOnlyOneComponentRegistration() => ((List<string>)useCase.Cases["ComponentNames"]!).Should().HaveCount(1);
 }

@@ -3,9 +3,15 @@ namespace LowlandTech.TinyTools.Tests.SPEC3302.Validation.US01.Validation;
 [Trait(Spec.SPEC, "3302")]
 [Trait(Spec.SC, "05")]
 [UserStory("01", "Template validation checks all templates in registry")]
-public sealed class SC05_ValidatesMixedTemplateTypes : TinyToolsScenario<TemplateRegistry>
+public sealed class SC05_ValidatesMixedTemplateTypes : TinyToolsScenario<TemplateRegistry>, IClassFixture<UseCases.ValidationUseCase>
 {
-    private Dictionary<string, TemplateValidationResult> _results = [];
+    private readonly UseCases.ValidationUseCase useCase;
+
+    public SC05_ValidatesMixedTemplateTypes(UseCases.ValidationUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TemplateRegistry For()
     {
@@ -24,28 +30,26 @@ public sealed class SC05_ValidatesMixedTemplateTypes : TinyToolsScenario<Templat
     protected override void When()
     {
         base.When();
-        _results = Sut.ValidateAll();
+        useCase.Cases["Results"] = Sut.ValidateAll();
     }
-
-    public SC05_ValidatesMixedTemplateTypes() => ArrangeAndAct();
 
     [Then("the validated templates should have count 2")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_ValidatesBothTypes() => _results.Should().HaveCount(2);
+    public void UAC01_ValidatesBothTypes() => ((Dictionary<string, TemplateValidationResult>)useCase.Cases["Results"]!).Should().HaveCount(2);
 
     [Then("the base template should be accepted")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_ValidatesTemplateBaseDerived() => new { Has = _results.ContainsKey("component"), Valid = _results["component"].IsValid }.Should().BeEquivalentTo(new { Has = true, Valid = true });
+    public void UAC02_ValidatesTemplateBaseDerived() => new { Has = ((Dictionary<string, TemplateValidationResult>)useCase.Cases["Results"]!).ContainsKey("component"), Valid = ((Dictionary<string, TemplateValidationResult>)useCase.Cases["Results"]!)["component"].IsValid }.Should().BeEquivalentTo(new { Has = true, Valid = true });
 
     [Then("the simple template should be accepted")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_ValidatesNonTemplateBase() => new { Has = _results.ContainsKey("simple"), Valid = _results["simple"].IsValid }.Should().BeEquivalentTo(new { Has = true, Valid = true });
+    public void UAC03_ValidatesNonTemplateBase() => new { Has = ((Dictionary<string, TemplateValidationResult>)useCase.Cases["Results"]!).ContainsKey("simple"), Valid = ((Dictionary<string, TemplateValidationResult>)useCase.Cases["Results"]!)["simple"].IsValid }.Should().BeEquivalentTo(new { Has = true, Valid = true });
 
     [Then("the base template result should not be null")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_HasDetailedResultForTemplateBase() => _results["component"].ActualResult.Should().NotBeNull();
+    public void UAC04_HasDetailedResultForTemplateBase() => ((Dictionary<string, TemplateValidationResult>)useCase.Cases["Results"]!)["component"].ActualResult.Should().NotBeNull();
 
     [Then("the non base template result should be null")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_HasNoDetailedResultForNonTemplateBase() => _results["simple"].ActualResult.Should().BeNull();
+    public void UAC05_HasNoDetailedResultForNonTemplateBase() => ((Dictionary<string, TemplateValidationResult>)useCase.Cases["Results"]!)["simple"].ActualResult.Should().BeNull();
 }

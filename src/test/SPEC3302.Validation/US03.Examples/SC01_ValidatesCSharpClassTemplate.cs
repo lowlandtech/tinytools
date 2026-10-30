@@ -3,10 +3,15 @@ namespace LowlandTech.TinyTools.Tests.SPEC3302.Validation.US03.Examples;
 [Trait(Spec.SPEC, "3302")]
 [Trait(Spec.SC, "01")]
 [UserStory("03", "Template validation validates example templates")]
-public sealed class SC01_ValidatesCSharpClassTemplate : TinyToolsScenario<CSharpClassTemplate>
+public sealed class SC01_ValidatesCSharpClassTemplate : TinyToolsScenario<CSharpClassTemplate>, IClassFixture<UseCases.ExamplesUseCase>
 {
-    private bool _validation;
-    private TemplateValidationResult _detailed = null!;
+    private readonly UseCases.ExamplesUseCase useCase;
+
+    public SC01_ValidatesCSharpClassTemplate(UseCases.ExamplesUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override CSharpClassTemplate For() => new();
 
@@ -19,25 +24,23 @@ public sealed class SC01_ValidatesCSharpClassTemplate : TinyToolsScenario<CSharp
     protected override void When()
     {
         base.When();
-        _validation = Sut.Validate();
-        _detailed = Sut.ValidateDetailed();
+        useCase.Cases["Validation"] = Sut.Validate();
+        useCase.Cases["Detailed"] = Sut.ValidateDetailed();
     }
-
-    public SC01_ValidatesCSharpClassTemplate() => ArrangeAndAct();
 
     [Then("the validation should be accepted")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_PassesValidation() => _validation.Should().BeTrue();
+    public void UAC01_PassesValidation() => useCase.Cases["Validation"].Should().Be(true);
 
     [Then("the detailed validation should be accepted")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_HasValidDetailedResult() => new { Present = _detailed is not null, IsValid = _detailed!.IsValid }.Should().BeEquivalentTo(new { Present = true, IsValid = true });
+    public void UAC02_HasValidDetailedResult() => new { Present = useCase.Cases["Detailed"] is not null, IsValid = ((TemplateValidationResult)useCase.Cases["Detailed"]!).IsValid }.Should().BeEquivalentTo(new { Present = true, IsValid = true });
 
     [Then("the validation error should be null")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_HasNoErrors() => _detailed!.ErrorMessage.Should().BeNullOrEmpty();
+    public void UAC03_HasNoErrors() => ((TemplateValidationResult)useCase.Cases["Detailed"]!).ErrorMessage.Should().BeNullOrEmpty();
 
     [Then("the validation differences should be null")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_HasNoDifferences() => _detailed!.Differences.Should().BeNullOrEmpty();
+    public void UAC04_HasNoDifferences() => ((TemplateValidationResult)useCase.Cases["Detailed"]!).Differences.Should().BeNullOrEmpty();
 }

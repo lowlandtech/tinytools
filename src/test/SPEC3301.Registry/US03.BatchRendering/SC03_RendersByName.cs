@@ -3,11 +3,16 @@ namespace LowlandTech.TinyTools.Tests.SPEC3301.Registry.US03.BatchRendering;
 [Trait(Spec.SPEC, "3301")]
 [Trait(Spec.SC, "03")]
 [UserStory("03", "Template registry renders templates by name")]
-public sealed class SC03_RendersByName : TinyToolsScenario<TemplateRegistry>
+public sealed class SC03_RendersByName : TinyToolsScenario<TemplateRegistry>, IClassFixture<UseCases.BatchRenderingUseCase>
 {
+    private readonly UseCases.BatchRenderingUseCase useCase;
     private ComponentData _data = null!;
-    private TemplateResult? _result;
-    private TemplateResult? _missing;
+
+    public SC03_RendersByName(UseCases.BatchRenderingUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TemplateRegistry For()
     {
@@ -29,25 +34,23 @@ public sealed class SC03_RendersByName : TinyToolsScenario<TemplateRegistry>
     {
         base.When();
 
-        _result = Sut.Render("component", _data);
-        _missing = Sut.Render("nonexistent", _data);
+        useCase.Cases["Result"] = Sut.Render("component", _data);
+        useCase.Cases["Missing"] = Sut.Render("nonexistent", _data);
     }
-
-    public SC03_RendersByName() => ArrangeAndAct();
 
     [Then("the rendered result should not be null")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_RendersTemplate() => _result.Should().NotBeNull();
+    public void UAC01_RendersTemplate() => useCase.Cases["Result"].Should().NotBeNull();
 
     [Then("the rendered content should contain Card")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_ContainsComponentName() => _result!.Content.Should().Contain("Card");
+    public void UAC02_ContainsComponentName() => ((TemplateResult)useCase.Cases["Result"]!).Content.Should().Contain("Card");
 
     [Then("the rendered path should be exact")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_HasCorrectPath() => _result!.Path.Should().Be("src/components/Card.tsx");
+    public void UAC03_HasCorrectPath() => ((TemplateResult)useCase.Cases["Result"]!).Path.Should().Be("src/components/Card.tsx");
 
     [Then("the missing template should be null")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_ReturnsNullForNonExistentTemplate() => _missing.Should().BeNull();
+    public void UAC04_ReturnsNullForNonExistentTemplate() => useCase.Cases["Missing"].Should().BeNull();
 }

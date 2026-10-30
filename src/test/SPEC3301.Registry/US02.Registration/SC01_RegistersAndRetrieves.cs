@@ -3,15 +3,17 @@ namespace LowlandTech.TinyTools.Tests.SPEC3301.Registry.US02.Registration;
 [Trait(Spec.SPEC, "3301")]
 [Trait(Spec.SC, "01")]
 [UserStory("02", "Template registry supports manual registration")]
-public sealed class SC01_RegistersAndRetrieves : TinyToolsScenario<TemplateRegistry>
+public sealed class SC01_RegistersAndRetrieves : TinyToolsScenario<TemplateRegistry>, IClassFixture<UseCases.RegistrationUseCase>
 {
+    private readonly UseCases.RegistrationUseCase useCase;
     private ComponentTemplate _componentTemplate = null!;
     private CSharpClassTemplate _classTemplate = null!;
-    private ITemplate? _component;
-    private ITemplate? _class;
-    private ITemplate? _missing;
-    private List<string> _names = [];
-    private List<ITemplate> _all = [];
+
+    public SC01_RegistersAndRetrieves(UseCases.RegistrationUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TemplateRegistry For() => new();
 
@@ -30,32 +32,32 @@ public sealed class SC01_RegistersAndRetrieves : TinyToolsScenario<TemplateRegis
         Sut.Register("component", _componentTemplate);
         Sut.Register("class", _classTemplate);
 
-        _component = Sut.Get("component");
-        _class = Sut.Get("class");
-        _missing = Sut.Get("nonexistent");
-        _names = Sut.GetNames().ToList();
-        _all = Sut.GetAll().ToList();
+        useCase.Cases["ComponentTemplate"] = _componentTemplate;
+        useCase.Cases["ClassTemplate"] = _classTemplate;
+        useCase.Cases["Component"] = Sut.Get("component");
+        useCase.Cases["Class"] = Sut.Get("class");
+        useCase.Cases["Missing"] = Sut.Get("nonexistent");
+        useCase.Cases["Names"] = Sut.GetNames().ToList();
+        useCase.Cases["All"] = Sut.GetAll().ToList();
     }
-
-    public SC01_RegistersAndRetrieves() => ArrangeAndAct();
 
     [Then("the component template should be registered")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_RetrievesComponentTemplate() => _component.Should().BeSameAs(_componentTemplate);
+    public void UAC01_RetrievesComponentTemplate() => useCase.Cases["Component"].Should().BeSameAs(useCase.Cases["ComponentTemplate"]);
 
     [Then("the class template should be registered")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_RetrievesCSharpClassTemplate() => _class.Should().BeSameAs(_classTemplate);
+    public void UAC02_RetrievesCSharpClassTemplate() => useCase.Cases["Class"].Should().BeSameAs(useCase.Cases["ClassTemplate"]);
 
     [Then("the unregistered template should be null")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_ReturnsNullForUnregisteredTemplate() => _missing.Should().BeNull();
+    public void UAC03_ReturnsNullForUnregisteredTemplate() => useCase.Cases["Missing"].Should().BeNull();
 
     [Then("the registered names should have count 2")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_ListsAllRegisteredNames() => _names.Should().BeEquivalentTo("component", "class");
+    public void UAC04_ListsAllRegisteredNames() => ((List<string>)useCase.Cases["Names"]!).Should().BeEquivalentTo("component", "class");
 
     [Then("the registered templates should have count 2")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_GetsAllTemplates() => _all.Should().BeEquivalentTo(new ITemplate[] { _componentTemplate, _classTemplate });
+    public void UAC05_GetsAllTemplates() => ((List<ITemplate>)useCase.Cases["All"]!).Should().BeEquivalentTo(new ITemplate[] { (ITemplate)useCase.Cases["ComponentTemplate"]!, (ITemplate)useCase.Cases["ClassTemplate"]! });
 }

@@ -3,10 +3,16 @@ namespace LowlandTech.TinyTools.Tests.SPEC3301.Registry.US01.Discovery;
 [Trait(Spec.SPEC, "3301")]
 [Trait(Spec.SC, "04")]
 [UserStory("01", "Template registry discovers templates from assemblies")]
-public sealed class SC04_RendersDiscoveredTemplates : TinyToolsScenario<TemplateRegistry>
+public sealed class SC04_RendersDiscoveredTemplates : TinyToolsScenario<TemplateRegistry>, IClassFixture<UseCases.DiscoveryUseCase>
 {
+    private readonly UseCases.DiscoveryUseCase useCase;
     private ComponentData _data = null!;
-    private TemplateResult? _result;
+
+    public SC04_RendersDiscoveredTemplates(UseCases.DiscoveryUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override TemplateRegistry For()
     {
@@ -28,20 +34,18 @@ public sealed class SC04_RendersDiscoveredTemplates : TinyToolsScenario<Template
     {
         base.When();
 
-        _result = Sut.Render("Component", _data);
+        useCase.Cases["Result"] = Sut.Render("Component", _data);
     }
-
-    public SC04_RendersDiscoveredTemplates() => ArrangeAndAct();
 
     [Then("the rendered result should not be null")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_RendersTheDiscoveredTemplate() => _result.Should().NotBeNull();
+    public void UAC01_RendersTheDiscoveredTemplate() => useCase.Cases["Result"].Should().NotBeNull();
 
     [Then("the rendered content should contain DiscoveredButton")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_ContainsExpectedContent() => _result!.Content.Should().Contain("DiscoveredButton");
+    public void UAC02_ContainsExpectedContent() => ((TemplateResult)useCase.Cases["Result"]!).Content.Should().Contain("DiscoveredButton");
 
     [Then("the rendered path should contain DiscoveredButton")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_GeneratesPath() => _result!.Path.Should().Contain("DiscoveredButton");
+    public void UAC03_GeneratesPath() => ((TemplateResult)useCase.Cases["Result"]!).Path.Should().Contain("DiscoveredButton");
 }
