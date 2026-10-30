@@ -6,6 +6,9 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US09.Includes;
 public sealed class SC01_RendersRegisteredIncludes : IClassFixture<UseCases.IncludesUseCase>
 {
     private readonly UseCases.IncludesUseCase useCase;
+    private readonly TinyTemplateEngine engine = new();
+    private ExecutionContext ada = null!;
+    private ExecutionContext grace = null!;
 
     public SC01_RendersRegisteredIncludes(UseCases.IncludesUseCase useCase)
     {
@@ -13,15 +16,9 @@ public sealed class SC01_RendersRegisteredIncludes : IClassFixture<UseCases.Incl
         useCase.RunOnce(Given, When);
     }
 
-    [Given("a registered fragment set, a nested pair and a recursive pair")]
+    [Given("an engine with registered fragments, two caller contexts and a recursive pair")]
     private void Given()
     {
-    }
-
-    [When("the public Render composes each parent once")]
-    private void When()
-    {
-        var engine = new TinyTemplateEngine();
         engine.RegisterFragment("greeting", "Hello ${Name}!");
         engine.RegisterFragment("outer", "A[@include('greeting')]B");
         engine.RegisterFragment("inner", "I[@include(\"greeting\")]J");
@@ -30,36 +27,35 @@ public sealed class SC01_RendersRegisteredIncludes : IClassFixture<UseCases.Incl
         engine.RegisterFragment("loop-a", "a[@include('loop-b')]");
         engine.RegisterFragment("loop-b", "b[@include('loop-a')]");
 
-        var ada = new ExecutionContext();
+        ada = new ExecutionContext();
         ada.Set("Name", "Ada");
-        var grace = new ExecutionContext();
+        grace = new ExecutionContext();
         grace.Set("Name", "Grace");
+    }
 
+    [When("the public Render composes each parent once")]
+    private void When()
+    {
         useCase.Cases["Included"] = engine.Render("Parent: @include('greeting')", ada);
         useCase.Cases["Nested"] = engine.Render("[@include('outer')][@include('inner')]", ada);
         useCase.Cases["CallerOne"] = engine.Render("@include('greeting')", ada);
         useCase.Cases["CallerTwo"] = engine.Render("@include('greeting')", grace);
         useCase.Cases["Multiline"] = engine.Render("@include('block')", ada);
         useCase.Cases["Empty"] = engine.Render("<@include('empty')>", ada);
+        useCase.Cases["Missing"] = Thrown("@include('absent')");
+        useCase.Cases["Cycle"] = Thrown("@include('loop-a')");
+    }
 
+    private string Thrown(string template)
+    {
         try
         {
-            engine.Render("@include('absent')", ada);
-            useCase.Cases["Missing"] = "no-throw";
+            engine.Render(template, ada);
+            return "no-throw";
         }
         catch (InvalidOperationException error)
         {
-            useCase.Cases["Missing"] = error.Message;
-        }
-
-        try
-        {
-            engine.Render("@include('loop-a')", ada);
-            useCase.Cases["Cycle"] = "no-throw";
-        }
-        catch (InvalidOperationException error)
-        {
-            useCase.Cases["Cycle"] = error.Message;
+            return error.Message;
         }
     }
 
