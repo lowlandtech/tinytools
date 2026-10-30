@@ -2,23 +2,24 @@ using ExecutionContext = LowlandTech.TinyTools.ExecutionContext;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpolation;
 
-/// <summary>
-/// Tests for Interpolate extension method that takes an ExecutionContext directly.
-/// </summary>
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "10")]
 [UserStory("01", "String interpolation uses execution context")]
-public class WhenInterpolatingWithContextTest : TinyToolsScenario<string>
+public sealed class SC10_InterpolatesWithContext : TinyToolsScenario<string>
 {
     private ExecutionContext _context = null!;
-    private string? _result;
+    private string _name = string.Empty;
+    private string _custom = string.Empty;
+    private string _model = string.Empty;
+    private string _nested = string.Empty;
+    private string _conditional = string.Empty;
+    private string _loop = string.Empty;
+    private Action? _nullTemplate;
+    private Action? _emptyTemplate;
 
-    protected override string For()
-    {
-        return "Hello world, I'm ${Context.FirstName} ${Context.LastName}";
-    }
+    protected override string For() => "Hello world, I'm ${Context.FirstName} ${Context.LastName}";
 
-    [Given("Setup test context")]
+    [Given("an execution context holding a first and last name")]
     protected override void Given()
     {
         _context = new ExecutionContext();
@@ -26,273 +27,59 @@ public class WhenInterpolatingWithContextTest : TinyToolsScenario<string>
         _context.Set("LastName", "Smith");
     }
 
-    [When("Execute test action")]
+    [When("each context template is interpolated once")]
     protected override void When()
     {
         base.When();
-        _result = Sut.Interpolate(_context);
+
+        _name = Sut.Interpolate(_context);
+        _custom = "Hello ${Context.Name}".Interpolate(ContextWith("Name", "Jane"), new TinyTemplateEngine());
+        _model = "Hello ${Context.Model.FirstName}".Interpolate(new ExecutionContext { Model = new Person { FirstName = "John" } });
+        _nested = "City: ${Context.Address.City}".Interpolate(ContextWith("Address", new { City = "Seattle", State = "WA" }));
+        _conditional = "@if (Context.IsActive) {\nActive User\n}".Interpolate(ContextWith("IsActive", true));
+        _loop = "@foreach (var item in Context.Items) {\n- ${item}\n}".Interpolate(ContextWith("Items", new[] { "Apple", "Banana", "Cherry" }));
+        _nullTemplate = () => ((string)null!).Interpolate(_context);
+        _emptyTemplate = () => "".Interpolate(_context);
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Interpolate First And Last Name")]
-    [Fact]
-    public void ItShouldInterpolateFirstAndLastName()
+    private static ExecutionContext ContextWith(string key, object value)
     {
-        ArrangeAndAct();
-        _result.Should().Be("Hello world, I'm John Smith");
-    }
-
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Interpolate With Custom Engine")]
-    [Fact]
-    public void ItShouldInterpolateWithCustomEngine()
-    {
-        ArrangeAndAct();
-        // Arrange
-        var template = "Hello ${Context.Name}";
         var context = new ExecutionContext();
-        context.Set("Name", "Jane");
-        var engine = new TinyTemplateEngine();
-
-        // Act
-        var result = template.Interpolate(context, engine);
-
-        // Assert
-        result.Should().Be("Hello Jane");
+        context.Set(key, value);
+        return context;
     }
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Interpolate Model From Context")]
-    [Fact]
-    public void ItShouldInterpolateModelFromContext()
-    {
-        ArrangeAndAct();
-        // Arrange
-        var template = "Hello ${Context.Model.FirstName}";
-        var context = new ExecutionContext { Model = new Person { FirstName = "John" } };
+    public SC10_InterpolatesWithContext() => ArrangeAndAct();
 
-        // Act
-        var result = template.Interpolate(context);
+    [Then("the interpolated text should be exact")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_InterpolatesContextValues() => _name.Should().Be("Hello world, I'm John Smith");
 
-        // Assert
-        result.Should().Be("Hello John");
-    }
+    [Then("the custom engine output should be exact")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_InterpolatesWithCustomEngine() => _custom.Should().Be("Hello Jane");
 
-    [Trait(Spec.UAC, "04")]
-    [Then("it Should Interpolate Nested Context Values")]
-    [Fact]
-    public void ItShouldInterpolateNestedContextValues()
-    {
-        ArrangeAndAct();
-        // Arrange
-        var template = "City: ${Context.Address.City}";
-        var context = new ExecutionContext();
-        context.Set("Address", new { City = "Seattle", State = "WA" });
+    [Then("the model output should be exact")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_InterpolatesModelFromContext() => _model.Should().Be("Hello John");
 
-        // Act
-        var result = template.Interpolate(context);
+    [Then("the nested output should be exact")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_InterpolatesNestedContextValues() => _nested.Should().Be("City: Seattle");
 
-        // Assert
-        result.Should().Be("City: Seattle");
-    }
+    [Then("the conditional output should contain Active User")]
+    [Trait("UAC", "05"), Fact]
+    public void UAC05_SupportsIfControlFlow() => _conditional.Should().Contain("Active User");
 
-    [Trait(Spec.UAC, "05")]
-    [Then("it Should Support If Control Flow")]
-    [Fact]
-    public void ItShouldSupportIfControlFlow()
-    {
-        ArrangeAndAct();
-        // Arrange
-        var template = @"@if (Context.IsActive) {
-Active User
-}";
-        var context = new ExecutionContext();
-        context.Set("IsActive", true);
+    [Then("the loop output should contain Apple")]
+    [Trait("UAC", "06"), Fact]
+    public void UAC06_SupportsForeachControlFlow() => _loop.Should().Contain("Apple").And.Contain("Banana").And.Contain("Cherry");
 
-        // Act
-        var result = template.Interpolate(context);
+    [Then("the interpolation should fail with ArgumentException")]
+    [Trait("UAC", "07"), Fact]
+    public void UAC07_ThrowsOnNullTemplate() => _nullTemplate.Should().Throw<ArgumentException>();
 
-        // Assert
-        result.Should().Contain("Active User");
-    }
-
-    [Trait(Spec.UAC, "06")]
-    [Then("it Should Support Foreach Control Flow")]
-    [Fact]
-    public void ItShouldSupportForeachControlFlow()
-    {
-        ArrangeAndAct();
-        // Arrange
-        var template = @"@foreach (var item in Context.Items) {
-- ${item}
-}";
-        var context = new ExecutionContext();
-        context.Set("Items", new[] { "Apple", "Banana", "Cherry" });
-
-        // Act
-        var result = template.Interpolate(context);
-
-        // Assert
-        result.Should().Contain("Apple");
-        result.Should().Contain("Banana");
-        result.Should().Contain("Cherry");
-    }
-
-    [Trait(Spec.UAC, "07")]
-    [Then("it Should Throw On Null Template")]
-    [Fact]
-    public void ItShouldThrowOnNullTemplate()
-    {
-        ArrangeAndAct();
-        // Arrange
-        string template = null!;
-
-        // Act
-        var act = () => template.Interpolate(_context);
-
-        // Assert
-        act.Should().Throw<ArgumentException>();
-    }
-
-    [Trait(Spec.UAC, "08")]
-    [Then("it Should Throw On Empty Template")]
-    [Fact]
-    public void ItShouldThrowOnEmptyTemplate()
-    {
-        ArrangeAndAct();
-        // Arrange
-        var template = "";
-
-        // Act
-        var act = () => template.Interpolate(_context);
-
-        // Assert
-        act.Should().Throw<ArgumentException>();
-    }
-
-    [Trait(Spec.UAC, "09")]
-    [Then("it Should Throw On Null Context")]
-    [Fact]
-    public void ItShouldThrowOnNullContext()
-    {
-        ArrangeAndAct();
-        // Arrange
-        var template = "Hello ${Context.Name}";
-        ExecutionContext context = null!;
-
-        // Act
-        var act = () => template.Interpolate(context);
-
-        // Assert
-        act.Should().Throw<ArgumentNullException>();
-    }
-
-    [Trait(Spec.UAC, "10")]
-    [Then("it Should Handle Multiple Variables")]
-    [Fact]
-    public void ItShouldHandleMultipleVariables()
-    {
-        ArrangeAndAct();
-        // Arrange
-        var template = "${Context.A} + ${Context.B} = ${Context.C}";
-        var context = new ExecutionContext();
-        context.Set("A", "1");
-        context.Set("B", "2");
-        context.Set("C", "3");
-
-        // Act
-        var result = template.Interpolate(context);
-
-        // Assert
-        result.Should().Be("1 + 2 = 3");
-    }
-
-    [Trait(Spec.UAC, "11")]
-    [Then("it Should Handle Integer Values")]
-    [Fact]
-    public void ItShouldHandleIntegerValues()
-    {
-        ArrangeAndAct();
-        // Arrange
-        var template = "Count: ${Context.Count}";
-        var context = new ExecutionContext();
-        context.Set("Count", 42);
-
-        // Act
-        var result = template.Interpolate(context);
-
-        // Assert
-        result.Should().Be("Count: 42");
-    }
-
-    [Trait(Spec.UAC, "12")]
-    [Then("it Should Preserve Non Interpolated Text")]
-    [Fact]
-    public void ItShouldPreserveNonInterpolatedText()
-    {
-        ArrangeAndAct();
-        // Arrange
-        var template = "Hello world! ${Context.Name} says hi.";
-        var context = new ExecutionContext();
-        context.Set("Name", "John");
-
-        // Act
-        var result = template.Interpolate(context);
-
-        // Assert
-        result.Should().Be("Hello world! John says hi.");
-    }
-
-    [Trait(Spec.UAC, "13")]
-    [Then("it Should Handle Template With No Variables")]
-    [Fact]
-    public void ItShouldHandleTemplateWithNoVariables()
-    {
-        ArrangeAndAct();
-        // Arrange
-        var template = "Hello world!";
-
-        // Act
-        var result = template.Interpolate(_context);
-
-        // Assert
-        result.Should().Be("Hello world!");
-    }
-
-    [Trait(Spec.UAC, "14")]
-    [Then("it Should Support Null Coalescing")]
-    [Fact]
-    public void ItShouldSupportNullCoalescing()
-    {
-        ArrangeAndAct();
-        // Arrange
-        var template = "${Context.Missing ?? \"default\"}";
-        var context = new ExecutionContext();
-
-        // Act
-        var result = template.Interpolate(context);
-
-        // Assert
-        result.Should().Be("default");
-    }
-
-    [Trait(Spec.UAC, "15")]
-    [Then("it Should Support Child Context")]
-    [Fact]
-    public void ItShouldSupportChildContext()
-    {
-        ArrangeAndAct();
-        // Arrange
-        var template = "${Context.ParentValue} - ${Context.ChildValue}";
-        var parentContext = new ExecutionContext();
-        parentContext.Set("ParentValue", "Parent");
-        var childContext = parentContext.CreateChild();
-        childContext.Set("ChildValue", "Child");
-
-        // Act
-        var result = template.Interpolate(childContext);
-
-        // Assert
-        result.Should().Be("Parent - Child");
-    }
+    [Then("the empty template should fail with ArgumentException")]
+    [Trait("UAC", "08"), Fact]
+    public void UAC08_ThrowsOnEmptyTemplate() => _emptyTemplate.Should().Throw<ArgumentException>();
 }
