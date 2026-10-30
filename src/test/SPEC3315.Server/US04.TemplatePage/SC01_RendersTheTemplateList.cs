@@ -13,10 +13,16 @@ namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US04.TemplatePage;
 [Trait(Spec.SPEC, "3315")]
 [Trait(Spec.SC, "01")]
 [UserStory("04", "The app hosts the templates page on LowlandTech.Components")]
-public sealed class SC01_RendersTheTemplateList : IDisposable
+public sealed class SC01_RendersTheTemplateList : IDisposable, IClassFixture<UseCases.TemplatePageUseCase>
 {
+    private readonly UseCases.TemplatePageUseCase useCase;
     private readonly BunitContext _context = new();
-    private IRenderedComponent<TemplatesPage> _page = null!;
+
+    public SC01_RendersTheTemplateList(UseCases.TemplatePageUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     [Given("a library holding two templates")]
     private void Given()
@@ -30,19 +36,14 @@ public sealed class SC01_RendersTheTemplateList : IDisposable
     [When("the templates page renders")]
     private void When()
     {
-        _page = _context.Render<TemplatesPage>();
-        _page.WaitForState(() => _page.Markup.Contains("EntityClass", StringComparison.Ordinal), TimeSpan.FromSeconds(5));
-    }
-
-    public SC01_RendersTheTemplateList()
-    {
-        Given();
-        When();
+        var page = _context.Render<TemplatesPage>();
+        page.WaitForState(() => page.Markup.Contains("EntityClass", StringComparison.Ordinal), TimeSpan.FromSeconds(5));
+        useCase.Cases["Markup"] = page.Markup;
     }
 
     [Then("the markup should contain EntityClass")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_LoadedTemplatesAreVisible() => _page.Markup.Should().Contain("EntityClass");
+    public void UAC01_LoadedTemplatesAreVisible() => ((string)useCase.Cases["Markup"]!).Should().Contain("EntityClass");
 
     public void Dispose() => _context.Dispose();
 }

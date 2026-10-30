@@ -6,8 +6,9 @@ namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US03.TemplateStore;
 [Trait(Spec.SPEC, "3315")]
 [Trait(Spec.SC, "15")]
 [UserStory("03", "Template reducer produces correct state transitions")]
-public sealed class SC15_ClampsPreviousVersion
+public sealed class SC15_ClampsPreviousVersion : IClassFixture<UseCases.TemplateStoreUseCase>
 {
+    private readonly UseCases.TemplateStoreUseCase useCase;
     private TemplateState _state = new();
 
     [Given("a version list already at the first version")]
@@ -18,16 +19,20 @@ public sealed class SC15_ClampsPreviousVersion
     };
 
     [When("the previous version is requested")]
-    private void When() => _state = TemplateReducer.Reduce(_state, new TemplatePreviousVersion());
-
-    public SC15_ClampsPreviousVersion()
+    private void When()
     {
-        Given();
-        When();
+        _state = TemplateReducer.Reduce(_state, new TemplatePreviousVersion());
+        useCase.Cases["VersionIndex"] = _state.VersionIndex;
+    }
+
+    public SC15_ClampsPreviousVersion(UseCases.TemplateStoreUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
     }
 
     [Then("the version index should be 0")]
     [Trait("UAC", "13"), Fact]
-    public void UAC13_PreviousStopsAtTheFirst() => _state.VersionIndex.Should().Be(0);
+    public void UAC13_PreviousStopsAtTheFirst() => ((int)useCase.Cases["VersionIndex"]!).Should().Be(0);
 }
 #endif

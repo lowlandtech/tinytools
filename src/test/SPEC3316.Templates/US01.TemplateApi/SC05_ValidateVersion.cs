@@ -8,12 +8,11 @@ namespace LowlandTech.TinyTools.Tests.SPEC3316.Templates.US01.TemplateApi;
 [Trait(Spec.SPEC, "3316")]
 [Trait(Spec.SC, "05")]
 [UserStory("01", "Template API CRUD operations")]
-public sealed class SC05_ValidateVersion : TemplateApiScenario
+public sealed class SC05_ValidateVersion : TemplateApiScenario, IClassFixture<UseCases.TemplateApiUseCase>
 {
-    private HttpResponseMessage _response = null!;
-    private bool _valid;
-    private HttpStatusCode _unknownStatus;
-    private HttpStatusCode _missingDataStatus;
+    private readonly UseCases.TemplateApiUseCase useCase;
+
+    public SC05_ValidateVersion(UseCases.TemplateApiUseCase useCase) => this.useCase = useCase;
 
     [Given("a template library seeded with two templates")]
     private Task GivenAsync() => SeedLibraryAsync();
@@ -21,30 +20,31 @@ public sealed class SC05_ValidateVersion : TemplateApiScenario
     [When("POST /api/templates/versions/{id}/validate is called with EntityClass v1")]
     private async Task WhenAsync()
     {
-        _response = await Client.PostAsync($"/api/templates/versions/{EntityClassV1Id}/validate", null);
-        _valid = (await _response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("valid").GetBoolean();
+        var response = await Client.PostAsync($"/api/templates/versions/{EntityClassV1Id}/validate", null);
+        useCase.Cases["Valid"] = (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("valid").GetBoolean();
 
-        _unknownStatus = (await Client.PostAsync($"/api/templates/versions/{Guid.NewGuid()}/validate", null)).StatusCode;
-        _missingDataStatus = (await Client.PostAsync($"/api/templates/versions/{DbContextClassV1Id}/validate", null)).StatusCode;
+        useCase.Cases["UnknownStatus"] = (await Client.PostAsync($"/api/templates/versions/{Guid.NewGuid()}/validate", null)).StatusCode;
+        useCase.Cases["MissingDataStatus"] = (await Client.PostAsync($"/api/templates/versions/{DbContextClassV1Id}/validate", null)).StatusCode;
     }
 
-    public override async ValueTask InitializeAsync()
+    public override ValueTask InitializeAsync()
     {
-        await base.InitializeAsync();
-        await GivenAsync();
-        await WhenAsync();
+        useCase.RunOnce(
+            () => { base.InitializeAsync(); GivenAsync().GetAwaiter().GetResult(); },
+            () => WhenAsync().GetAwaiter().GetResult());
+        return ValueTask.CompletedTask;
     }
 
     [Then("the version should be valid")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_ResponseIsValid() => _valid.Should().BeTrue();
+    public void UAC01_ResponseIsValid() => ((bool)useCase.Cases["Valid"]!).Should().Be(true);
 
     [Then("the unknown version should be NotFound")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_UnknownVersionReturns404() => _unknownStatus.Should().Be(HttpStatusCode.NotFound);
+    public void UAC02_UnknownVersionReturns404() => ((HttpStatusCode)useCase.Cases["UnknownStatus"]!).Should().Be(HttpStatusCode.NotFound);
 
     [Then("the version without test data should be rejected")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_MissingTestDataReturns400() => _missingDataStatus.Should().Be(HttpStatusCode.BadRequest);
+    public void UAC03_MissingTestDataReturns400() => ((HttpStatusCode)useCase.Cases["MissingDataStatus"]!).Should().Be(HttpStatusCode.BadRequest);
 }
 #endif

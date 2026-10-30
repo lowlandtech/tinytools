@@ -8,14 +8,13 @@ namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US02.TemplateApi;
 [Trait(Spec.SPEC, "3315")]
 [Trait(Spec.SC, "01")]
 [UserStory("02", "The server serves the template contract over HTTP")]
-public sealed class SC01_ServesTemplateContract : IAsyncLifetime
+public sealed class SC01_ServesTemplateContract : IAsyncLifetime, IClassFixture<UseCases.TemplateApiUseCase>
 {
+    private readonly UseCases.TemplateApiUseCase useCase;
     private TemplateApiFactory _development = null!;
     private TemplateApiFactory _production = null!;
-    private HttpStatusCode _listStatus, _createStatus, _anonymousStatus, _keyedStatus;
-    private int _listedCount, _openApiPathCount;
-    private string? _renderOutput, _providerName;
-    private bool _validated;
+
+    public SC01_ServesTemplateContract(UseCases.TemplateApiUseCase useCase) => this.useCase = useCase;
 
     [Given("a served template library in development and in production with and without a key")]
     private void Given()
@@ -35,27 +34,27 @@ public sealed class SC01_ServesTemplateContract : IAsyncLifetime
         });
         var version = (await created.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("versions")[0].GetProperty("id").GetGuid();
         var listed = await client.GetAsync("/api/templates");
-        _createStatus = created.StatusCode;
-        _listStatus = listed.StatusCode;
-        _listedCount = (await listed.Content.ReadFromJsonAsync<JsonElement>()).GetArrayLength();
+        useCase.Cases["CreateStatus"] = created.StatusCode;
+        useCase.Cases["ListStatus"] = listed.StatusCode;
+        useCase.Cases["ListedCount"] = (await listed.Content.ReadFromJsonAsync<JsonElement>()).GetArrayLength();
         var rendered = await client.PostAsJsonAsync("/api/templates/render", new { Template = "Hello ${Name}!", Json = """{"Name":"Ada"}""" });
-        _renderOutput = (await rendered.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("output").GetString();
+        useCase.Cases["RenderOutput"] = (await rendered.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("output").GetString();
         var validated = await client.PostAsync($"/api/templates/versions/{version}/validate", null);
-        _validated = (await validated.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("valid").GetBoolean();
+        useCase.Cases["Validated"] = (await validated.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("valid").GetBoolean();
         var openApi = await client.GetFromJsonAsync<JsonElement>("/openapi/v1.json");
-        _openApiPathCount = openApi.GetProperty("paths").EnumerateObject().Count();
-        _anonymousStatus = (await _production.CreateClient().GetAsync("/api/templates")).StatusCode;
+        useCase.Cases["OpenApiPathCount"] = openApi.GetProperty("paths").EnumerateObject().Count();
+        useCase.Cases["AnonymousStatus"] = (await _production.CreateClient().GetAsync("/api/templates")).StatusCode;
         var keyed = _production.CreateClient();
         keyed.DefaultRequestHeaders.Add("X-Api-Key", "secret-key");
-        _keyedStatus = (await keyed.GetAsync("/api/templates")).StatusCode;
+        useCase.Cases["KeyedStatus"] = (await keyed.GetAsync("/api/templates")).StatusCode;
         using var database = _development.CreateDbContext();
-        _providerName = database.Database.ProviderName;
+        useCase.Cases["ProviderName"] = database.Database.ProviderName;
     }
 
-    public async ValueTask InitializeAsync()
+    public ValueTask InitializeAsync()
     {
-        Given();
-        await WhenAsync();
+        useCase.RunOnce(Given, () => WhenAsync().GetAwaiter().GetResult());
+        return ValueTask.CompletedTask;
     }
 
     public ValueTask DisposeAsync()
@@ -66,30 +65,30 @@ public sealed class SC01_ServesTemplateContract : IAsyncLifetime
     }
     [Then("the list status should be OK")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_ListReturnsOk() => _listStatus.Should().Be(HttpStatusCode.OK);
+    public void UAC01_ListReturnsOk() => ((HttpStatusCode)useCase.Cases["ListStatus"]!).Should().Be(HttpStatusCode.OK);
     [Then("the create status should be Created")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_CreateReturnsCreated() => _createStatus.Should().Be(HttpStatusCode.Created);
+    public void UAC02_CreateReturnsCreated() => ((HttpStatusCode)useCase.Cases["CreateStatus"]!).Should().Be(HttpStatusCode.Created);
     [Then("the listed templates should have count 1")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_ListContainsTheCreatedTemplate() => _listedCount.Should().Be(1);
+    public void UAC03_ListContainsTheCreatedTemplate() => ((int)useCase.Cases["ListedCount"]!).Should().Be(1);
     [Then("the render output should contain Hello Ada")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_RendersThroughThisRepositorysEngine() => _renderOutput.Should().Contain("Hello Ada");
+    public void UAC04_RendersThroughThisRepositorysEngine() => ((string?)useCase.Cases["RenderOutput"]!).Should().Contain("Hello Ada");
     [Then("the validation should be true")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_ValidatesTheVersion() => _validated.Should().BeTrue();
+    public void UAC05_ValidatesTheVersion() => ((bool)useCase.Cases["Validated"]!).Should().Be(true);
     [Then("the open api paths should have count 4")]
     [Trait("UAC", "06"), Fact]
-    public void UAC06_PublishesTheDocumentedPaths() => _openApiPathCount.Should().Be(4);
+    public void UAC06_PublishesTheDocumentedPaths() => ((int)useCase.Cases["OpenApiPathCount"]!).Should().Be(4);
     [Then("the anonymous production call should be unauthorized")]
     [Trait("UAC", "07"), Fact]
-    public void UAC07_RefusesProductionWithoutAKey() => _anonymousStatus.Should().Be(HttpStatusCode.Unauthorized);
+    public void UAC07_RefusesProductionWithoutAKey() => ((HttpStatusCode)useCase.Cases["AnonymousStatus"]!).Should().Be(HttpStatusCode.Unauthorized);
     [Then("the keyed production call should be OK")]
     [Trait("UAC", "08"), Fact]
-    public void UAC08_AcceptsProductionWithTheKey() => _keyedStatus.Should().Be(HttpStatusCode.OK);
+    public void UAC08_AcceptsProductionWithTheKey() => ((HttpStatusCode)useCase.Cases["KeyedStatus"]!).Should().Be(HttpStatusCode.OK);
     [Then("the provider should contain Sqlite")]
     [Trait("UAC", "09"), Fact]
-    public void UAC09_SelectsTheScenarioProvider() => _providerName.Should().Contain("Sqlite");
+    public void UAC09_SelectsTheScenarioProvider() => ((string?)useCase.Cases["ProviderName"]!).Should().Contain("Sqlite");
 }
 #endif

@@ -5,9 +5,15 @@ namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US01.EntityModel;
 [Trait(Spec.SPEC, "3315")]
 [Trait(Spec.SC, "04")]
 [UserStory("01", "The Tinytools server shares one template entity model")]
-public sealed class SC04_AvoidsHostFrameworkReferences
+public sealed class SC04_AvoidsHostFrameworkReferences : IClassFixture<UseCases.EntityModelUseCase>
 {
-    private List<string> _hostReferences = [];
+    private readonly UseCases.EntityModelUseCase useCase;
+
+    public SC04_AvoidsHostFrameworkReferences(UseCases.EntityModelUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     [Given("the Tinytools core assembly")]
     private void Given()
@@ -15,19 +21,13 @@ public sealed class SC04_AvoidsHostFrameworkReferences
     }
 
     [When("its referenced assemblies are read")]
-    private void When() => _hostReferences = typeof(Template).Assembly.GetReferencedAssemblies()
+    private void When() => useCase.Cases["HostReferences"] = typeof(Template).Assembly.GetReferencedAssemblies()
         .Select(name => name.Name ?? string.Empty)
         .Where(name => name.StartsWith("Microsoft.AspNetCore", StringComparison.Ordinal)
             || name.StartsWith("Microsoft.EntityFrameworkCore", StringComparison.Ordinal))
         .ToList();
 
-    public SC04_AvoidsHostFrameworkReferences()
-    {
-        Given();
-        When();
-    }
-
     [Then("the host references should be empty")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_NoHostFramework() => _hostReferences.Should().BeEmpty();
+    public void UAC04_NoHostFramework() => ((List<string>)useCase.Cases["HostReferences"]!).Should().BeEmpty();
 }

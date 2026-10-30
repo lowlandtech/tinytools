@@ -13,10 +13,16 @@ namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US04.TemplatePage;
 [Trait(Spec.SPEC, "3315")]
 [Trait(Spec.SC, "02")]
 [UserStory("04", "The app hosts the templates page on LowlandTech.Components")]
-public sealed class SC02_ShowsCommandBarActions : IDisposable
+public sealed class SC02_ShowsCommandBarActions : IDisposable, IClassFixture<UseCases.TemplatePageUseCase>
 {
+    private readonly UseCases.TemplatePageUseCase useCase;
     private readonly BunitContext _context = new();
-    private IRenderedComponent<TemplatesPage> _page = null!;
+
+    public SC02_ShowsCommandBarActions(UseCases.TemplatePageUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     [Given("a library holding two templates")]
     private void Given()
@@ -30,19 +36,14 @@ public sealed class SC02_ShowsCommandBarActions : IDisposable
     [When("the templates page renders")]
     private void When()
     {
-        _page = _context.Render<TemplatesPage>();
-        _page.WaitForState(() => _page.Markup.Contains("New template", StringComparison.Ordinal), TimeSpan.FromSeconds(5));
-    }
-
-    public SC02_ShowsCommandBarActions()
-    {
-        Given();
-        When();
+        var page = _context.Render<TemplatesPage>();
+        page.WaitForState(() => page.Markup.Contains("New template", StringComparison.Ordinal), TimeSpan.FromSeconds(5));
+        useCase.Cases["Markup"] = page.Markup;
     }
 
     [Then("the markup should contain New template")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_CommandBarActionsArePresent() => _page.Markup.Should().Contain("New template");
+    public void UAC02_CommandBarActionsArePresent() => ((string)useCase.Cases["Markup"]!).Should().Contain("New template");
 
     public void Dispose() => _context.Dispose();
 }

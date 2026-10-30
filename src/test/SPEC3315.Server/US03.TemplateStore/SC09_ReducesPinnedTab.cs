@@ -6,8 +6,9 @@ namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US03.TemplateStore;
 [Trait(Spec.SPEC, "3315")]
 [Trait(Spec.SC, "09")]
 [UserStory("03", "Template reducer produces correct state transitions")]
-public sealed class SC09_ReducesPinnedTab
+public sealed class SC09_ReducesPinnedTab : IClassFixture<UseCases.TemplateStoreUseCase>
 {
+    private readonly UseCases.TemplateStoreUseCase useCase;
     private TemplateState _state = new();
     private static readonly Guid Node = Guid.NewGuid();
 
@@ -15,16 +16,20 @@ public sealed class SC09_ReducesPinnedTab
     private void Given() => _state = new TemplateState();
 
     [When("a template node is pinned")]
-    private void When() => _state = TemplateReducer.Reduce(_state, new TemplatePinNodeSelected($"tpl:{Node}", "A", "template", Node));
-
-    public SC09_ReducesPinnedTab()
+    private void When()
     {
-        Given();
-        When();
+        _state = TemplateReducer.Reduce(_state, new TemplatePinNodeSelected($"tpl:{Node}", "A", "template", Node));
+        useCase.Cases["Pinned"] = new { Count = _state.OpenTabs.Count, Pinned = _state.OpenTabs[0].IsPinned };
+    }
+
+    public SC09_ReducesPinnedTab(UseCases.TemplateStoreUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
     }
 
     [Then("the opened tab should be pinned")]
     [Trait("UAC", "07"), Fact]
-    public void UAC07_PinOpensATab() => new { Count = _state.OpenTabs.Count, Pinned = _state.OpenTabs[0].IsPinned }.Should().BeEquivalentTo(new { Count = 1, Pinned = true });
+    public void UAC07_PinOpensATab() => useCase.Cases["Pinned"].Should().BeEquivalentTo(new { Count = 1, Pinned = true });
 }
 #endif

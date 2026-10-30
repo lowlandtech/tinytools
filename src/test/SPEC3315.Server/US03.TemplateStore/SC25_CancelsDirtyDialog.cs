@@ -6,8 +6,9 @@ namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US03.TemplateStore;
 [Trait(Spec.SPEC, "3315")]
 [Trait(Spec.SC, "25")]
 [UserStory("03", "Template reducer produces correct state transitions")]
-public sealed class SC25_CancelsDirtyDialog
+public sealed class SC25_CancelsDirtyDialog : IClassFixture<UseCases.TemplateStoreUseCase>
 {
+    private readonly UseCases.TemplateStoreUseCase useCase;
     private TemplateState _state = new();
 
     [Given("a dirty dialog waiting for a decision")]
@@ -18,16 +19,20 @@ public sealed class SC25_CancelsDirtyDialog
     };
 
     [When("the dialog is cancelled")]
-    private void When() => _state = TemplateReducer.Reduce(_state, new TemplateDirtyCancel());
-
-    public SC25_CancelsDirtyDialog()
+    private void When()
     {
-        Given();
-        When();
+        _state = TemplateReducer.Reduce(_state, new TemplateDirtyCancel());
+        useCase.Cases["Dialog"] = new { _state.ShowDirtyDialog, _state.PendingNodeKey };
+    }
+
+    public SC25_CancelsDirtyDialog(UseCases.TemplateStoreUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
     }
 
     [Then("the dialog should be cancelled")]
     [Trait("UAC", "23"), Fact]
-    public void UAC23_CancelHidesDialog() => new { _state.ShowDirtyDialog, _state.PendingNodeKey }.Should().BeEquivalentTo(new { ShowDirtyDialog = false, PendingNodeKey = (string?)null });
+    public void UAC23_CancelHidesDialog() => useCase.Cases["Dialog"].Should().BeEquivalentTo(new { ShowDirtyDialog = false, PendingNodeKey = (string?)null });
 }
 #endif

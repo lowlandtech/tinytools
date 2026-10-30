@@ -6,8 +6,9 @@ namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US03.TemplateStore;
 [Trait(Spec.SPEC, "3315")]
 [Trait(Spec.SC, "17")]
 [UserStory("03", "Template reducer produces correct state transitions")]
-public sealed class SC17_StopsAtTheLastVersion
+public sealed class SC17_StopsAtTheLastVersion : IClassFixture<UseCases.TemplateStoreUseCase>
 {
+    private readonly UseCases.TemplateStoreUseCase useCase;
     private TemplateState _state = new();
 
     [Given("a version list positioned on the last version")]
@@ -19,16 +20,20 @@ public sealed class SC17_StopsAtTheLastVersion
     };
 
     [When("the next version is requested")]
-    private void When() => _state = TemplateReducer.Reduce(_state, new TemplateNextVersion());
-
-    public SC17_StopsAtTheLastVersion()
+    private void When()
     {
-        Given();
-        When();
+        _state = TemplateReducer.Reduce(_state, new TemplateNextVersion());
+        useCase.Cases["VersionIndex"] = _state.VersionIndex;
+    }
+
+    public SC17_StopsAtTheLastVersion(UseCases.TemplateStoreUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
     }
 
     [Then("the version index should be 1")]
     [Trait("UAC", "15"), Fact]
-    public void UAC15_NextAtEndDoesNotMove() => _state.VersionIndex.Should().Be(1);
+    public void UAC15_NextAtEndDoesNotMove() => ((int)useCase.Cases["VersionIndex"]!).Should().Be(1);
 }
 #endif

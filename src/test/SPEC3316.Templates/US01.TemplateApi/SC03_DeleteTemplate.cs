@@ -7,11 +7,11 @@ namespace LowlandTech.TinyTools.Tests.SPEC3316.Templates.US01.TemplateApi;
 [Trait(Spec.SPEC, "3316")]
 [Trait(Spec.SC, "03")]
 [UserStory("01", "Template API CRUD operations")]
-public sealed class SC03_DeleteTemplate : TemplateApiScenario
+public sealed class SC03_DeleteTemplate : TemplateApiScenario, IClassFixture<UseCases.TemplateApiUseCase>
 {
-    private HttpResponseMessage _response = null!;
-    private bool _remaining;
-    private HttpStatusCode _unknownStatus;
+    private readonly UseCases.TemplateApiUseCase useCase;
+
+    public SC03_DeleteTemplate(UseCases.TemplateApiUseCase useCase) => this.useCase = useCase;
 
     [Given("a template library seeded with two templates")]
     private Task GivenAsync() => SeedLibraryAsync();
@@ -19,31 +19,33 @@ public sealed class SC03_DeleteTemplate : TemplateApiScenario
     [When("DELETE /api/templates/{id} is called with the EntityClass ID")]
     private async Task WhenAsync()
     {
-        _response = await Client.DeleteAsync($"/api/templates/{EntityClassId}");
+        var response = await Client.DeleteAsync($"/api/templates/{EntityClassId}");
+        useCase.Cases["Status"] = response.StatusCode;
 
         await using var database = CreateDbContext();
-        _remaining = await database.Templates.AnyAsync(row => row.Id == EntityClassId);
+        useCase.Cases["Remaining"] = await database.Templates.AnyAsync(row => row.Id == EntityClassId);
 
-        _unknownStatus = (await Client.DeleteAsync($"/api/templates/{Guid.NewGuid()}")).StatusCode;
+        useCase.Cases["UnknownStatus"] = (await Client.DeleteAsync($"/api/templates/{Guid.NewGuid()}")).StatusCode;
     }
 
-    public override async ValueTask InitializeAsync()
+    public override ValueTask InitializeAsync()
     {
-        await base.InitializeAsync();
-        await GivenAsync();
-        await WhenAsync();
+        useCase.RunOnce(
+            () => { base.InitializeAsync(); GivenAsync().GetAwaiter().GetResult(); },
+            () => WhenAsync().GetAwaiter().GetResult());
+        return ValueTask.CompletedTask;
     }
 
     [Then("the response status should be NoContent")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_ResponseIs204() => _response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    public void UAC01_ResponseIs204() => ((HttpStatusCode)useCase.Cases["Status"]!).Should().Be(HttpStatusCode.NoContent);
 
     [Then("the deleted template should be gone")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_TemplateRemoved() => _remaining.Should().BeFalse();
+    public void UAC02_TemplateRemoved() => ((bool)useCase.Cases["Remaining"]!).Should().Be(false);
 
     [Then("the unknown delete should be NotFound")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_UnknownIdReturns404() => _unknownStatus.Should().Be(HttpStatusCode.NotFound);
+    public void UAC03_UnknownIdReturns404() => ((HttpStatusCode)useCase.Cases["UnknownStatus"]!).Should().Be(HttpStatusCode.NotFound);
 }
 #endif

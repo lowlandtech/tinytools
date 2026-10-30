@@ -8,10 +8,11 @@ namespace LowlandTech.TinyTools.Tests.SPEC3316.Templates.US01.TemplateApi;
 [Trait(Spec.SPEC, "3316")]
 [Trait(Spec.SC, "01")]
 [UserStory("01", "Template API CRUD operations")]
-public sealed class SC01_ListTemplates : TemplateApiScenario
+public sealed class SC01_ListTemplates : TemplateApiScenario, IClassFixture<UseCases.TemplateApiUseCase>
 {
-    private HttpResponseMessage _response = null!;
-    private int _listedCount;
+    private readonly UseCases.TemplateApiUseCase useCase;
+
+    public SC01_ListTemplates(UseCases.TemplateApiUseCase useCase) => this.useCase = useCase;
 
     [Given("a template library seeded with two templates")]
     private Task GivenAsync() => SeedLibraryAsync();
@@ -19,23 +20,25 @@ public sealed class SC01_ListTemplates : TemplateApiScenario
     [When("GET /api/templates is called")]
     private async Task WhenAsync()
     {
-        _response = await Client.GetAsync("/api/templates");
-        _listedCount = (await _response.Content.ReadFromJsonAsync<JsonElement>()).GetArrayLength();
+        var response = await Client.GetAsync("/api/templates");
+        useCase.Cases["Status"] = response.StatusCode;
+        useCase.Cases["ListedCount"] = (await response.Content.ReadFromJsonAsync<JsonElement>()).GetArrayLength();
     }
 
-    public override async ValueTask InitializeAsync()
+    public override ValueTask InitializeAsync()
     {
-        await base.InitializeAsync();
-        await GivenAsync();
-        await WhenAsync();
+        useCase.RunOnce(
+            () => { base.InitializeAsync(); GivenAsync().GetAwaiter().GetResult(); },
+            () => WhenAsync().GetAwaiter().GetResult());
+        return ValueTask.CompletedTask;
     }
 
     [Then("the response status should be OK")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_ResponseIs200() => _response.StatusCode.Should().Be(HttpStatusCode.OK);
+    public void UAC01_ResponseIs200() => ((HttpStatusCode)useCase.Cases["Status"]!).Should().Be(HttpStatusCode.OK);
 
     [Then("the listed templates should have count 2")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_Returns2Templates() => _listedCount.Should().Be(2);
+    public void UAC02_Returns2Templates() => ((int)useCase.Cases["ListedCount"]!).Should().Be(2);
 }
 #endif

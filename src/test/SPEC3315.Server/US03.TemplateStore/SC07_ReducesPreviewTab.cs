@@ -6,8 +6,9 @@ namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US03.TemplateStore;
 [Trait(Spec.SPEC, "3315")]
 [Trait(Spec.SC, "07")]
 [UserStory("03", "Template reducer produces correct state transitions")]
-public sealed class SC07_ReducesPreviewTab
+public sealed class SC07_ReducesPreviewTab : IClassFixture<UseCases.TemplateStoreUseCase>
 {
+    private readonly UseCases.TemplateStoreUseCase useCase;
     private TemplateState _state = new();
     private static readonly Guid Node = Guid.NewGuid();
 
@@ -15,16 +16,20 @@ public sealed class SC07_ReducesPreviewTab
     private void Given() => _state = new TemplateState();
 
     [When("a template node is selected")]
-    private void When() => _state = TemplateReducer.Reduce(_state, new TemplateNodeSelected($"tpl:{Node}", "Test", "template", Node));
-
-    public SC07_ReducesPreviewTab()
+    private void When()
     {
-        Given();
-        When();
+        _state = TemplateReducer.Reduce(_state, new TemplateNodeSelected($"tpl:{Node}", "Test", "template", Node));
+        useCase.Cases["Preview"] = new { Count = _state.OpenTabs.Count, Pinned = _state.OpenTabs[0].IsPinned, _state.ActiveTabKey, _state.SelectedNodeKey };
+    }
+
+    public SC07_ReducesPreviewTab(UseCases.TemplateStoreUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
     }
 
     [Then("the preview tab should be active")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_SelectionOpensOnePreviewTab() => new { Count = _state.OpenTabs.Count, Pinned = _state.OpenTabs[0].IsPinned, _state.ActiveTabKey, _state.SelectedNodeKey }.Should().BeEquivalentTo(new { Count = 1, Pinned = false, ActiveTabKey = $"tpl:{Node}", SelectedNodeKey = $"tpl:{Node}" });
+    public void UAC05_SelectionOpensOnePreviewTab() => useCase.Cases["Preview"].Should().BeEquivalentTo(new { Count = 1, Pinned = false, ActiveTabKey = $"tpl:{Node}", SelectedNodeKey = $"tpl:{Node}" });
 }
 #endif

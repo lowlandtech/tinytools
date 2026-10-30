@@ -6,8 +6,9 @@ namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US03.TemplateStore;
 [Trait(Spec.SPEC, "3315")]
 [Trait(Spec.SC, "28")]
 [UserStory("03", "Template reducer produces correct state transitions")]
-public sealed class SC28_IgnoresUnknownAction
+public sealed class SC28_IgnoresUnknownAction : IClassFixture<UseCases.TemplateStoreUseCase>
 {
+    private readonly UseCases.TemplateStoreUseCase useCase;
     private TemplateState _state = new();
     private TemplateState _before = new();
 
@@ -19,16 +20,21 @@ public sealed class SC28_IgnoresUnknownAction
     }
 
     [When("an unknown action is dispatched")]
-    private void When() => _state = TemplateReducer.Reduce(_state, "unknown");
-
-    public SC28_IgnoresUnknownAction()
+    private void When()
     {
-        Given();
-        When();
+        _state = TemplateReducer.Reduce(_state, "unknown");
+        useCase.Cases["State"] = _state;
+        useCase.Cases["Before"] = _before;
+    }
+
+    public SC28_IgnoresUnknownAction(UseCases.TemplateStoreUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
     }
 
     [Then("the state should be unchanged")]
     [Trait("UAC", "26"), Fact]
-    public void UAC26_UnknownActionIsIgnored() => _state.Should().Be(_before);
+    public void UAC26_UnknownActionIsIgnored() => useCase.Cases["State"].Should().Be(useCase.Cases["Before"]);
 }
 #endif
