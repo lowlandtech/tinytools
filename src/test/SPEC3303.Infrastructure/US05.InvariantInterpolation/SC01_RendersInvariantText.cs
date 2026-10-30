@@ -65,9 +65,9 @@ public sealed class SC01_RendersInvariantText : IClassFixture<UseCases.Invariant
 
     [Then("the string text should be Ada")]
     [Trait("UAC", "05"), Fact]
-    public void UAC04b_KeepsStringText() => ((string)useCase.Cases["String"]!).Should().Be("Ada");
+    public void UAC05_KeepsStringText() => ((string)useCase.Cases["String"]!).Should().Be("Ada");
 
     [Then("the null text should be empty")]
     [Trait("UAC", "06"), Fact]
-    public void UAC04c_KeepsNullText() => ((string)useCase.Cases["Null"]!).Should().Be("[]");
+    public void UAC06_KeepsNullText() => ((string)useCase.Cases["Null"]!).Should().Be("[]");
 }
