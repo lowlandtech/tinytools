@@ -26,6 +26,13 @@
 		<ProjectReference Include="..\infrastructure\LowlandTech.TinyTools.Tests.Infrastructure.csproj" />
 	</ItemGroup>
 
+	<!-- The API host targets net10.0 only, so its integration specs exist on that
+	     target framework and the scenario source is guarded with NET10_0_OR_GREATER. -->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.9" />
+		<ProjectReference Include="..\api\LowlandTech.TinyTools.Api.csproj" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<None Update="files.zip">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
