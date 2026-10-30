@@ -6,6 +6,8 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US10.Macros;
 public sealed class SC01_RendersMacros : IClassFixture<UseCases.MacrosUseCase>
 {
     private readonly UseCases.MacrosUseCase useCase;
+    private TinyTemplateEngine engine = null!;
+    private ExecutionContext context = null!;
 
     public SC01_RendersMacros(UseCases.MacrosUseCase useCase)
     {
@@ -13,18 +15,18 @@ public sealed class SC01_RendersMacros : IClassFixture<UseCases.MacrosUseCase>
         useCase.RunOnce(Given, When);
     }
 
-    [Given("templates declaring a greeting macro, a composed macro and a self-invoking macro")]
+    [Given("an engine, a caller context and the templates for each macro case")]
     private void Given()
     {
+        engine = new TinyTemplateEngine();
+        context = new ExecutionContext();
+        context.Set("Name", "Ada");
+        context.Set("Flag", true);
     }
 
     [When("the public Render executes each template once")]
     private void When()
     {
-        var engine = new TinyTemplateEngine();
-        var context = new ExecutionContext();
-        context.Set("Name", "Ada");
-        context.Set("Flag", true);
 
         useCase.Cases["Macro"] = engine.Render(
             "@macro greet(who, mark) { Hello ${who}${mark} }\n@greet(\"Ada\", \"!\")", context);
