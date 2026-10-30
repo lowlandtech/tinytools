@@ -1,0 +1,31 @@
+<Project>
+
+  <!--
+    Renders declared template items during the build.
+
+      <ItemGroup>
+        <TinyTemplate Include="greeting.tmpl" Model="model.json" Output="$(IntermediateOutputPath)Generated/greeting.txt" />
+      </ItemGroup>
+
+    `Output` is a reserved MSBuild metadata name, so the destination is `TinyToolsOutput`.
+
+    The target is incremental: an unchanged template and model pair is skipped, and a template that
+    cannot render fails the build with its path and the engine diagnostic instead of writing a
+    partial file.
+  -->
+  <PropertyGroup>
+    <TinyToolsBuildAssembly Condition="'$(TinyToolsBuildAssembly)' == ''">$(MSBuildThisFileDirectory)tools/LowlandTech.TinyTools.Build.dll</TinyToolsBuildAssembly>
+  </PropertyGroup>
+
+  <UsingTask TaskName="LowlandTech.TinyTools.Build.RenderTemplates"
+             AssemblyFile="$(TinyToolsBuildAssembly)" />
+
+  <Target Name="TinyToolsRenderTemplates"
+          BeforeTargets="BeforeBuild"
+          Condition="'@(TinyTemplate)' != ''"
+          Inputs="@(TinyTemplate);@(TinyTemplate->'%(Model)')"
+          Outputs="@(TinyTemplate->'%(TinyToolsOutput)')">
+    <LowlandTech.TinyTools.Build.RenderTemplates Templates="@(TinyTemplate)" />
+  </Target>
+
+</Project>

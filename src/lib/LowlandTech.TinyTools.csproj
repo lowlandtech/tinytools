@@ -61,6 +61,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- The MSBuild integration: a target that renders declared template items, plus the task
+         assembly it loads. Packed into buildTransitive so a consumer inherits it by referencing
+         the package, with no extra reference to add. -->
+    <None Include="Build\LowlandTech.TinyTools.targets" Pack="true" PackagePath="buildTransitive\" />
+    <None Include="Build\LowlandTech.TinyTools.targets" Pack="true" PackagePath="build\" />
+    <None Include="..\build\bin\$(Configuration)\net10.0\LowlandTech.TinyTools.Build.dll" Pack="true" PackagePath="buildTransitive\tools\" Visible="false" />
+    <None Include="bin\$(Configuration)\net10.0\LowlandTech.TinyTools.dll" Pack="true" PackagePath="buildTransitive\tools\" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!--
       The package readme is deliberately src/README.md: it is the short, install-first
       document for package consumers. The repository root readme.md is the project

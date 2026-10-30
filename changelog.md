@@ -1,4 +1,7 @@
 # 2026.10.4
+## MSBuild rendering
+
+* The package ships a `buildTransitive` target that renders declared `<TinyTemplate Include="..." Model="..." TinyToolsOutput="..." />` items during the build, incrementally, and fails the build with the engine diagnostic when a template cannot render.
 ## Snapshot approvals
 
 * `tinytools test <directory> [--approve]` pins the rendered output of every `.tmpl` beside it as
