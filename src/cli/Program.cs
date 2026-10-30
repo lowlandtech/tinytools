@@ -1,17 +1,35 @@
 using System.Diagnostics;
 using System.Text.Json;
+using LowlandTech.TinyTools.Rendering;
 using LowlandTech.TinyTools.Workflows;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
+const string Usage = """
+    tinytools generate <workflow.yml> [--model model.json] [--root directory] [--templates directory]
+    tinytools render <template> [<template>...] --output <file> | --out-dir <dir> [--model model.json] [--root directory]
+    tinytools watch <template> --output <file> [--model model.json] [--root directory]
+    """;
+
 if (args.Length == 0 || args[0] is "--help" or "-h")
 {
-    Console.WriteLine("tinytools generate <workflow.yml> [--model model.json] [--root directory] [--templates directory]");
+    Console.WriteLine(Usage);
     return 0;
 }
+
+if (string.Equals(args[0], "render", StringComparison.OrdinalIgnoreCase))
+{
+    return RunRender(args);
+}
+
+if (string.Equals(args[0], "watch", StringComparison.OrdinalIgnoreCase))
+{
+    return await RunWatch(args);
+}
+
 if (!string.Equals(args[0], "generate", StringComparison.OrdinalIgnoreCase) || args.Length < 2)
 {
-    Console.Error.WriteLine("Usage: tinytools generate <workflow.yml> [--model model.json] [--root directory] [--templates directory]");
+    Console.Error.WriteLine(Usage);
     return 2;
 }
 
@@ -65,3 +83,106 @@ static object? ToModel(JsonElement value) => value.ValueKind switch
     JsonValueKind.False => false,
     _ => null
 };
+
+static int RunRender(string[] args)
+{
+    var templates = new List<string>();
+    string? model = null;
+    string? output = null;
+    string? outDir = null;
+    var root = Directory.GetCurrentDirectory();
+
+    for (var i = 1; i < args.Length; i++)
+    {
+        switch (args[i])
+        {
+            case "--model" when i + 1 < args.Length: model = args[++i]; break;
+            case "--output" when i + 1 < args.Length: output = args[++i]; break;
+            case "--out-dir" when i + 1 < args.Length: outDir = args[++i]; break;
+            case "--root" when i + 1 < args.Length: root = args[++i]; break;
+            default: templates.Add(args[i]); break;
+        }
+    }
+
+    if (templates.Count == 0 || (output is null && outDir is null))
+    {
+        Console.Error.WriteLine("render needs at least one template and --output or --out-dir.");
+        return 2;
+    }
+
+    var renderer = new TemplateFileRenderer();
+    var failures = 0;
+    try
+    {
+        foreach (var template in templates)
+        {
+            var destination = output ?? Path.Combine(outDir!, Path.GetFileNameWithoutExtension(template) + ".txt");
+            var result = renderer.Render(template, model, destination, root);
+            Console.WriteLine($"{(result.Success ? "rendered" : "failed"),-9} {template}: {result.Message}");
+            if (!result.Success) failures++;
+        }
+    }
+    catch (InvalidOperationException error)
+    {
+        Console.Error.WriteLine(error.Message);
+        return 3;
+    }
+
+    return failures == 0 ? 0 : 1;
+}
+
+static async Task<int> RunWatch(string[] args)
+{
+    var templates = new List<string>();
+    string? model = null;
+    string? output = null;
+    string? outDir = null;
+    var root = Directory.GetCurrentDirectory();
+
+    for (var i = 1; i < args.Length; i++)
+    {
+        switch (args[i])
+        {
+            case "--model" when i + 1 < args.Length: model = args[++i]; break;
+            case "--output" when i + 1 < args.Length: output = args[++i]; break;
+            case "--out-dir" when i + 1 < args.Length: outDir = args[++i]; break;
+            case "--root" when i + 1 < args.Length: root = args[++i]; break;
+            default: templates.Add(args[i]); break;
+        }
+    }
+
+    if (templates.Count == 0)
+    {
+        Console.Error.WriteLine("watch needs at least one template.");
+        return 2;
+    }
+
+    var renderer = new TemplateFileRenderer();
+    var relevant = templates.Concat(model is null ? [] : new[] { model }).ToList();
+    using var cancellation = new CancellationTokenSource();
+    Console.CancelKeyPress += (_, eventArgs) => { eventArgs.Cancel = true; cancellation.Cancel(); };
+
+    void RenderAll(IReadOnlyList<string> changed)
+    {
+        foreach (var template in templates)
+        {
+            var destination = output ?? Path.Combine(outDir ?? root, Path.GetFileNameWithoutExtension(template) + ".txt");
+            var result = renderer.Render(template, model, destination, root);
+            Console.WriteLine($"{(result.Success ? "rendered" : "failed"),-9} {template}: {result.Message}");
+        }
+    }
+
+    RenderAll(relevant);
+    Console.WriteLine($"watching {string.Join(", ", relevant)}; press Ctrl+C to stop.");
+    var watcher = new TemplateWatcher(relevant, RenderAll);
+    try
+    {
+        await watcher.RunAsync(cancellation.Token);
+    }
+    catch (OperationCanceledException)
+    {
+        // Ctrl+C is the documented shutdown path.
+    }
+
+    return 0;
+}
