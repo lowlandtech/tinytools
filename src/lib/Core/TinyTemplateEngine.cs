@@ -44,6 +44,107 @@ public partial class TinyTemplateEngine : ITemplateEngine
         return _resolver.ResolveExpression(expression, context);
     }
 
+    /// <summary>
+    /// Validates the supported syntax without rendering. Diagnostics are stable codes:
+    /// TS001 unterminated <c>${</c>, TS002 unterminated comment, TS003 control-flow
+    /// statement without a condition, TS004 control-flow statement without an opening
+    /// brace, TS005 control-flow block that is never closed, TS006 closing brace with no
+    /// open block.
+    /// </summary>
+    public TemplateSyntaxValidationResult ValidateSyntax(string template)
+    {
+        if (string.IsNullOrEmpty(template)) return TemplateSyntaxValidationResult.Valid;
+
+        var diagnostics = new List<TemplateSyntaxDiagnostic>();
+        var text = template.Replace("\r\n", "\n").Replace("\r", "\n");
+        text = StripComments(text, diagnostics);
+
+        for (var index = text.IndexOf("${", StringComparison.Ordinal); index >= 0;
+             index = text.IndexOf("${", index + 2, StringComparison.Ordinal))
+        {
+            if (text.IndexOf('}', index) < 0)
+            {
+                diagnostics.Add(new("TS001", "An interpolation opened with '${' is never closed."));
+                break;
+            }
+        }
+
+        var lines = text.Split('\n');
+        for (var i = 0; i < lines.Length; i++)
+        {
+            var line = lines[i].TrimStart();
+            var isIf = line.StartsWith("@if", StringComparison.Ordinal);
+            var isForeach = line.StartsWith("@foreach", StringComparison.Ordinal);
+            if (!isIf && !isForeach) continue;
+
+            var keyword = isIf ? "@if" : "@foreach";
+            if (!line.Contains('(') || !line.Contains(')'))
+            {
+                diagnostics.Add(new("TS003", $"{keyword} on line {i + 1} has no condition."));
+                continue;
+            }
+
+            if (!line.Contains('{'))
+            {
+                diagnostics.Add(new("TS004", $"{keyword} on line {i + 1} has no opening brace."));
+                continue;
+            }
+
+            if (FindBlockEnd(lines, i) < 0)
+            {
+                diagnostics.Add(new("TS005", $"{keyword} opened on line {i + 1} is never closed."));
+            }
+        }
+
+        return diagnostics.Count == 0
+            ? TemplateSyntaxValidationResult.Valid
+            : new TemplateSyntaxValidationResult(false, diagnostics);
+    }
+
+    private static string StripComments(string text, List<TemplateSyntaxDiagnostic> diagnostics)
+    {
+        var open = text.IndexOf("@*", StringComparison.Ordinal);
+        while (open >= 0)
+        {
+            var close = text.IndexOf("*@", open + 2, StringComparison.Ordinal);
+            if (close < 0)
+            {
+                diagnostics.Add(new("TS002", "A comment opened with '@*' is never closed."));
+                return text;
+            }
+
+            text = text.Remove(open, close + 2 - open);
+            open = text.IndexOf("@*", StringComparison.Ordinal);
+        }
+
+        return text;
+    }
+
+    /// <summary>
+    /// Finds the line that closes the block opened at <paramref name="startIndex"/>,
+    /// using the same brace counting the renderer uses, or -1 when it never closes.
+    /// </summary>
+    private static int FindBlockEnd(string[] lines, int startIndex)
+    {
+        var depth = 0;
+        var opened = false;
+
+        for (var i = startIndex; i < lines.Length; i++)
+        {
+            foreach (var character in lines[i])
+            {
+                if (character == '{') { depth++; opened = true; }
+                else if (character == '}') depth--;
+            }
+
+            if (i == startIndex) continue;
+            if (opened && depth == 0) return i;
+            if (depth < 0) return -1;
+        }
+
+        return -1;
+    }
+
     private string ProcessControlFlow(string template, ToolContext context)
     {
         // First, remove comments (@* ... *@)

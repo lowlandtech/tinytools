@@ -1,4 +1,4 @@
-﻿namespace LowlandTech.TinyTools;
+namespace LowlandTech.TinyTools;
 
 /// <summary>
 /// Interface for the template engine that renders templates with model data.
@@ -16,4 +16,11 @@ public interface ITemplateEngine
     /// Used for simple interpolation without control flow.
     /// </summary>
     string ResolveVariables(string input, ToolContext context);
+
+    /// <summary>
+    /// Validates the supported control-flow and interpolation syntax without
+    /// rendering it. This is an explicit parse/validate operation: it never invokes
+    /// helpers and never changes what <see cref="Render"/> does.
+    /// </summary>
+    TemplateSyntaxValidationResult ValidateSyntax(string template);
 }
