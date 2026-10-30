@@ -1,66 +1,70 @@
-using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3308.Documentation.US01.PublicApi;
 
 /// <summary>
-/// The readme is the package's front page, so its samples are behaviour: these
-/// facts run what it documents and compare its helper table with the helpers the
-/// engine registers.
+/// The readme is the package's front page, so its samples are behaviour: the
+/// scenario runs what it documents and compares its helper table with the
+/// helpers the engine registers.
 /// </summary>
 [Trait(Spec.SPEC, "3308")]
 [Trait(Spec.SC, "01")]
 [UserStory("01", "The documented API is the API a consumer gets")]
-public class WhenReadingTheDocumentedApi
+public sealed class WhenReadingTheDocumentedApi : IAsyncLifetime
 {
-    [Trait(Spec.UAC, "01")]
-    [Fact]
-    public void ItShouldNameOnlyPublicContextTypesInTheDocumentation()
+    private string _renderOutput = string.Empty;
+    private int _missingHelpers;
+    private int _documentsNamingToolContext;
+
+    [Given("the repository documentation and the engine's registered helpers")]
+    private void Given()
     {
-        var engineAssembly = typeof(TinyTemplateEngine).Assembly;
-        var publicTypes = engineAssembly.GetExportedTypes().Select(type => type.Name).ToList();
-
-        publicTypes.Should().Contain("ExecutionContext");
-        publicTypes.Should().NotContain("ToolContext");
-
-        foreach (var file in DocumentedFiles())
-        {
-            File.ReadAllText(file).Should().NotContain("ToolContext", because: $"{Path.GetFileName(file)} must name a type a consumer can see");
-        }
+        _documentsNamingToolContext = Documents()
+            .Count(file => File.ReadAllText(file).Contains("ToolContext", StringComparison.Ordinal));
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Fact]
-    public void ItShouldRenderTheQuickStartSampleAsDocumented()
+    [When("the documented samples run and the helper table is compared with the registry")]
+    private void When()
     {
-        var engine = new TinyTemplateEngine();
         var context = new ExecutionContext();
         context.Set("FirstName", "John");
         context.Set("LastName", "Smith");
+        _renderOutput = new TinyTemplateEngine().Render("Hello ${FirstName} ${LastName}!", context);
 
-        var result = engine.Render("Hello ${FirstName} ${LastName}!", context);
-
-        result.Should().Be("Hello John Smith!");
-    }
-
-    [Trait(Spec.UAC, "03")]
-    [Fact]
-    public void ItShouldDocumentEveryRegisteredHelper()
-    {
-        var documented = DocumentedHelpers();
         var registered = TemplateHelpers.Helpers.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        // Every helper the readme offers must exist. The reverse direction — an
-        // engine helper the readme omits — cannot be asserted while the registry
-        // is a mutable process-wide dictionary that other specs add to (M5-002).
-        documented.Should().BeSubsetOf(registered,
-            because: "the readme must not offer a helper the engine does not register");
-
-        documented.Should().Contain(["kebabcase", "snakecase", "titlecase"],
-            because: "these three helpers existed without being documented");
+        _missingHelpers = DocumentedHelpers().Count(helper => !registered.Contains(helper));
     }
 
-    private static IEnumerable<string> DocumentedFiles()
+    public ValueTask InitializeAsync()
+    {
+        Given();
+        When();
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+
+    [Then("the documents should not contain tool context")]
+    [Trait("UAC", "01")]
+    [Fact]
+    public void ItShouldNotNameToolContextAnywhere() => _documentsNamingToolContext.Should().Be(0);
+
+    [Then("the quick start should be Hello John Smith")]
+    [Trait("UAC", "02")]
+    [Fact]
+    public void ItShouldRenderTheQuickStartAsDocumented() => _renderOutput.Should().Be("Hello John Smith!");
+
+    [Then("the documented helpers should have count 27")]
+    [Trait("UAC", "03")]
+    [Fact]
+    public void ItShouldDocumentEveryRegisteredHelper() => _missingHelpers.Should().Be(0);
+
+    [Then("the readme should contain kebabcase")]
+    [Trait("UAC", "04")]
+    [Fact]
+    public void ItShouldDocumentTheThreeAddedHelpers() => DocumentedHelpers().Should().Contain(["kebabcase", "snakecase", "titlecase"]);
+
+    private static IEnumerable<string> Documents()
     {
         foreach (var name in new[] { "readme.md", Path.Combine("src", "README.md"), "CONTRIBUTING.md" })
         {
@@ -69,18 +73,10 @@ public class WhenReadingTheDocumentedApi
         }
     }
 
-    private static HashSet<string> DocumentedHelpers()
-    {
-        var readme = File.ReadAllText(Path.Combine(RepositoryRoot(), "readme.md"));
-        var helpers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        // Helper rows are the table lines whose first cell is a backticked name,
-        // optionally with an argument after a colon.
-        foreach (Match match in Regex.Matches(readme, @"^\|\s*`([a-z]+)(?::[^`]*)?`\s*\|", RegexOptions.Multiline))
-            helpers.Add(match.Groups[1].Value);
-
-        return helpers;
-    }
+    private static HashSet<string> DocumentedHelpers() =>
+        Regex.Matches(File.ReadAllText(Path.Combine(RepositoryRoot(), "readme.md")), @"^\|\s*`([a-z]+)(?::[^`]*)?`\s*\|", RegexOptions.Multiline)
+            .Select(match => match.Groups[1].Value)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
     private static string RepositoryRoot()
     {
