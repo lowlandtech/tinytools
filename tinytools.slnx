@@ -15,6 +15,7 @@
   <Folder Name="/src/">
     <Project Path="src/api/LowlandTech.TinyTools.Api.csproj" />
     <Project Path="src/core/LowlandTech.TinyTools.Core.csproj" />
+    <Project Path="src/frontend/LowlandTech.TinyTools.Frontend.csproj" />
     <Project Path="src/lib/LowlandTech.TinyTools.csproj" />
     <Project Path="src/cli/LowlandTech.TinyTools.Cli.csproj" />
     <Project Path="src/test/LowlandTech.TinyTools.Tests.csproj" />
