@@ -1,4 +1,4 @@
-﻿namespace LowlandTech.TinyTools;
+namespace LowlandTech.TinyTools;
 
 /// <summary>
 /// Resolves ${Context.xxx} variable expressions.
@@ -78,8 +78,11 @@ public partial class VariableResolver
 
             var result = ResolveExpressionWithPipes(expression, context);
             var resultStr = result?.ToString() ?? string.Empty;
-            _logger.LogDebug("${{{Expression}}} → \"{Result}\"", expression,
-                resultStr.Length > 100 ? resultStr[..100] + "..." : resultStr);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("${{{Expression}}} → \"{Result}\"", expression,
+                    resultStr.Length > 100 ? resultStr[..100] + "..." : resultStr);
+            }
             return resultStr;
         });
     }
@@ -317,17 +320,56 @@ public partial class VariableResolver
         // Resolve the base value
         var value = ResolveExpression(variableExpr, context);
 
-        // Apply each helper in sequence
-        var matches = PipePattern().Matches(helpersExpr);
-        foreach (RegexMatch helperMatch in matches)
+        // Apply each helper in sequence. The pipe syntax is parsed by hand here: the
+        // regex form allocated a MatchCollection per expression, which dominated the
+        // per-render allocation for multi-helper templates.
+        var span = helpersExpr.AsSpan();
+        var index = 0;
+        while (index < span.Length)
         {
-            var helperName = helperMatch.Groups[1].Value;
-            var helperArg = helperMatch.Groups[2].Success ? helperMatch.Groups[2].Value : null;
+            var pipe = span[index..].IndexOf('|');
+            if (pipe < 0) break;
+
+            index += pipe + 1;
+            var start = index;
+            while (index < span.Length && span[index] != '|') index++;
+
+            // Leading whitespace before the helper name is insignificant; the argument
+            // keeps its exact text, including a trailing space such as `join:, `.
+            var segment = span[start..index].TrimStart();
+            if (segment.IsEmpty) continue;
+
+            var colon = segment.IndexOf(':');
+            var nameSpan = colon < 0 ? segment : segment[..colon];
+            var nameLength = 0;
+            while (nameLength < nameSpan.Length
+                   && (char.IsLetterOrDigit(nameSpan[nameLength]) || nameSpan[nameLength] == '_'))
+            {
+                nameLength++;
+            }
+
+            var helperName = nameSpan[..nameLength].ToString();
+            var helperArg = colon < 0 ? null : segment[(colon + 1)..].ToString();
+
+            // A space before the next pipe is decoration, so it is not part of the
+            // argument; a trailing space at the end of the expression is the argument,
+            // as in `join:, ` where the separator really is a comma and a space.
+            if (helperArg is not null && index < span.Length)
+            {
+                helperArg = helperArg.TrimEnd();
+            }
+
             if (!TemplateHelpers.Exists(helperName))
+            {
                 _logger.LogWarning("Unknown pipe helper '{Helper}', value unchanged", helperName);
-            var before = value;
+            }
+
             value = TemplateHelpers.Apply(value, helperName, helperArg);
-            _logger.LogDebug("Pipe helper '{Helper}': \"{Before}\" → \"{After}\"", helperName, before, value);
+
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Pipe helper '{Helper}' applied", helperName);
+            }
         }
 
         return value;
@@ -341,7 +383,7 @@ public partial class VariableResolver
         // Handle Context.Get("key") syntax
         if (expression.StartsWith("Context.Get(", StringComparison.OrdinalIgnoreCase))
         {
-            var keyMatch = Regex.Match(expression, @"Context\.Get\([""']([^""']+)[""']\)");
+            var keyMatch = _contextGetPattern.Match(expression);
             if (keyMatch.Success)
             {
                 return context.Get(keyMatch.Groups[1].Value);
@@ -370,6 +412,12 @@ public partial class VariableResolver
         if (path.Contains('('))
         {
             return ResolvePathWithMethodCalls(path, context);
+        }
+
+        // A single key needs no path split at all, which is the common case.
+        if (path.IndexOf('.') < 0)
+        {
+            return context.Get(path);
         }
 
         var parts = path.Split('.');
@@ -404,11 +452,11 @@ public partial class VariableResolver
         var index = 0;
 
         // Pattern to match method call: methodName('arg') or methodName("arg")
-        var methodCallPattern = new Regex(@"^(\w+)\('([^']*)'\)|^(\w+)\(""([^""]*)""\)");
+        var methodCallPattern = MethodCallPattern();
         // Pattern to match direct invocation with string literal: ('arg') or ("arg")
-        var directCallLiteralPattern = new Regex(@"^\('([^']*)'\)|^\(""([^""]*)""\)");
+        var directCallLiteralPattern = DirectCallLiteralPattern();
         // Pattern to match direct invocation with variable: (varName) or (Context.Path.To.Value)
-        var directCallVariablePattern = new Regex(@"^\(([^)]+)\)");
+        var directCallVariablePattern = DirectCallVariablePattern();
 
         while (index < path.Length)
         {
@@ -598,19 +646,18 @@ public partial class VariableResolver
         }
 
         var type = obj.GetType();
+        var member = Members.GetOrAdd((type, propertyName), static key => new MemberCacheEntry(
+            key.Type.GetProperty(key.Name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase),
+            key.Type.GetField(key.Name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)));
 
-        // Try property
-        var property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-        if (property != null)
+        if (member.Property != null)
         {
-            return property.GetValue(obj);
+            return member.Property.GetValue(obj);
         }
 
-        // Try field
-        var field = type.GetField(propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-        if (field != null)
+        if (member.Field != null)
         {
-            return field.GetValue(obj);
+            return member.Field.GetValue(obj);
         }
 
         // Try dictionary
@@ -626,6 +673,25 @@ public partial class VariableResolver
 
         return null;
     }
+
+    /// <summary>
+    /// Caches the reflected member per type and name. Reflection lookups dominated
+    /// variable resolution, and the same few paths repeat for every render.
+    /// </summary>
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<(Type Type, string Name), MemberCacheEntry> Members = new();
+
+    private readonly record struct MemberCacheEntry(PropertyInfo? Property, FieldInfo? Field);
+
+    private static readonly Regex _methodCallPattern = new(@"^(\w+)\('([^']*)'\)|^(\w+)\(""([^""]*)""\)", RegexOptions.Compiled);
+    private static Regex MethodCallPattern() => _methodCallPattern;
+
+    private static readonly Regex _directCallLiteralPattern = new(@"^\('([^']*)'\)|^\(""([^""]*)""\)", RegexOptions.Compiled);
+    private static Regex DirectCallLiteralPattern() => _directCallLiteralPattern;
+
+    private static readonly Regex _directCallVariablePattern = new(@"^\(([^)]+)\)", RegexOptions.Compiled);
+    private static Regex DirectCallVariablePattern() => _directCallVariablePattern;
+
+    private static readonly Regex _contextGetPattern = new(@"Context\.Get\([""']([^""']+)[""']\)", RegexOptions.Compiled);
 
     /// <summary>
     /// Resolves inputs dictionary, replacing any ${Context.xxx} expressions.
