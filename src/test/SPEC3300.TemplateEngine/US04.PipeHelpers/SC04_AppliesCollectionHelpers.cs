@@ -5,21 +5,17 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US04.PipeHelpers;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "04")]
 [UserStory("04", "Template engine applies collection pipe helpers")]
-public class WhenRenderingWithCollectionHelpersTest : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC04_AppliesCollectionHelpers : TinyToolsScenario<TinyTemplateEngine>
 {
-    private ExecutionContext _context = null!;
-    private string _template = null!;
-    private string? _result;
+    private readonly ExecutionContext _context = new();
+    private string _template = string.Empty;
+    private string _result = string.Empty;
 
-    protected override TinyTemplateEngine For()
-    {
-        return new TinyTemplateEngine();
-    }
+    protected override TinyTemplateEngine For() => new();
 
-    [Given("Setup test context")]
+    [Given("a context holding tags, numbers, an empty list and a single word")]
     protected override void Given()
     {
-        _context = new ExecutionContext();
         _context.Set("Tags", new[] { "csharp", "dotnet", "templates" });
         _context.Set("Numbers", new[] { 1, 2, 3, 4, 5 });
         _context.Set("EmptyList", Array.Empty<string>());
@@ -37,82 +33,44 @@ public class WhenRenderingWithCollectionHelpersTest : TinyToolsScenario<TinyTemp
             """;
     }
 
-    [When("Execute test action")]
+    [When("the collection helper template is rendered once")]
     protected override void When()
     {
         base.When();
         _result = Sut.Render(_template, _context);
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Count Items")]
-    [Fact]
-    public void ItShouldCountItems()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Count: 3");
-    }
+    public SC04_AppliesCollectionHelpers() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Get First Item")]
-    [Fact]
-    public void ItShouldGetFirstItem()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("First: csharp");
-    }
+    [Then("the render should contain Count: 3")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_CountsItems() => _result.Should().Contain("Count: 3");
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Get Last Item")]
-    [Fact]
-    public void ItShouldGetLastItem()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Last: templates");
-    }
+    [Then("the render should contain First: csharp")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_GetsFirstItem() => _result.Should().Contain("First: csharp");
 
-    [Trait(Spec.UAC, "04")]
-    [Then("it Should Join With Comma")]
-    [Fact]
-    public void ItShouldJoinWithComma()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Join: csharp, dotnet, templates");
-    }
+    [Then("the render should contain Last: templates")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_GetsLastItem() => _result.Should().Contain("Last: templates");
 
-    [Trait(Spec.UAC, "05")]
-    [Then("it Should Join With Dash")]
-    [Fact]
-    public void ItShouldJoinWithDash()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Join Dash: 1-2-3-4-5");
-    }
+    [Then("the render should contain Join: csharp, dotnet, templates")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_JoinsWithComma() => _result.Should().Contain("Join: csharp, dotnet, templates");
 
-    [Trait(Spec.UAC, "06")]
-    [Then("it Should Reverse String")]
-    [Fact]
-    public void ItShouldReverseString()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Reverse String: olleH");
-    }
+    [Then("the render should contain Join Dash: 1-2-3-4-5")]
+    [Trait("UAC", "05"), Fact]
+    public void UAC05_JoinsWithDash() => _result.Should().Contain("Join Dash: 1-2-3-4-5");
 
-    [Trait(Spec.UAC, "07")]
-    [Then("it Should Count Empty List")]
-    [Fact]
-    public void ItShouldCountEmptyList()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Empty Count: 0");
-    }
+    [Then("the render should contain Reverse String: olleH")]
+    [Trait("UAC", "06"), Fact]
+    public void UAC06_ReversesString() => _result.Should().Contain("Reverse String: olleH");
 
-    [Trait(Spec.UAC, "08")]
-    [Then("it Should Count String Length")]
-    [Fact]
-    public void ItShouldCountStringLength()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("String Length: 5");
-    }
+    [Then("the render should contain Empty Count: 0")]
+    [Trait("UAC", "07"), Fact]
+    public void UAC07_CountsEmptyList() => _result.Should().Contain("Empty Count: 0");
+
+    [Then("the render should contain String Length: 5")]
+    [Trait("UAC", "08"), Fact]
+    public void UAC08_CountsStringLength() => _result.Should().Contain("String Length: 5");
 }

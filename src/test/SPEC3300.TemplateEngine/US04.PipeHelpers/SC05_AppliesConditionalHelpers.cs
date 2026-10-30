@@ -5,21 +5,17 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US04.PipeHelpers;
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "05")]
 [UserStory("04", "Template engine applies conditional pipe helpers")]
-public class WhenRenderingWithConditionalHelpersTest : TinyToolsScenario<TinyTemplateEngine>
+public sealed class SC05_AppliesConditionalHelpers : TinyToolsScenario<TinyTemplateEngine>
 {
-    private ExecutionContext _context = null!;
-    private string _template = null!;
-    private string? _result;
+    private readonly ExecutionContext _context = new();
+    private string _template = string.Empty;
+    private string _result = string.Empty;
 
-    protected override TinyTemplateEngine For()
-    {
-        return new TinyTemplateEngine();
-    }
+    protected override TinyTemplateEngine For() => new();
 
-    [Given("Setup test context")]
+    [Given("a context holding a name, a null nickname, an empty value, booleans and a zero count")]
     protected override void Given()
     {
-        _context = new ExecutionContext();
         _context.Set("Name", "Alice");
         _context.Set("Nickname", null);
         _context.Set("EmptyValue", "");
@@ -39,82 +35,44 @@ public class WhenRenderingWithConditionalHelpersTest : TinyToolsScenario<TinyTem
             """;
     }
 
-    [When("Execute test action")]
+    [When("the conditional helper template is rendered once")]
     protected override void When()
     {
         base.When();
         _result = Sut.Render(_template, _context);
     }
 
-    [Trait(Spec.UAC, "01")]
-    [Then("it Should Keep Existing Value")]
-    [Fact]
-    public void ItShouldKeepExistingValue()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Name: Alice");
-    }
+    public SC05_AppliesConditionalHelpers() => ArrangeAndAct();
 
-    [Trait(Spec.UAC, "02")]
-    [Then("it Should Use Default For Null")]
-    [Fact]
-    public void ItShouldUseDefaultForNull()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Nickname: No nickname");
-    }
+    [Then("the render should contain Name: Alice")]
+    [Trait("UAC", "01"), Fact]
+    public void UAC01_KeepsExistingValue() => _result.Should().Contain("Name: Alice");
 
-    [Trait(Spec.UAC, "03")]
-    [Then("it Should Use If Empty For Empty String")]
-    [Fact]
-    public void ItShouldUseIfEmptyForEmptyString()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Empty: N/A");
-    }
+    [Then("the render should contain Nickname: No nickname")]
+    [Trait("UAC", "02"), Fact]
+    public void UAC02_UsesDefaultForNull() => _result.Should().Contain("Nickname: No nickname");
 
-    [Trait(Spec.UAC, "04")]
-    [Then("it Should Use Default For Missing Variable")]
-    [Fact]
-    public void ItShouldUseDefaultForMissingVariable()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Missing: Not set");
-    }
+    [Then("the render should contain Empty: N/A")]
+    [Trait("UAC", "03"), Fact]
+    public void UAC03_UsesIfEmptyForEmptyString() => _result.Should().Contain("Empty: N/A");
 
-    [Trait(Spec.UAC, "05")]
-    [Then("it Should Show Yes For True")]
-    [Fact]
-    public void ItShouldShowYesForTrue()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Active: Yes");
-    }
+    [Then("the render should contain Missing: Not set")]
+    [Trait("UAC", "04"), Fact]
+    public void UAC04_UsesDefaultForMissingVariable() => _result.Should().Contain("Missing: Not set");
 
-    [Trait(Spec.UAC, "06")]
-    [Then("it Should Show No For False")]
-    [Fact]
-    public void ItShouldShowNoForFalse()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Disabled: No");
-    }
+    [Then("the render should contain Active: Yes")]
+    [Trait("UAC", "05"), Fact]
+    public void UAC05_ShowsYesForTrue() => _result.Should().Contain("Active: Yes");
 
-    [Trait(Spec.UAC, "07")]
-    [Then("it Should Use Custom Yes No Values")]
-    [Fact]
-    public void ItShouldUseCustomYesNoValues()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Custom Yes/No: Enabled");
-    }
+    [Then("the render should contain Disabled: No")]
+    [Trait("UAC", "06"), Fact]
+    public void UAC06_ShowsNoForFalse() => _result.Should().Contain("Disabled: No");
 
-    [Trait(Spec.UAC, "08")]
-    [Then("it Should Treat Zero As Falsy")]
-    [Fact]
-    public void ItShouldTreatZeroAsFalsy()
-    {
-        ArrangeAndAct();
-        _result.Should().Contain("Count Status: Empty");
-    }
+    [Then("the render should contain Custom Yes/No: Enabled")]
+    [Trait("UAC", "07"), Fact]
+    public void UAC07_UsesCustomYesNoValues() => _result.Should().Contain("Custom Yes/No: Enabled");
+
+    [Then("the render should contain Count Status: Empty")]
+    [Trait("UAC", "08"), Fact]
+    public void UAC08_TreatsZeroAsFalsy() => _result.Should().Contain("Count Status: Empty");
 }
