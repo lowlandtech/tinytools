@@ -11,7 +11,6 @@
          ships them, not in the development host. -->
     <IsPackable>true</IsPackable>
     <PackageId>LowlandTech.TinyTools.Frontend</PackageId>
-    <Version>2026.10.1</Version>
     <Authors>LowlandTech</Authors>
     <Company>LowlandTech</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

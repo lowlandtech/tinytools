@@ -1,0 +1,14 @@
+<Project>
+
+  <!--
+    One version authority for the whole repository. Every project derives its package
+    version from this single property, so a package cannot disagree with its tag, its
+    readme badge or its feed entry. Change it with `eng/set-version.ps1`, which also
+    updates the badge and the changelog heading, then tag `v<version>`; CI refuses a tag
+    that does not match this value.
+  -->
+  <PropertyGroup>
+    <Version>2026.10.3</Version>
+  </PropertyGroup>
+
+</Project>

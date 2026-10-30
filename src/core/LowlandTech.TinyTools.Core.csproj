@@ -12,7 +12,6 @@
     <PackageId>LowlandTech.TinyTools.Core</PackageId>
     <!-- Version authority is not settled yet (M5-004); this follows the workspace
          calendar versioning until that workitem decides the scheme. -->
-    <Version>2026.10.1</Version>
     <Authors>LowlandTech</Authors>
     <Company>LowlandTech</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

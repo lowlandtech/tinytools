@@ -1,3 +1,34 @@
+# 2026.10.3
+
+## Included and parameterized templates, asynchronous services, collection helpers
+
+### Added
+
+* `@include("name")` with `RegisterFragment`/`UnregisterFragment`: named in-memory fragments
+  compose into a parent template, keep declaration order when nested, render with the
+  caller's own context, and refuse a missing or recursive fragment by name instead of
+  returning partial output.
+* `@macro name(parameters) { body }` definitions and `@name(arguments)` calls: arguments bind
+  onto a child context, so a macro body keeps interpolation and control flow, calls cannot
+  share state, arity errors name the macro, and self-invocation stops at the recursion limit.
+* `TinyTemplateEngine.RenderAsync` with `ExecutionContext.RegisterAsyncService` and
+  `@service("name", expression)`: calls are awaited in source order, a fault becomes
+  `TemplateServiceException` naming only the service, cancellation propagates before any
+  later call, and the synchronous path refuses asynchronous services instead of blocking.
+* Collection helpers `where:path==value`, `orderby:path`, `groupby:path` and `distinct`:
+  null input is empty, ordering is stable, grouping keeps first-seen key order, and a missing
+  member path is refused by name.
+
+### Changed
+
+* `VariableResolver.ResolveExpression` honours pipe helpers, so the same expression works
+  outside `${...}` interpolation.
+* One version authority: `Directory.Build.props` declares the version, `eng/set-version.ps1`
+  updates it together with the readme badge, and the tag must match it.
+* The package no longer depends on Moq: the mocking-based logger helper and the legacy
+  `WhenTestingFor<T>` base moved to the test infrastructure project.
+* `TemplateHelpers.Helpers` is read-only; use `Register`/`Unregister` for process-wide
+  helpers or `ExecutionContext.RegisterService` for per-render ones.
 # 2026.5.31
 
 ## Helper registry is read-only

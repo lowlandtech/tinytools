@@ -54,7 +54,19 @@ jobs:
         VERSION=${TAG#v}
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
         echo "TAG=$TAG" >> $GITHUB_OUTPUT
-    
+
+    - name: Verify the tag matches the declared version
+      run: |
+        # Directory.Build.props owns the version. A tag that disagrees with it would publish
+        # a package whose version does not match its own release tag.
+        DECLARED=$(dotnet msbuild src/lib/LowlandTech.TinyTools.csproj -getProperty:Version -nologo)
+        TAG_VERSION="${{ steps.get_version.outputs.VERSION }}"
+        echo "declared=$DECLARED tag=$TAG_VERSION"
+        if [ "$DECLARED" != "$TAG_VERSION" ]; then
+          echo "::error::Tag v$TAG_VERSION does not match the declared version $DECLARED. Run eng/set-version.ps1 or retag."
+          exit 1
+        fi
+
     - name: Restore dependencies
       run: dotnet restore
     
@@ -65,7 +77,7 @@ jobs:
       run: dotnet test --configuration Release --no-build --verbosity normal
     
     - name: Pack NuGet package
-      run: dotnet pack src/lib/LowlandTech.TinyTools.csproj --configuration Release --no-build --output ./artifacts /p:PackageVersion=${{ steps.get_version.outputs.VERSION }}
+      run: dotnet pack src/lib/LowlandTech.TinyTools.csproj --configuration Release --no-build --output ./artifacts
     
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2

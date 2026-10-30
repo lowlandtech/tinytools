@@ -84,10 +84,10 @@ jobs:
       run: dotnet restore
     
     - name: Build with version
-      run: dotnet build --configuration Release --no-restore -p:Version=${{ steps.version.outputs.VERSION }}
+      run: dotnet build --configuration Release --no-restore
     
     - name: Pack with version
-      run: dotnet pack src/lib/LowlandTech.TinyTools.csproj --configuration Release --no-build --output ./artifacts -p:PackageVersion=${{ steps.version.outputs.VERSION }}
+      run: dotnet pack src/lib/LowlandTech.TinyTools.csproj --configuration Release --no-build --output ./artifacts
     
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
