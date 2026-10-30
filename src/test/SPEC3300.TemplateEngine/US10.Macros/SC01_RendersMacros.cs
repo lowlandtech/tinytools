@@ -41,6 +41,7 @@ public sealed class SC01_RendersMacros : IClassFixture<UseCases.MacrosUseCase>
         useCase.Cases["TooMany"] = Thrown(engine, "@macro one(a) { ${a} }\n@one(\"x\", \"y\")", context);
         useCase.Cases["Unknown"] = Thrown(engine, "@macro known(a) { ${a} }\n@missing(\"x\")", context);
         useCase.Cases["Recursion"] = Thrown(engine, "@macro loop(a) { @loop(\"x\") }\n@loop(\"x\")", context);
+        useCase.Cases["Indirect"] = Thrown(engine, "@macro ping(a) { @pong(\"x\") }\n@macro pong(a) { @ping(\"x\") }\n@ping(\"x\")", context);
     }
 
     private static string Thrown(TinyTemplateEngine engine, string template, ExecutionContext context)
@@ -80,7 +81,11 @@ public sealed class SC01_RendersMacros : IClassFixture<UseCases.MacrosUseCase>
     [Trait("UAC", "05"), Fact]
     public void UAC05_NamesTheUnknownMacro() => ((string)useCase.Cases["Unknown"]!).Should().Contain("Macro 'missing' is not defined");
 
-    [Then("the recursion message should contain recursion limit")]
+    [Then("the recursion message should contain the direct chain")]
     [Trait("UAC", "07"), Fact]
-    public void UAC07_StopsRecursion() => ((string)useCase.Cases["Recursion"]!).Should().Contain("Macro recursion limit exceeded");
+    public void UAC07_StopsDirectRecursion() => ((string)useCase.Cases["Recursion"]!).Should().Contain("loop -> loop");
+
+    [Then("the indirect message should contain the full chain")]
+    [Trait("UAC", "08"), Fact]
+    public void UAC08_StopsIndirectRecursion() => ((string)useCase.Cases["Indirect"]!).Should().Contain("ping -> pong -> ping");
 }

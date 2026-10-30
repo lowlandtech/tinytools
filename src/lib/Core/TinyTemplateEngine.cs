@@ -25,9 +25,9 @@ public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
         _resolver = new VariableResolver(loggerFactory);
     }
 
-    public string Render(string template, ToolContext context) => RenderInternal(template, context, 0, null);
+    public string Render(string template, ToolContext context) => RenderInternal(template, context, 0, null, Array.Empty<string>());
 
-    private string RenderInternal(string template, ToolContext context, int depth, IReadOnlyDictionary<string, MacroDefinition>? inherited)
+    private string RenderInternal(string template, ToolContext context, int depth, IReadOnlyDictionary<string, MacroDefinition>? inherited, IReadOnlyList<string> chain)
     {
         if (string.IsNullOrEmpty(template)) return template;
 
@@ -51,7 +51,7 @@ public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
 
         // Macros then expand their bodies eagerly, binding arguments as context values, so a
         // macro body keeps the full renderer (interpolation and control flow) inside it.
-        composed = ExpandMacros(composed, context, depth, inherited);
+        composed = ExpandMacros(composed, context, depth, inherited, chain);
 
         // First, process control flow (@if, @foreach)
         var processed = ProcessControlFlow(composed, context);
@@ -141,7 +141,7 @@ public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
             position = end + 1;
         }
 
-        return RenderInternal(builder.ToString(), context, 0, null);
+        return RenderInternal(builder.ToString(), context, 0, null, Array.Empty<string>());
     }
 
     private static int FindClosingParenthesis(string source, int openIndex)
@@ -223,7 +223,7 @@ public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
     /// declares at least one macro, so text that merely looks like <c>@name(...)</c> is left
     /// alone.
     /// </summary>
-    private string ExpandMacros(string source, ToolContext context, int depth, IReadOnlyDictionary<string, MacroDefinition>? inherited)
+    private string ExpandMacros(string source, ToolContext context, int depth, IReadOnlyDictionary<string, MacroDefinition>? inherited, IReadOnlyList<string> chain)
     {
         var definitions = new Dictionary<string, MacroDefinition>(StringComparer.Ordinal);
         var remaining = RemoveMacroDefinitions(source, definitions);
@@ -249,13 +249,22 @@ public partial class TinyTemplateEngine : ITemplateEngine, ITemplateCompiler
                     $"Macro '{name}' expects {macro.Parameters.Length} argument(s) but received {arguments.Count}.");
             }
 
+            // The chain records the macros currently expanding, in order, so a repeat is a
+            // named cycle naming the whole path rather than a bare depth-limit message.
+            if (chain.Contains(name, StringComparer.Ordinal))
+            {
+                var cycle = string.Join(" -> ", chain.Concat([name]));
+                throw new InvalidOperationException($"Macro recursion cycle detected: {cycle}");
+            }
+
             var child = context.CreateChild($"macro:{name}");
             for (var index = 0; index < arguments.Count; index++)
             {
                 child.Set(macro.Parameters[index], EvaluateArgument(arguments[index], context));
             }
 
-            return RenderInternal(macro.Body, child, depth + 1, definitions);
+            var deeper = new List<string>(chain) { name };
+            return RenderInternal(macro.Body, child, depth + 1, definitions, deeper);
         });
     }
 
