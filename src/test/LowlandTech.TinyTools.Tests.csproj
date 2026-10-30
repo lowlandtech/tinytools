@@ -46,4 +46,11 @@
 		</None>
 	</ItemGroup>
 
+	<ItemGroup>
+		<!-- A template embedded in this assembly, so the RazorLight compatibility
+		     embedded-resource project path is exercised by a real resource lookup. -->
+		<EmbeddedResource Include="EmbeddedTemplate.cshtml"
+		                  LogicalName="LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US11.RazorLightCache.EmbeddedTemplate.cshtml" />
+	</ItemGroup>
+
 </Project>
