@@ -3,10 +3,16 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "05")]
 [UserStory("01", "String interpolation handles integer values")]
-public sealed class SC05_InterpolatesIntegers : TinyToolsScenario<string>
+public sealed class SC05_InterpolatesIntegers : TinyToolsScenario<string>, IClassFixture<UseCases.StringInterpolationUseCase>
 {
+    private readonly UseCases.StringInterpolationUseCase useCase;
     private Person _person = null!;
-    private string? _result;
+
+    public SC05_InterpolatesIntegers(UseCases.StringInterpolationUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override string For() => "Hello world, I'm ${Age} years old";
 
@@ -17,12 +23,10 @@ public sealed class SC05_InterpolatesIntegers : TinyToolsScenario<string>
     protected override void When()
     {
         base.When();
-        _result = Sut.Interpolate(_person);
+        useCase.Cases["AgeGreeting"] = Sut.Interpolate(_person);
     }
-
-    public SC05_InterpolatesIntegers() => ArrangeAndAct();
 
     [Then("the interpolated text should be exact")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_InterpolatesAge() => _result.Should().Be("Hello world, I'm 20 years old");
+    public void UAC01_InterpolatesAge() => useCase.Cases["AgeGreeting"].Should().Be("Hello world, I'm 20 years old");
 }

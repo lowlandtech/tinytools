@@ -5,16 +5,16 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "12")]
 [UserStory("01", "String interpolation handles list templates with context")]
-public sealed class SC12_InterpolatesListWithContext : TinyToolsScenario<List<string>>
+public sealed class SC12_InterpolatesListWithContext : TinyToolsScenario<List<string>>, IClassFixture<UseCases.StringInterpolationUseCase>
 {
+    private readonly UseCases.StringInterpolationUseCase useCase;
     private ExecutionContext _context = null!;
-    private List<string> _all = [];
-    private List<string> _custom = [];
-    private List<string> _empty = [];
-    private List<string> _single = [];
-    private List<string> _model = [];
-    private Action? _nullTemplates;
-    private Action? _nullContext;
+
+    public SC12_InterpolatesListWithContext(UseCases.StringInterpolationUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override List<string> For() =>
     [
@@ -37,13 +37,13 @@ public sealed class SC12_InterpolatesListWithContext : TinyToolsScenario<List<st
     {
         base.When();
 
-        _all = Sut.Interpolate(_context, engine: null);
-        _custom = new List<string> { "Hello ${Context.Name}", "Bye ${Context.Name}" }.Interpolate(ContextWith("Name", "Jane"), new TinyTemplateEngine());
-        _empty = new List<string>().Interpolate(_context, engine: null);
-        _single = new List<string> { "Hello ${Context.Name}" }.Interpolate(ContextWith("Name", "John"), engine: null);
-        _model = new List<string> { "${Context.Model.FirstName}", "${Context.Model.LastName}" }.Interpolate(ContextWith("Model", new Person { FirstName = "John", LastName = "Doe" }), engine: null);
-        _nullTemplates = () => ((List<string>)null!).Interpolate(_context, engine: null);
-        _nullContext = () => new List<string> { "Hello" }.Interpolate((ExecutionContext)null!, engine: null);
+        useCase.Cases["All"] = Sut.Interpolate(_context, engine: null);
+        useCase.Cases["Custom"] = new List<string> { "Hello ${Context.Name}", "Bye ${Context.Name}" }.Interpolate(ContextWith("Name", "Jane"), new TinyTemplateEngine());
+        useCase.Cases["Empty"] = new List<string>().Interpolate(_context, engine: null);
+        useCase.Cases["Single"] = new List<string> { "Hello ${Context.Name}" }.Interpolate(ContextWith("Name", "John"), engine: null);
+        useCase.Cases["Model"] = new List<string> { "${Context.Model.FirstName}", "${Context.Model.LastName}" }.Interpolate(ContextWith("Model", new Person { FirstName = "John", LastName = "Doe" }), engine: null);
+        useCase.Cases["NullTemplates"] = (Action)(() => ((List<string>)null!).Interpolate(_context, engine: null));
+        useCase.Cases["NullContext"] = (Action)(() => new List<string> { "Hello" }.Interpolate((ExecutionContext)null!, engine: null));
     }
 
     private static ExecutionContext ContextWith(string key, object value)
@@ -53,33 +53,31 @@ public sealed class SC12_InterpolatesListWithContext : TinyToolsScenario<List<st
         return context;
     }
 
-    public SC12_InterpolatesListWithContext() => ArrangeAndAct();
-
     [Then("the interpolated list should be exact")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_InterpolatesAllTemplates() => _all.Should().Equal("Hello John", "Welcome to Seattle", "Your age is 30");
+    public void UAC01_InterpolatesAllTemplates() => ((List<string>)useCase.Cases["All"]!).Should().Equal("Hello John", "Welcome to Seattle", "Your age is 30");
 
     [Then("the custom engine list should be exact")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_InterpolatesWithCustomEngine() => _custom.Should().Equal("Hello Jane", "Bye Jane");
+    public void UAC02_InterpolatesWithCustomEngine() => ((List<string>)useCase.Cases["Custom"]!).Should().Equal("Hello Jane", "Bye Jane");
 
     [Then("the empty list should be empty")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_HandlesEmptyList() => _empty.Should().BeEmpty();
+    public void UAC03_HandlesEmptyList() => ((List<string>)useCase.Cases["Empty"]!).Should().BeEmpty();
 
     [Then("the single item list should be exact")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_HandlesSingleItemList() => _single.Should().Equal("Hello John");
+    public void UAC04_HandlesSingleItemList() => ((List<string>)useCase.Cases["Single"]!).Should().Equal("Hello John");
 
     [Then("the null templates should fail with ArgumentNullException")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_ThrowsOnNullTemplates() => _nullTemplates.Should().Throw<ArgumentNullException>();
+    public void UAC05_ThrowsOnNullTemplates() => ((Action)useCase.Cases["NullTemplates"]!).Should().Throw<ArgumentNullException>();
 
     [Then("the null context should fail with ArgumentNullException")]
     [Trait("UAC", "06"), Fact]
-    public void UAC06_ThrowsOnNullContext() => _nullContext.Should().Throw<ArgumentNullException>();
+    public void UAC06_ThrowsOnNullContext() => ((Action)useCase.Cases["NullContext"]!).Should().Throw<ArgumentNullException>();
 
     [Then("the model list should be exact")]
     [Trait("UAC", "07"), Fact]
-    public void UAC07_InterpolatesModelFromContext() => _model.Should().Equal("John", "Doe");
+    public void UAC07_InterpolatesModelFromContext() => ((List<string>)useCase.Cases["Model"]!).Should().Equal("John", "Doe");
 }

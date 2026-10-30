@@ -3,17 +3,16 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "11")]
 [UserStory("01", "String interpolation uses TinyTemplateEngine")]
-public sealed class SC11_InterpolatesWithEngine : TinyToolsScenario<string>
+public sealed class SC11_InterpolatesWithEngine : TinyToolsScenario<string>, IClassFixture<UseCases.StringInterpolationUseCase>
 {
+    private readonly UseCases.StringInterpolationUseCase useCase;
     private Person _person = null!;
-    private string _name = string.Empty;
-    private string _custom = string.Empty;
-    private string _integer = string.Empty;
-    private string _boolean = string.Empty;
-    private string _date = string.Empty;
-    private string _conditional = string.Empty;
-    private string _ifElse = string.Empty;
-    private string _nested = string.Empty;
+
+    public SC11_InterpolatesWithEngine(UseCases.StringInterpolationUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override string For() => "Hello world, I'm ${Context.Model.FirstName} ${Context.Model.LastName}";
 
@@ -29,47 +28,45 @@ public sealed class SC11_InterpolatesWithEngine : TinyToolsScenario<string>
     {
         base.When();
 
-        _name = Sut.InterpolateWithEngine(_person);
-        _custom = "Hello ${Context.Model.FirstName}".InterpolateWithEngine(_person, new TinyTemplateEngine());
-        _integer = "${Context.Model.FirstName} is ${Context.Model.Age} years old".InterpolateWithEngine(new Person { FirstName = "John", Age = 30 });
-        _boolean = "Married: ${Context.Model.IsMarried}".InterpolateWithEngine(new Person { IsMarried = true });
-        _date = "Born: ${Context.Model.Dob}".InterpolateWithEngine(new Person { Dob = new DateTime(1990, 5, 15) });
-        _conditional = "@if (Context.Model.IsMarried) {\nMarried\n}".InterpolateWithEngine(new Person { IsMarried = true });
-        _ifElse = "@if (Context.Model.IsMarried) {\nMarried\n} else {\nSingle\n}".InterpolateWithEngine(new Person { IsMarried = false });
-        _nested = "Name: ${Context.Model.Name}, City: ${Context.Model.Address.City}".InterpolateWithEngine(new { Name = "John", Address = new { City = "Seattle" } });
+        useCase.Cases["Name"] = Sut.InterpolateWithEngine(_person);
+        useCase.Cases["CustomEngine"] = "Hello ${Context.Model.FirstName}".InterpolateWithEngine(_person, new TinyTemplateEngine());
+        useCase.Cases["Integer"] = "${Context.Model.FirstName} is ${Context.Model.Age} years old".InterpolateWithEngine(new Person { FirstName = "John", Age = 30 });
+        useCase.Cases["Boolean"] = "Married: ${Context.Model.IsMarried}".InterpolateWithEngine(new Person { IsMarried = true });
+        useCase.Cases["Date"] = "Born: ${Context.Model.Dob}".InterpolateWithEngine(new Person { Dob = new DateTime(1990, 5, 15) });
+        useCase.Cases["Conditional"] = "@if (Context.Model.IsMarried) {\nMarried\n}".InterpolateWithEngine(new Person { IsMarried = true });
+        useCase.Cases["IfElse"] = "@if (Context.Model.IsMarried) {\nMarried\n} else {\nSingle\n}".InterpolateWithEngine(new Person { IsMarried = false });
+        useCase.Cases["Nested"] = "Name: ${Context.Model.Name}, City: ${Context.Model.Address.City}".InterpolateWithEngine(new { Name = "John", Address = new { City = "Seattle" } });
     }
-
-    public SC11_InterpolatesWithEngine() => ArrangeAndAct();
 
     [Then("the engine output should be exact")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_InterpolatesFirstAndLastName() => _name.Should().Be("Hello world, I'm John Smith");
+    public void UAC01_InterpolatesFirstAndLastName() => useCase.Cases["Name"].Should().Be("Hello world, I'm John Smith");
 
     [Then("the custom engine output should be exact")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_InterpolatesWithCustomEngine() => _custom.Should().Be("Hello John");
+    public void UAC02_InterpolatesWithCustomEngine() => useCase.Cases["CustomEngine"].Should().Be("Hello John");
 
     [Then("the integer output should be exact")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_InterpolatesIntegerProperty() => _integer.Should().Be("John is 30 years old");
+    public void UAC03_InterpolatesIntegerProperty() => useCase.Cases["Integer"].Should().Be("John is 30 years old");
 
     [Then("the boolean output should be exact")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_InterpolatesBooleanProperty() => _boolean.Should().Be("Married: True");
+    public void UAC04_InterpolatesBooleanProperty() => useCase.Cases["Boolean"].Should().Be("Married: True");
 
     [Then("the date output should contain 1990")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_InterpolatesDateTimeProperty() => _date.Should().Contain("1990");
+    public void UAC05_InterpolatesDateTimeProperty() => ((string)useCase.Cases["Date"]!).Should().Contain("1990");
 
     [Then("the conditional output should contain Married")]
     [Trait("UAC", "06"), Fact]
-    public void UAC06_SupportsIfControlFlow() => _conditional.Should().Contain("Married");
+    public void UAC06_SupportsIfControlFlow() => ((string)useCase.Cases["Conditional"]!).Should().Contain("Married");
 
     [Then("the else branch should contain Single")]
     [Trait("UAC", "07"), Fact]
-    public void UAC07_SupportsIfElseControlFlow() => _ifElse.Should().Contain("Single").And.NotContain("Married");
+    public void UAC07_SupportsIfElseControlFlow() => ((string)useCase.Cases["IfElse"]!).Should().Contain("Single").And.NotContain("Married");
 
     [Then("the nested property output should be exact")]
     [Trait("UAC", "08"), Fact]
-    public void UAC08_HandlesNestedProperties() => _nested.Should().Be("Name: John, City: Seattle");
+    public void UAC08_HandlesNestedProperties() => useCase.Cases["Nested"].Should().Be("Name: John, City: Seattle");
 }

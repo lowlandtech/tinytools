@@ -5,17 +5,16 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "10")]
 [UserStory("01", "String interpolation uses execution context")]
-public sealed class SC10_InterpolatesWithContext : TinyToolsScenario<string>
+public sealed class SC10_InterpolatesWithContext : TinyToolsScenario<string>, IClassFixture<UseCases.StringInterpolationUseCase>
 {
+    private readonly UseCases.StringInterpolationUseCase useCase;
     private ExecutionContext _context = null!;
-    private string _name = string.Empty;
-    private string _custom = string.Empty;
-    private string _model = string.Empty;
-    private string _nested = string.Empty;
-    private string _conditional = string.Empty;
-    private string _loop = string.Empty;
-    private Action? _nullTemplate;
-    private Action? _emptyTemplate;
+
+    public SC10_InterpolatesWithContext(UseCases.StringInterpolationUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override string For() => "Hello world, I'm ${Context.FirstName} ${Context.LastName}";
 
@@ -32,14 +31,14 @@ public sealed class SC10_InterpolatesWithContext : TinyToolsScenario<string>
     {
         base.When();
 
-        _name = Sut.Interpolate(_context);
-        _custom = "Hello ${Context.Name}".Interpolate(ContextWith("Name", "Jane"), new TinyTemplateEngine());
-        _model = "Hello ${Context.Model.FirstName}".Interpolate(new ExecutionContext { Model = new Person { FirstName = "John" } });
-        _nested = "City: ${Context.Address.City}".Interpolate(ContextWith("Address", new { City = "Seattle", State = "WA" }));
-        _conditional = "@if (Context.IsActive) {\nActive User\n}".Interpolate(ContextWith("IsActive", true));
-        _loop = "@foreach (var item in Context.Items) {\n- ${item}\n}".Interpolate(ContextWith("Items", new[] { "Apple", "Banana", "Cherry" }));
-        _nullTemplate = () => ((string)null!).Interpolate(_context);
-        _emptyTemplate = () => "".Interpolate(_context);
+        useCase.Cases["ContextValues"] = Sut.Interpolate(_context);
+        useCase.Cases["CustomEngine"] = "Hello ${Context.Name}".Interpolate(ContextWith("Name", "Jane"), new TinyTemplateEngine());
+        useCase.Cases["ContextModel"] = "Hello ${Context.Model.FirstName}".Interpolate(new ExecutionContext { Model = new Person { FirstName = "John" } });
+        useCase.Cases["NestedContext"] = "City: ${Context.Address.City}".Interpolate(ContextWith("Address", new { City = "Seattle", State = "WA" }));
+        useCase.Cases["Conditional"] = "@if (Context.IsActive) {\nActive User\n}".Interpolate(ContextWith("IsActive", true));
+        useCase.Cases["Loop"] = "@foreach (var item in Context.Items) {\n- ${item}\n}".Interpolate(ContextWith("Items", new[] { "Apple", "Banana", "Cherry" }));
+        useCase.Cases["NullTemplate"] = (Action)(() => ((string)null!).Interpolate(_context));
+        useCase.Cases["EmptyTemplate"] = (Action)(() => "".Interpolate(_context));
     }
 
     private static ExecutionContext ContextWith(string key, object value)
@@ -49,37 +48,35 @@ public sealed class SC10_InterpolatesWithContext : TinyToolsScenario<string>
         return context;
     }
 
-    public SC10_InterpolatesWithContext() => ArrangeAndAct();
-
     [Then("the interpolated text should be exact")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_InterpolatesContextValues() => _name.Should().Be("Hello world, I'm John Smith");
+    public void UAC01_InterpolatesContextValues() => useCase.Cases["ContextValues"].Should().Be("Hello world, I'm John Smith");
 
     [Then("the custom engine output should be exact")]
     [Trait("UAC", "02"), Fact]
-    public void UAC02_InterpolatesWithCustomEngine() => _custom.Should().Be("Hello Jane");
+    public void UAC02_InterpolatesWithCustomEngine() => useCase.Cases["CustomEngine"].Should().Be("Hello Jane");
 
     [Then("the model output should be exact")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_InterpolatesModelFromContext() => _model.Should().Be("Hello John");
+    public void UAC03_InterpolatesModelFromContext() => useCase.Cases["ContextModel"].Should().Be("Hello John");
 
     [Then("the nested output should be exact")]
     [Trait("UAC", "04"), Fact]
-    public void UAC04_InterpolatesNestedContextValues() => _nested.Should().Be("City: Seattle");
+    public void UAC04_InterpolatesNestedContextValues() => useCase.Cases["NestedContext"].Should().Be("City: Seattle");
 
     [Then("the conditional output should contain Active User")]
     [Trait("UAC", "05"), Fact]
-    public void UAC05_SupportsIfControlFlow() => _conditional.Should().Contain("Active User");
+    public void UAC05_SupportsIfControlFlow() => ((string)useCase.Cases["Conditional"]!).Should().Contain("Active User");
 
     [Then("the loop output should contain Apple")]
     [Trait("UAC", "06"), Fact]
-    public void UAC06_SupportsForeachControlFlow() => _loop.Should().Contain("Apple").And.Contain("Banana").And.Contain("Cherry");
+    public void UAC06_SupportsForeachControlFlow() => ((string)useCase.Cases["Loop"]!).Should().Contain("Apple").And.Contain("Banana").And.Contain("Cherry");
 
     [Then("the interpolation should fail with ArgumentException")]
     [Trait("UAC", "07"), Fact]
-    public void UAC07_ThrowsOnNullTemplate() => _nullTemplate.Should().Throw<ArgumentException>();
+    public void UAC07_ThrowsOnNullTemplate() => ((Action)useCase.Cases["NullTemplate"]!).Should().Throw<ArgumentException>();
 
     [Then("the empty template should fail with ArgumentException")]
     [Trait("UAC", "08"), Fact]
-    public void UAC08_ThrowsOnEmptyTemplate() => _emptyTemplate.Should().Throw<ArgumentException>();
+    public void UAC08_ThrowsOnEmptyTemplate() => ((Action)useCase.Cases["EmptyTemplate"]!).Should().Throw<ArgumentException>();
 }

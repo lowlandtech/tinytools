@@ -3,10 +3,16 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "07")]
 [UserStory("01", "String interpolation replaces dictionary values without tags")]
-public sealed class SC07_InterpolatesDictionaryUntagged : TinyToolsScenario<string>
+public sealed class SC07_InterpolatesDictionaryUntagged : TinyToolsScenario<string>, IClassFixture<UseCases.StringInterpolationUseCase>
 {
+    private readonly UseCases.StringInterpolationUseCase useCase;
     private IDictionary _person = null!;
-    private string? _result;
+
+    public SC07_InterpolatesDictionaryUntagged(UseCases.StringInterpolationUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override string For() => "Hello world, I'm FirstName LastName";
 
@@ -21,12 +27,10 @@ public sealed class SC07_InterpolatesDictionaryUntagged : TinyToolsScenario<stri
     protected override void When()
     {
         base.When();
-        _result = Sut.Interpolate(_person, hasTags: false);
+        useCase.Cases["UntaggedDictionaryGreeting"] = Sut.Interpolate(_person, hasTags: false);
     }
-
-    public SC07_InterpolatesDictionaryUntagged() => ArrangeAndAct();
 
     [Then("the interpolated text should be exact")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_InterpolatesDictionaryUntagged() => _result.Should().Be("Hello world, I'm John Smith");
+    public void UAC01_InterpolatesDictionaryUntagged() => useCase.Cases["UntaggedDictionaryGreeting"].Should().Be("Hello world, I'm John Smith");
 }

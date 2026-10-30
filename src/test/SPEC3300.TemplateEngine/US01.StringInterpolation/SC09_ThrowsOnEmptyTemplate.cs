@@ -3,10 +3,16 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "09")]
 [UserStory("01", "String interpolation validates input parameters")]
-public sealed class SC09_ThrowsOnEmptyTemplate : TinyToolsScenario<string>
+public sealed class SC09_ThrowsOnEmptyTemplate : TinyToolsScenario<string>, IClassFixture<UseCases.StringInterpolationUseCase>
 {
+    private readonly UseCases.StringInterpolationUseCase useCase;
     private Person _person = null!;
-    private Action? _act;
+
+    public SC09_ThrowsOnEmptyTemplate(UseCases.StringInterpolationUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override string For() => "";
 
@@ -21,12 +27,10 @@ public sealed class SC09_ThrowsOnEmptyTemplate : TinyToolsScenario<string>
     protected override void When()
     {
         base.When();
-        _act = () => Sut.Interpolate(_person);
+        useCase.Cases["EmptyTemplate"] = (Action)(() => Sut.Interpolate(_person));
     }
-
-    public SC09_ThrowsOnEmptyTemplate() => ArrangeAndAct();
 
     [Then("the interpolation should fail with ArgumentException")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_ThrowsOnEmptyTemplate() => _act.Should().Throw<ArgumentException>().WithMessage("Template should be supplied. (Parameter 'template')");
+    public void UAC01_ThrowsOnEmptyTemplate() => ((Action)useCase.Cases["EmptyTemplate"]!).Should().Throw<ArgumentException>().WithMessage("Template should be supplied. (Parameter 'template')");
 }

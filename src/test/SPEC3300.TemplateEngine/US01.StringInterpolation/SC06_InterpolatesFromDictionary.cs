@@ -3,10 +3,16 @@ namespace LowlandTech.TinyTools.Tests.SPEC3300.TemplateEngine.US01.StringInterpo
 [Trait(Spec.SPEC, "3300")]
 [Trait(Spec.SC, "06")]
 [UserStory("01", "String interpolation replaces variables from dictionaries")]
-public sealed class SC06_InterpolatesFromDictionary : TinyToolsScenario<string>
+public sealed class SC06_InterpolatesFromDictionary : TinyToolsScenario<string>, IClassFixture<UseCases.StringInterpolationUseCase>
 {
+    private readonly UseCases.StringInterpolationUseCase useCase;
     private IDictionary _person = null!;
-    private string? _result;
+
+    public SC06_InterpolatesFromDictionary(UseCases.StringInterpolationUseCase useCase)
+    {
+        this.useCase = useCase;
+        useCase.RunOnce(Given, When);
+    }
 
     protected override string For() => "Hello world, I'm ${FirstName} ${LastName}";
 
@@ -21,12 +27,10 @@ public sealed class SC06_InterpolatesFromDictionary : TinyToolsScenario<string>
     protected override void When()
     {
         base.When();
-        _result = Sut.Interpolate(_person);
+        useCase.Cases["DictionaryGreeting"] = Sut.Interpolate(_person);
     }
-
-    public SC06_InterpolatesFromDictionary() => ArrangeAndAct();
 
     [Then("the interpolated text should be exact")]
     [Trait("UAC", "01"), Fact]
-    public void UAC01_InterpolatesFromDictionary() => _result.Should().Be("Hello world, I'm John Smith");
+    public void UAC01_InterpolatesFromDictionary() => useCase.Cases["DictionaryGreeting"].Should().Be("Hello world, I'm John Smith");
 }
