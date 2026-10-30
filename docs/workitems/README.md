@@ -5,6 +5,7 @@
 | M3 | Advanced templating | Includes, macros, asynchronous services and collection helpers meet their contracts. |
 | M4 | Ecosystem and tooling | Editor, source generation, reusable template packs and CLI delivery are accepted. |
 | M5 | Package and release integrity | The published package carries only runtime dependencies and no test-only types, the helper registry is immutable, one version authority produces every version surface, and exactly one workflow publishes each feed with real quality gates. |
+| M6 | Tinytools server | A shared core entity model, an api host serving the template contract with this repository engine, a Blazor app on LowlandTech.Components driven by the imported store, the imported API, store and page specifications running against them, and packaging as a Harness extension plugin. |
 
 | Work | Scope | Title | Priority | Lane | Depends on | Status | Refined | Issue |
 |---|---|---|---|---|---|---|---|---|
@@ -35,3 +36,11 @@
 | M5-004 | SPEC3311-US01-SC01 | [Establish one version authority](todo/SPEC3311.US01.SC01.version-authority.md) | P1 | tinytools | M5-003 | todo | false | [#62](https://github.com/lowlandtech/tinytools/issues/62) |
 | M5-005 | SPEC3312-US01-SC01 | [Keep one release pipeline and real quality gates](todo/SPEC3312.US01.SC01.release-pipeline-and-quality-gates.md) | P2 | tinytools | M5-004 | todo | false | [#63](https://github.com/lowlandtech/tinytools/issues/63) |
 | M5-006 | SPEC3313-US01-SC01 | [Remove the duplicate test project](todo/SPEC3313.US01.SC01.test-project-consolidation.md) | P2 | tinytools | None | todo | true | [#64](https://github.com/lowlandtech/tinytools/issues/64) |
+| M6-001 | SPEC3315-US01-SC01 | [Import the template entity model](todo/SPEC3315.US01.SC01.template-entity-model.md) | P1 | tinytools | None | todo | true | [#67](https://github.com/lowlandtech/tinytools/issues/67) |
+| M6-002 | SPEC3315-US02-SC01 | [Serve the template API contract](todo/SPEC3315.US02.SC01.template-api-host.md) | P1 | tinytools | M6-001 | todo | true | [#68](https://github.com/lowlandtech/tinytools/issues/68) |
+| M6-003 | SPEC3315-US03-SC01 | [Add the templates store, reducer and HTTP client](todo/SPEC3315.US03.SC01.template-store.md) | P2 | tinytools | M6-002 | todo | true | [#69](https://github.com/lowlandtech/tinytools/issues/69) |
+| M6-004 | SPEC3315-US04-SC01 | [Host the templates page on LowlandTech.Components](todo/SPEC3315.US04.SC01.template-app-page.md) | P1 | tinytools | M6-003 | todo | true | [#70](https://github.com/lowlandtech/tinytools/issues/70) |
+| M6-005 | SPEC3316-US01-SC01 | [Import the template API specifications](todo/SPEC3316.US01.SC01.template-api-specs.md) | P2 | tinytools | M6-002 | todo | true | [#71](https://github.com/lowlandtech/tinytools/issues/71) |
+| M6-006 | SPEC3316-US03-SC01 | [Import the template store specifications](todo/SPEC3316.US03.SC01.template-store-specs.md) | P2 | tinytools | M6-003 | todo | true | [#72](https://github.com/lowlandtech/tinytools/issues/72) |
+| M6-007 | SPEC3316-US02-SC01 | [Import the templates page specifications](todo/SPEC3316.US02.SC01.template-page-specs.md) | P2 | tinytools | M6-004 | todo | true | [#73](https://github.com/lowlandtech/tinytools/issues/73) |
+| M6-008 | SPEC3317-US01-SC01 | [Package Tinytools as a Harness extension plugin](todo/SPEC3317.US01.SC01.harness-extension-plugin.md) | P2 | tinytools | M6-002, M6-004 | todo | false | [#74](https://github.com/lowlandtech/tinytools/issues/74) |
