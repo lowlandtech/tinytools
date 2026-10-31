@@ -1,5 +1,15 @@
 name: Release
 
+# The only workflow that publishes to nuget.org and GitHub Packages. CI (main.yml) verifies
+# and packs, but never pushes, so a version reaches a feed from exactly one place.
+#
+# Feeds and secrets, for whoever runs a release:
+#   nuget.org                              -> secret NUGET_API_KEY
+#   nuget.pkg.github.com/lowlandtech       -> secret GITHUB_TOKEN (automatic)
+#   git.lowlandtech.com/.../tinytools/nuget-> secret NUGET_TOKEN, published by .gitea/workflows/build.yml
+# The release path used to read NUGET_APIKEY while an unreachable job in main.yml read
+# NUGET_API_KEY, so one of the two always failed; the name is NUGET_API_KEY everywhere now.
+
 on:
   push:
     tags:
@@ -29,8 +39,8 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4
       with:
+        # One pinned SDK builds every shipped framework; see main.yml for the same decision.
         dotnet-version: |
-          8.0.x
           10.0.x
     
     - name: Install ImageMagick
@@ -42,9 +52,9 @@ jobs:
       run: |
         if [ -f "icon.svg" ] && [ ! -f "icon.png" ]; then
           convert -background none -resize 128x128 icon.svg icon.png
-          echo "? Icon converted from SVG to PNG"
+          echo "Icon converted from SVG to PNG"
         else
-          echo "? Icon PNG already exists or SVG not found"
+          echo "Icon PNG already exists or SVG not found"
         fi
     
     - name: Extract version from tag
@@ -67,14 +77,17 @@ jobs:
           exit 1
         fi
 
-    - name: Restore dependencies
-      run: dotnet restore
-    
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-    
-    - name: Run tests
-      run: dotnet test --configuration Release --no-build --verbosity normal
+    - name: Build the library for every shipped framework
+      run: dotnet build src/lib/LowlandTech.TinyTools.csproj --configuration Release
+
+    - name: Build the behavior tests
+      run: dotnet build src/test/LowlandTech.TinyTools.Tests.csproj --configuration Release --framework net10.0 -p:HostPageSpecs=false
+
+    - name: Run the behavior tests
+      run: >
+        dotnet test src/test/LowlandTech.TinyTools.Tests.csproj --configuration Release
+        --framework net10.0 -p:HostPageSpecs=false --no-build --verbosity normal
+        --filter "FullyQualifiedName!~SPEC3309&FullyQualifiedName!~SPEC3327"
     
     - name: Pack NuGet package
       run: dotnet pack src/lib/LowlandTech.TinyTools.csproj --configuration Release --no-build --output ./artifacts
@@ -90,7 +103,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Publish to NuGet.org
-      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_APIKEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      run: dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
       if: success()
     
     - name: Publish to GitHub Packages

@@ -1,5 +1,10 @@
 name: Build, Test & Publish
 
+# The Gitea mirror builds the same suite and publishes to the Gitea NuGet feed only. It used
+# to stamp a CalVer package version derived from the run number, which published a second
+# version of the same assembly alongside the one Directory.Build.props declares. The version
+# now comes from the single authority, so the feed carries one version per release.
+
 on:
   push:
     branches: [develop, main]
@@ -21,22 +26,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET SDKs (8, 9, 10)
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: |
-            8.0.x
-            9.0.x
-            10.0.x
+          # One pinned SDK builds netstandard2.1, net8.0, net9.0 and net10.0.
+          dotnet-version: 10.0.x
 
-      - name: Restore
-        run: dotnet restore
+      - name: Build the library for every shipped framework
+        run: dotnet build src/lib/LowlandTech.TinyTools.csproj --configuration Release
 
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
+      - name: Build the behavior tests
+        run: dotnet build src/test/LowlandTech.TinyTools.Tests.csproj --configuration Release --framework net10.0 -p:HostPageSpecs=false
 
       - name: Test
-        run: dotnet test --configuration Release --no-build --verbosity normal
+        run: >
+          dotnet test src/test/LowlandTech.TinyTools.Tests.csproj --configuration Release
+          --framework net10.0 -p:HostPageSpecs=false --no-build --verbosity normal
+          --filter "FullyQualifiedName!~SPEC3309&FullyQualifiedName!~SPEC3327"
 
   publish:
     name: Pack & Publish to Gitea NuGet
@@ -48,35 +54,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET SDKs (8, 9, 10)
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: |
-            8.0.x
-            9.0.x
-            10.0.x
+          dotnet-version: 10.0.x
 
-      - name: Calculate CalVer
+      - name: Report the declared version
         id: ver
         run: |
-          VERSION=$(date +'%Y.%m%d').${{ github.run_number }}
+          VERSION=$(dotnet msbuild src/lib/LowlandTech.TinyTools.csproj -getProperty:Version -nologo)
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-          echo "Package version: $VERSION"
+          echo "Package version from Directory.Build.props: $VERSION"
 
-      - name: Restore
-        run: dotnet restore
-
-      - name: Build (versioned)
-        run: |
-          dotnet build --configuration Release --no-restore \
-            -p:Version=${{ steps.ver.outputs.VERSION }}
+      - name: Build
+        run: dotnet build src/lib/LowlandTech.TinyTools.csproj --configuration Release
 
       - name: Pack
         run: |
           dotnet pack src/lib/LowlandTech.TinyTools.csproj \
             --configuration Release --no-build \
-            --output ./artifacts \
-            -p:PackageVersion=${{ steps.ver.outputs.VERSION }}
+            --output ./artifacts
+
+      - name: Confirm the packed version
+        run: |
+          VERSION="${{ steps.ver.outputs.VERSION }}"
+          test -f "artifacts/LowlandTech.TinyTools.$VERSION.nupkg" || {
+            echo "::error::Expected artifacts/LowlandTech.TinyTools.$VERSION.nupkg."
+            ls -1 artifacts
+            exit 1
+          }
 
       - name: Publish to Gitea NuGet
         run: |

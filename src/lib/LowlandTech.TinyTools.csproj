@@ -94,7 +94,7 @@
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.8" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.300" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.403" PrivateAssets="All" />
     <PackageReference Include="System.Text.Json" Version="10.0.8" Condition="'$(TargetFramework)' == 'netstandard2.1'" />
   </ItemGroup>
 

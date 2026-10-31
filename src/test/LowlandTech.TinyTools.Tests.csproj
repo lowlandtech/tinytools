@@ -5,6 +5,10 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IsPackable>false</IsPackable>
+		<!-- The page scenarios drive the App host, which consumes LowlandTech.Components from the
+		     workspace feed. A hosted runner cannot restore that feed, so CI sets HostPageSpecs=false
+		     and runs every other spec instead of failing at restore and running nothing. -->
+		<HostPageSpecs Condition="'$(HostPageSpecs)' == ''">true</HostPageSpecs>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -41,9 +45,15 @@
 		<ProjectReference Include="..\api\LowlandTech.TinyTools.Api.csproj" />
 		<!-- Both hosts declare a top-level entry point, so the page scenarios reach
 		     the app through an alias and keep API's Program unambiguous. -->
-		<ProjectReference Include="..\app\LowlandTech.TinyTools.App.csproj" Aliases="app" />
+		<ProjectReference Include="..\app\LowlandTech.TinyTools.App.csproj" Aliases="app" Condition="'$(HostPageSpecs)' == 'true'" />
 		<ProjectReference Include="..\frontend\LowlandTech.TinyTools.Frontend.csproj" />
 		<Using Include="Bunit" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(HostPageSpecs)' != 'true'">
+		<!-- Only these two folders reach the App host; everything else restores from public feeds. -->
+		<Compile Remove="SPEC3315.Server\US04.TemplatePage\**\*.cs" />
+		<Compile Remove="SPEC3316.Templates\US02.TemplatesPage\**\*.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
