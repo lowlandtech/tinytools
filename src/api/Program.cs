@@ -33,6 +33,7 @@ var app = builder.Build();
 app.UseExceptionHandler();
 app.UseMiddleware<CallerProvenanceMiddleware>();
 app.UseMiddleware<EnforcementObservationMiddleware>();
+app.UseMiddleware<ApiVersionMiddleware>();
 app.UseStatusCodePages();
 app.UseAuthorization();
 
