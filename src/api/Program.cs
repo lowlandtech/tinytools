@@ -26,11 +26,13 @@ builder.Services.AddSingleton<ITemplateExecutor, TemplateExecutor>();
 builder.Services.AddScoped<ITemplateLibrary, TemplateService>();
 builder.Services.AddApiKeyPolicy();
 builder.Services.AddSingleton<CallerProvenanceLog>();
+builder.Services.AddSingleton<EnforcementObservationLog>();
 
 var app = builder.Build();
 
 app.UseExceptionHandler();
 app.UseMiddleware<CallerProvenanceMiddleware>();
+app.UseMiddleware<EnforcementObservationMiddleware>();
 app.UseStatusCodePages();
 app.UseAuthorization();
 
