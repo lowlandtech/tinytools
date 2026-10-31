@@ -5,10 +5,12 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<IsPackable>false</IsPackable>
-		<!-- The page scenarios drive the App host, which consumes LowlandTech.Components from the
-		     workspace feed. A hosted runner cannot restore that feed, so CI sets HostPageSpecs=false
-		     and runs every other spec instead of failing at restore and running nothing. -->
-		<HostPageSpecs Condition="'$(HostPageSpecs)' == ''">true</HostPageSpecs>
+		<!-- The server and page scenarios drive src/api and src/app, which consume
+		     LowlandTech.Plugins.Domain and LowlandTech.Components from the workspace feed. A hosted
+		     runner cannot restore that feed, so CI sets HostSpecs=false: those two folders and the
+		     host references are dropped and every other spec still runs, instead of the matrix
+		     failing at restore and running nothing. -->
+		<HostSpecs Condition="'$(HostSpecs)' == ''">true</HostSpecs>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -42,18 +44,22 @@
 		<ProjectReference Include="..\generators\LowlandTech.TinyTools.Generators.csproj" />
 		<ProjectReference Include="..\lsp\LowlandTech.TinyTools.LanguageServer.csproj" />
 		<ProjectReference Include="..\playground\LowlandTech.TinyTools.Playground.csproj" />
-		<ProjectReference Include="..\api\LowlandTech.TinyTools.Api.csproj" />
+		<ProjectReference Include="..\api\LowlandTech.TinyTools.Api.csproj" Condition="'$(HostSpecs)' == 'true'" />
 		<!-- Both hosts declare a top-level entry point, so the page scenarios reach
 		     the app through an alias and keep API's Program unambiguous. -->
-		<ProjectReference Include="..\app\LowlandTech.TinyTools.App.csproj" Aliases="app" Condition="'$(HostPageSpecs)' == 'true'" />
+		<ProjectReference Include="..\app\LowlandTech.TinyTools.App.csproj" Aliases="app" Condition="'$(HostSpecs)' == 'true'" />
 		<ProjectReference Include="..\frontend\LowlandTech.TinyTools.Frontend.csproj" />
 		<Using Include="Bunit" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(HostPageSpecs)' != 'true'">
-		<!-- Only these two folders reach the App host; everything else restores from public feeds. -->
-		<Compile Remove="SPEC3315.Server\US04.TemplatePage\**\*.cs" />
-		<Compile Remove="SPEC3316.Templates\US02.TemplatesPage\**\*.cs" />
+	<ItemGroup Condition="'$(HostSpecs)' != 'true'">
+		<!-- The folders that reach src/api, src/app or the LowlandTech plugin contracts directly;
+		     everything else restores from public feeds. When a hosted runner can restore
+		     LowlandTech.Plugins.Domain and LowlandTech.Components, this group is deleted and the
+		     whole suite runs in CI. -->
+		<Compile Remove="SPEC3315.Server\**\*.cs" />
+		<Compile Remove="SPEC3316.Templates\**\*.cs" />
+		<Compile Remove="SPEC3317.PluginPackaging\**\*.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

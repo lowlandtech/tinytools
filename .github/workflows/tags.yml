@@ -81,12 +81,12 @@ jobs:
       run: dotnet build src/lib/LowlandTech.TinyTools.csproj --configuration Release
 
     - name: Build the behavior tests
-      run: dotnet build src/test/LowlandTech.TinyTools.Tests.csproj --configuration Release --framework net10.0 -p:HostPageSpecs=false
+      run: dotnet build src/test/LowlandTech.TinyTools.Tests.csproj --configuration Release --framework net10.0 -p:HostSpecs=false
 
     - name: Run the behavior tests
       run: >
         dotnet test src/test/LowlandTech.TinyTools.Tests.csproj --configuration Release
-        --framework net10.0 -p:HostPageSpecs=false --no-build --verbosity normal
+        --framework net10.0 -p:HostSpecs=false --no-build --verbosity normal
         --filter "FullyQualifiedName!~SPEC3309&FullyQualifiedName!~SPEC3327"
     
     - name: Pack NuGet package
