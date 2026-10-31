@@ -48,7 +48,9 @@
 		<!-- Both hosts declare a top-level entry point, so the page scenarios reach
 		     the app through an alias and keep API's Program unambiguous. -->
 		<ProjectReference Include="..\app\LowlandTech.TinyTools.App.csproj" Aliases="app" Condition="'$(HostSpecs)' == 'true'" />
-		<ProjectReference Include="..\frontend\LowlandTech.TinyTools.Frontend.csproj" />
+		<!-- The frontend package renders the shared Components surface, which a hosted runner cannot restore, -->
+		<!-- so it is a host-only reference like the api and app ones. -->
+		<ProjectReference Include="..\frontend\LowlandTech.TinyTools.Frontend.csproj" Condition="'$(HostSpecs)' == 'true'" />
 		<Using Include="Bunit" />
 	</ItemGroup>
 
