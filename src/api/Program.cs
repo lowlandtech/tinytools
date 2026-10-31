@@ -27,6 +27,7 @@ builder.Services.AddScoped<ITemplateLibrary, TemplateService>();
 builder.Services.AddApiKeyPolicy();
 builder.Services.AddSingleton<CallerProvenanceLog>();
 builder.Services.AddSingleton<EnforcementObservationLog>();
+builder.Services.AddSingleton<IdempotencyStore>();
 
 var app = builder.Build();
 
