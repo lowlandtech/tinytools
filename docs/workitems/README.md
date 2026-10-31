@@ -5,6 +5,7 @@
 | M3 | Advanced templating | Includes, macros, asynchronous services and collection helpers meet their contracts. |
 | M4 | Ecosystem and tooling | Editor, source generation, reusable template packs and CLI delivery are accepted. |
 | M5 | Package and release integrity | The published package carries only runtime dependencies and no test-only types, the helper registry is immutable, one version authority produces every version surface, and exactly one workflow publishes each feed with real quality gates. |
+| M7 | Template API protection | Every template operation is authorized, bounded, observable and proven against a real host, with the same threat model the backend applies to its plugin surface. |
 | M6 | Tinytools server | A shared core entity model, an api host serving the template contract with this repository engine, a Blazor app on LowlandTech.Components driven by the imported store, the imported API, store and page specifications running against them, and packaging as a Harness extension plugin. |
 
 | Work | Scope | Title | Priority | Lane | Depends on | Status | Refined | Issue |
@@ -58,3 +59,14 @@
 | M6-007 | SPEC3316-US02-SC01 | [Import the templates page specifications](done/SPEC3316.US02.SC01.template-page-specs.md) | P2 | tinytools | M6-004 | done | true | [#73](https://github.com/lowlandtech/tinytools/issues/73) |
 | M6-008 | SPEC3317-US01-SC01 | [Package Tinytools as a Harness extension plugin](doing/SPEC3317.US01.SC01.harness-extension-plugin.md) | P2 | tinytools | M5-004, M6-002, M6-004, M6-009 | doing | true | [#74](https://github.com/lowlandtech/tinytools/issues/74) |
 | M6-009 | SPEC3315-US02-SC02 | [Keep template API routes independent of plugin identity](done/SPEC3315.US02.SC02.resource-based-template-api-routes.md) | P1 | tinytools | M6-003 | done | true | [#85](https://github.com/lowlandtech/tinytools/issues/85) |
+| M7-001 | SPEC3329-US01-SC01 | [Prove every template endpoint with real requests](todo/SPEC3329.US01.SC01.base-endpoint-coverage.md) | P1 | tinytools | None | todo | true | [#99](https://github.com/lowlandtech/tinytools/issues/99) |
+| M7-002 | SPEC3329-US01-SC02 | [Refuse every template call without a valid credential](todo/SPEC3329.US01.SC02.caller-authorization.md) | P1 | tinytools | M7-001 | todo | true | [#100](https://github.com/lowlandtech/tinytools/issues/100) |
+| M7-003 | SPEC3329-US01-SC03 | [Record caller provenance and trust no client identity](todo/SPEC3329.US01.SC03.caller-provenance.md) | P2 | tinytools | M7-002 | todo | true | [#101](https://github.com/lowlandtech/tinytools/issues/101) |
+| M7-004 | SPEC3329-US01-SC04 | [Protect templates from abuse with limits and breakers](todo/SPEC3329.US01.SC04.endpoint-protection.md) | P1 | tinytools | M7-001, M7-011 | todo | true | [#102](https://github.com/lowlandtech/tinytools/issues/102) |
+| M7-005 | SPEC3329-US01-SC05 | [Publish and verify the template OpenAPI contract](todo/SPEC3329.US01.SC05.documented-endpoint-contracts.md) | P1 | tinytools | M7-001 | todo | true | [#103](https://github.com/lowlandtech/tinytools/issues/103) |
+| M7-006 | SPEC3329-US01-SC06 | [Keep template request and response shapes conventional](todo/SPEC3329.US01.SC06.request-response-conventions.md) | P2 | tinytools | M7-001 | todo | true | [#104](https://github.com/lowlandtech/tinytools/issues/104) |
+| M7-007 | SPEC3329-US01-SC07 | [Make template writes retry-safe and cache-honest](todo/SPEC3329.US01.SC07.retry-concurrency-cache-safety.md) | P2 | tinytools | M7-001 | todo | true | [#105](https://github.com/lowlandtech/tinytools/issues/105) |
+| M7-008 | SPEC3329-US01-SC08 | [Bound template work and cancel it](todo/SPEC3329.US01.SC08.bounded-execution-and-streams.md) | P2 | tinytools | M7-001 | todo | true | [#106](https://github.com/lowlandtech/tinytools/issues/106) |
+| M7-009 | SPEC3329-US01-SC09 | [Keep the template contract compatible across versions](todo/SPEC3329.US01.SC09.endpoint-compatibility.md) | P3 | tinytools | M7-001 | todo | true | [#107](https://github.com/lowlandtech/tinytools/issues/107) |
+| M7-010 | SPEC3329-US01-SC10 | [Prove the deployed template API is production-ready](todo/SPEC3329.US01.SC10.deployed-production-readiness.md) | P1 | tinytools | M7-004 | todo | true | [#108](https://github.com/lowlandtech/tinytools/issues/108) |
+| M7-011 | SPEC3329-US01-SC11 | [Observe enforcement decisions without enforcing](todo/SPEC3329.US01.SC11.observation-only-enforcement-context.md) | P2 | tinytools | M7-001 | todo | true | [#109](https://github.com/lowlandtech/tinytools/issues/109) |
