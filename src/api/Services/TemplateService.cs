@@ -31,6 +31,11 @@ public sealed class TemplateService(TinyToolsDbContext database, ITemplateExecut
 
     public async Task<Template?> UpdateAsync(Template template, CancellationToken ct = default)
     {
+        // A modified row that does not exist makes EF throw a concurrency exception, which the
+        // endpoint cannot turn into a 404. A missing template is a lookup answer, not a failure.
+        var exists = await database.Templates.AsNoTracking().AnyAsync(row => row.Id == template.Id, ct);
+        if (!exists) return null;
+
         database.Entry(template).State = EntityState.Modified;
         await database.SaveChangesAsync(ct);
         return template;

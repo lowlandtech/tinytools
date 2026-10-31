@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<MalformedRequestExceptionHandler>();
 
 // One connection string, two providers: a Npgsql string when it names a host,
 // SQLite otherwise, which is what a developer and the tests use.
