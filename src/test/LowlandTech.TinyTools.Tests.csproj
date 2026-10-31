@@ -60,6 +60,10 @@
 		<Compile Remove="SPEC3315.Server\**\*.cs" />
 		<Compile Remove="SPEC3316.Templates\**\*.cs" />
 		<Compile Remove="SPEC3317.PluginPackaging\**\*.cs" />
+		<!-- The endpoint-protection scenarios host src/api in memory through the same factory, so
+		     they need the API host reference that this property drops. They run wherever the
+		     workspace feed exists. -->
+		<Compile Remove="SPEC3329.EndpointProtection\**\*.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
