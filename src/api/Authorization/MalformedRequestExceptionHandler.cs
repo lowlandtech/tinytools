@@ -13,9 +13,9 @@ public sealed class MalformedRequestExceptionHandler : IExceptionHandler
     {
         if (exception is not BadHttpRequestException malformed) return false;
 
-        context.Response.StatusCode = malformed.StatusCode;
-        await context.Response.WriteAsJsonAsync(
-            new { error = "The request body could not be read." }, cancellationToken);
+        var problem = ApiProblems.For(context, malformed.StatusCode, ApiProblems.MalformedBody,
+            "Malformed request", "The request body could not be read.");
+        await ApiProblems.WriteAsync(context, problem, cancellationToken);
 
         return true;
     }

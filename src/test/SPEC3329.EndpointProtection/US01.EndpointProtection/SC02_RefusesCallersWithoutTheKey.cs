@@ -28,12 +28,12 @@ public sealed class SC02_RefusesCallersWithoutTheKey : IAsyncLifetime, IClassFix
         useCase.Cases["ValidStatus"] = (await valid.GetAsync("/api/templates")).StatusCode;
         var absent = await _keyed.CreateClient().GetAsync("/api/templates");
         useCase.Cases["AbsentStatus"] = absent.StatusCode;
-        useCase.Cases["AbsentBody"] = await absent.Content.ReadAsStringAsync();
+        useCase.Cases["AbsentBody"] = Redact(await absent.Content.ReadAsStringAsync());
         var wrong = _keyed.CreateClient();
         wrong.DefaultRequestHeaders.Add("X-Api-Key", "not-the-key");
         var wrongResponse = await wrong.GetAsync("/api/templates");
         useCase.Cases["WrongStatus"] = wrongResponse.StatusCode;
-        useCase.Cases["WrongBody"] = await wrongResponse.Content.ReadAsStringAsync();
+        useCase.Cases["WrongBody"] = Redact(await wrongResponse.Content.ReadAsStringAsync());
         var cased = _keyed.CreateClient();
         cased.DefaultRequestHeaders.Add("X-Api-Key", "SECRET-KEY");
         useCase.Cases["CasedStatus"] = (await cased.GetAsync("/api/templates")).StatusCode;
@@ -57,6 +57,7 @@ public sealed class SC02_RefusesCallersWithoutTheKey : IAsyncLifetime, IClassFix
         foreach (var call in Requests()) unconfiguredCodes.Add((await unconfigured.SendAsync(call)).StatusCode);
         useCase.Cases["UnconfiguredStatuses"] = string.Join(",", unconfiguredCodes);
     }
+    private static string Redact(string body) => System.Text.RegularExpressions.Regex.Replace(body, "\"traceId\":\"[^\"]*\"", "\"traceId\":\"redacted\"");
     public ValueTask InitializeAsync() { useCase.RunOnce(Given, () => WhenAsync().GetAwaiter().GetResult()); return ValueTask.CompletedTask; }
     public ValueTask DisposeAsync() { _keyed?.Dispose(); _unkeyed?.Dispose(); _development?.Dispose(); return ValueTask.CompletedTask; }
     [Then("the valid key status should be OK")]

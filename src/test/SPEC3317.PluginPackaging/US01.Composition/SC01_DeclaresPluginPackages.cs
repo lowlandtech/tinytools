@@ -58,9 +58,9 @@ public sealed class SC01_DeclaresPluginPackages : IClassFixture<UseCases.PluginP
     [Trait("UAC", "02"), Fact]
     public void UAC02_ApiTargetsBackend() => useCase.Cases["ApiTarget"].Should().Be(PluginTarget.Backend);
 
-    [Then("the schema version should be 1")]
+    [Then("the schema version should be 3")]
     [Trait("UAC", "03"), Fact]
-    public void UAC03_DeclaresSchemaVersionOne() => ((int)useCase.Cases["Schema"]!).Should().Be(1);
+    public void UAC03_DeclaresTheAssetSchemaVersion() => ((int)useCase.Cases["Schema"]!).Should().Be(3);
 
     [Then("the route path should be templates")]
     [Trait("UAC", "04"), Fact]

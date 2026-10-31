@@ -28,12 +28,12 @@ public sealed class ApiKeyAuthorizationResultHandler : IAuthorizationMiddlewareR
             ? StatusCodes.Status401Unauthorized
             : StatusCodes.Status403Forbidden;
 
-        context.Response.StatusCode = status;
-        await context.Response.WriteAsJsonAsync(new
-        {
-            error = status == StatusCodes.Status401Unauthorized
-                ? $"Provide the configured API key in the {ApiKeyPolicy.HeaderName} header."
-                : "The supplied key is not accepted.",
-        });
+        var problem = status == StatusCodes.Status401Unauthorized
+            ? ApiProblems.For(context, status, ApiProblems.KeyRequired, "API key required",
+                $"Provide the configured API key in the {ApiKeyPolicy.HeaderName} header.")
+            : ApiProblems.For(context, status, ApiProblems.KeyRejected, "API key rejected",
+                "The supplied key is not accepted.");
+
+        await ApiProblems.WriteAsync(context, problem);
     }
 }
