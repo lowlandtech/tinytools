@@ -9,15 +9,15 @@
 <div class="grid">
     <label>
         Template
-        <textarea @bind="session.Template" @bind:event="oninput" spellcheck="false"></textarea>
+        <textarea id="input-template" @bind="session.Template" @bind:event="oninput" spellcheck="false"></textarea>
     </label>
     <label>
         Model
-        <textarea @bind="session.Model" @bind:event="oninput" spellcheck="false"></textarea>
+        <textarea id="input-model" @bind="session.Model" @bind:event="oninput" spellcheck="false"></textarea>
     </label>
 </div>
 
-<button @onclick="Render">Render</button>
+<button id="render" @onclick="Render">Render</button>
 
 <h2>Output</h2>
 <pre class="output">@session.Output</pre>
@@ -28,17 +28,49 @@
 }
 
 <h2>Use it</h2>
-<pre class="snippet">@session.CSharpSnippet</pre>
-<pre class="snippet">@session.WorkflowSnippet</pre>
+
+<div class="snippet">
+    <div>
+        <pre id="snippet-csharp">@session.CSharpSnippet</pre>
+        <button class="copy" id="copy-csharp" @onclick="() => CopyAsync(session.CSharpSnippet)">Copy C#</button>
+    </div>
+    <div>
+        <pre id="snippet-workflow">@session.WorkflowSnippet</pre>
+        <button class="copy" id="copy-workflow" @onclick="() => CopyAsync(session.WorkflowSnippet)">Copy YAML</button>
+    </div>
+    <div>
+        <pre id="snippet-cli">@session.CommandSnippet</pre>
+        <button class="copy" id="copy-cli" @onclick="() => CopyAsync(session.CommandSnippet)">Copy CLI</button>
+    </div>
+</div>
+
+@if (CopyStatus is not null)
+{
+    <p class="copy-status">@CopyStatus</p>
+}
+
 <p class="version">Engine @Version</p>
 
 @code {
     [Inject]
     private PlaygroundSession session { get; set; } = default!;
 
+    [Inject]
+    private IJSRuntime JS { get; set; } = default!;
+
     private static string Version => typeof(TinyTemplateEngine).Assembly.GetName().Version?.ToString() ?? "unknown";
+
+    private string? CopyStatus { get; set; }
 
     protected override void OnInitialized() => session.Render();
 
     private void Render() => session.Render();
+
+    private async Task CopyAsync(string text)
+    {
+        var copied = await JS.InvokeAsync<bool>("tinytoolsCopy", text);
+        CopyStatus = copied
+            ? "Copied to the clipboard."
+            : "The browser refused the clipboard write; select the text instead.";
+    }
 }
