@@ -37,35 +37,28 @@ public sealed class SC02_RefusesCallersWithoutTheKey : IAsyncLifetime, IClassFix
         var cased = _keyed.CreateClient();
         cased.DefaultRequestHeaders.Add("X-Api-Key", "SECRET-KEY");
         useCase.Cases["CasedStatus"] = (await cased.GetAsync("/api/templates")).StatusCode;
-        useCase.Cases["Unconfigured"] = (await _unkeyed.CreateClient().GetAsync("/api/templates")).StatusCode;
-        useCase.Cases["Development"] = (await _development.CreateClient().GetAsync("/api/templates")).StatusCode;
+        static HttpRequestMessage[] Requests() =>
+        [
+            new(HttpMethod.Get, "/api/templates"),
+            new(HttpMethod.Get, $"/api/templates/{Guid.NewGuid()}"),
+            new(HttpMethod.Post, "/api/templates") { Content = JsonContent.Create(new { Name = "x" }) },
+            new(HttpMethod.Put, $"/api/templates/{Guid.NewGuid()}") { Content = JsonContent.Create(new { Name = "x" }) },
+            new(HttpMethod.Delete, $"/api/templates/{Guid.NewGuid()}"),
+            new(HttpMethod.Post, "/api/templates/render") { Content = JsonContent.Create(new { Template = "x", Json = "{}" }) },
+            new(HttpMethod.Post, $"/api/templates/versions/{Guid.NewGuid()}/validate"),
+        ];
         var anonymous = _keyed.CreateClient();
         var codes = new List<HttpStatusCode>();
-        var calls = new[]
-        {
-            new HttpRequestMessage(HttpMethod.Get, "/api/templates"),
-            new HttpRequestMessage(HttpMethod.Get, $"/api/templates/{Guid.NewGuid()}"),
-            new HttpRequestMessage(HttpMethod.Post, "/api/templates") { Content = JsonContent.Create(new { Name = "x" }) },
-            new HttpRequestMessage(HttpMethod.Put, $"/api/templates/{Guid.NewGuid()}") { Content = JsonContent.Create(new { Name = "x" }) },
-            new HttpRequestMessage(HttpMethod.Delete, $"/api/templates/{Guid.NewGuid()}"),
-            new HttpRequestMessage(HttpMethod.Post, "/api/templates/render") { Content = JsonContent.Create(new { Template = "x", Json = "{}" }) },
-            new HttpRequestMessage(HttpMethod.Post, $"/api/templates/versions/{Guid.NewGuid()}/validate"),
-        };
-        foreach (var call in calls) codes.Add((await anonymous.SendAsync(call)).StatusCode);
+        foreach (var call in Requests()) codes.Add((await anonymous.SendAsync(call)).StatusCode);
         useCase.Cases["Guarded"] = codes.Distinct().Count();
+        useCase.Cases["Development"] = (await _development.CreateClient().GetAsync("/api/templates")).StatusCode;
+        var unconfigured = _unkeyed.CreateClient();
+        var unconfiguredCodes = new List<HttpStatusCode>();
+        foreach (var call in Requests()) unconfiguredCodes.Add((await unconfigured.SendAsync(call)).StatusCode);
+        useCase.Cases["UnconfiguredStatuses"] = string.Join(",", unconfiguredCodes);
     }
-    public ValueTask InitializeAsync()
-    {
-        useCase.RunOnce(Given, () => WhenAsync().GetAwaiter().GetResult());
-        return ValueTask.CompletedTask;
-    }
-    public ValueTask DisposeAsync()
-    {
-        _keyed?.Dispose();
-        _unkeyed?.Dispose();
-        _development?.Dispose();
-        return ValueTask.CompletedTask;
-    }
+    public ValueTask InitializeAsync() { useCase.RunOnce(Given, () => WhenAsync().GetAwaiter().GetResult()); return ValueTask.CompletedTask; }
+    public ValueTask DisposeAsync() { _keyed?.Dispose(); _unkeyed?.Dispose(); _development?.Dispose(); return ValueTask.CompletedTask; }
     [Then("the valid key status should be OK")]
     [Trait("UAC", "01"), Fact]
     public void UAC01_AcceptsTheConfiguredKey() => ((HttpStatusCode)useCase.Cases["ValidStatus"]!).Should().Be(HttpStatusCode.OK);
@@ -84,9 +77,9 @@ public sealed class SC02_RefusesCallersWithoutTheKey : IAsyncLifetime, IClassFix
     [Then("the absent body should not contain secret-key")]
     [Trait("UAC", "06"), Fact]
     public void UAC06_LeaksNothingAboutTheKey() => ((string?)useCase.Cases["AbsentBody"]!).Should().NotContain("secret-key");
-    [Then("the unconfigured host status should be Unauthorized")]
+    [Then("the unconfigured host statuses should be Unauthorized,Unauthorized,Unauthorized,Unauthorized,Unauthorized,Unauthorized,Unauthorized")]
     [Trait("UAC", "07"), Fact]
-    public void UAC07_FailsClosedWithoutAConfiguredKey() => ((HttpStatusCode)useCase.Cases["Unconfigured"]!).Should().Be(HttpStatusCode.Unauthorized);
+    public void UAC07_FailsClosedWithoutAConfiguredKey() => ((string)useCase.Cases["UnconfiguredStatuses"]!).Should().Be("Unauthorized,Unauthorized,Unauthorized,Unauthorized,Unauthorized,Unauthorized,Unauthorized");
     [Then("the development anonymous status should be OK")]
     [Trait("UAC", "08"), Fact]
     public void UAC08_DocumentsTheDevelopmentBypass() => ((HttpStatusCode)useCase.Cases["Development"]!).Should().Be(HttpStatusCode.OK);
