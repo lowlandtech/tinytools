@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace LowlandTech.TinyTools.LanguageServer;
@@ -39,6 +40,28 @@ public sealed class TemplateLanguageServer(TextWriter? log = null)
         var id = message["id"];
         var parameters = message["params"] as JsonObject;
 
+        try
+        {
+            await RouteAsync(method, id, parameters, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception error) when (error is InvalidOperationException or FormatException
+                                          or ArgumentException or JsonException)
+        {
+            // An editor is allowed to send anything. A request it cannot serve must come back as a
+            // JSON-RPC error, not as a dead process: this used to throw out of the read loop and
+            // take the whole server down on a single malformed argument.
+            log?.WriteLine("rejected " + method + ": " + error.Message);
+            if (id is not null)
+            {
+                await ReplyErrorAsync(id, -32602, "Invalid params for " + method + ": " + error.Message,
+                    cancellationToken).ConfigureAwait(false);
+            }
+        }
+    }
+
+    private async Task RouteAsync(string? method, JsonNode? id, JsonObject? parameters,
+        CancellationToken cancellationToken)
+    {
         switch (method)
         {
             case "initialize":
@@ -193,8 +216,9 @@ public sealed class TemplateLanguageServer(TextWriter? log = null)
 
     private JsonObject Preview(JsonObject? parameters)
     {
-        var uri = parameters?["arguments"]?[0]?.GetValue<string>();
-        var revision = parameters?["arguments"]?[1]?.GetValue<int>() ?? Revision;
+        var arguments = parameters?["arguments"] as JsonArray;
+        var uri = TryReadArgument<string>(arguments, 0, out var requestedUri) ? requestedUri : null;
+        var revision = TryReadArgument<int>(arguments, 1, out var requestedRevision) ? requestedRevision : Revision;
 
         if (uri is null || !_documents.TryGetValue(uri, out var text))
         {
@@ -206,11 +230,27 @@ public sealed class TemplateLanguageServer(TextWriter? log = null)
         return new JsonObject { ["revision"] = revision, ["text"] = rendered, ["stale"] = revision < Revision };
     }
 
+    /// <summary>Reads a command argument defensively; a client may send any shape it likes.</summary>
+    private static bool TryReadArgument<T>(JsonArray? arguments, int index, out T value)
+    {
+        value = default!;
+        if (arguments is null || index >= arguments.Count) return false;
+        return arguments[index] is JsonValue node && node.TryGetValue<T>(out value!);
+    }
+
     private async Task ReplyAsync(JsonNode? id, JsonNode? result, CancellationToken cancellationToken) =>
         await _channel.WriteAsync(new JsonObject
         {
             ["jsonrpc"] = "2.0",
             ["id"] = id?.DeepClone(),
             ["result"] = result?.DeepClone(),
+        }, cancellationToken).ConfigureAwait(false);
+
+    private async Task ReplyErrorAsync(JsonNode id, int code, string message, CancellationToken cancellationToken) =>
+        await _channel.WriteAsync(new JsonObject
+        {
+            ["jsonrpc"] = "2.0",
+            ["id"] = id.DeepClone(),
+            ["error"] = new JsonObject { ["code"] = code, ["message"] = message },
         }, cancellationToken).ConfigureAwait(false);
 }
