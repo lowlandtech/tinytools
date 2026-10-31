@@ -38,11 +38,20 @@ public sealed class SC02_WatchesRelevantFiles : IClassFixture<UseCases.RenderCli
         var run = watcher.RunAsync(cancellation.Token);
 
         File.WriteAllText(Path.Combine(_root, "unrelated.txt"), "noise");
-        Thread.Sleep(150);
+        Thread.Sleep(250);
         var afterUnrelated = renders;
 
         File.WriteAllText(Path.Combine(_root, "hello.tpl"), "Hello ${Context.Model.Name} again!");
-        Thread.Sleep(200);
+
+        // A FileSystemWatcher notification is delivered by the operating system, so the wait is a
+        // deadline rather than a fixed sleep: on a loaded Windows runner 200ms was not enough and
+        // the scenario reported zero renders for a change that did arrive a moment later.
+        var deadline = DateTime.UtcNow.AddSeconds(10);
+        while (renders == 0 && DateTime.UtcNow < deadline)
+        {
+            Thread.Sleep(20);
+        }
+
         cancellation.Cancel();
 
         try
