@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options => options.DescribeApiKey());
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<MalformedRequestExceptionHandler>();
 

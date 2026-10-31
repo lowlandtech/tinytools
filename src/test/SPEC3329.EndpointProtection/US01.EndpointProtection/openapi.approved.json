@@ -1,0 +1,345 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "LowlandTech.TinyTools.Api | v1",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:5377/"
+    }
+  ],
+  "paths": {
+    "/api/templates": {
+      "get": {
+        "tags": [
+          "Templates"
+        ],
+        "description": "List every template with its versions and packages.",
+        "operationId": "ListTemplates",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Templates"
+        ],
+        "description": "Create a template with its versions.",
+        "operationId": "CreateTemplate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Template"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/templates/{id}": {
+      "get": {
+        "tags": [
+          "Templates"
+        ],
+        "description": "Get one template, its versions and its packages.",
+        "operationId": "GetTemplate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Templates"
+        ],
+        "description": "Replace a template.",
+        "operationId": "UpdateTemplate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Template"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Templates"
+        ],
+        "description": "Delete a template with its versions.",
+        "operationId": "DeleteTemplate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/templates/render": {
+      "post": {
+        "tags": [
+          "Templates"
+        ],
+        "description": "Render a template with a JSON model using ${Context.xxx} and ${name} syntax.",
+        "operationId": "RenderTemplate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/templates/versions/{id}/validate": {
+      "post": {
+        "tags": [
+          "Templates"
+        ],
+        "description": "Render a version with its test JSON and compare it with its expected text.",
+        "operationId": "ValidateTemplateVersion",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RenderRequest": {
+        "required": [
+          "template",
+          "json"
+        ],
+        "type": "object",
+        "properties": {
+          "template": {
+            "type": "string"
+          },
+          "json": {
+            "type": "string"
+          }
+        }
+      },
+      "Template": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "versions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateVersion"
+            }
+          },
+          "packages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplatePackage"
+            }
+          }
+        }
+      },
+      "TemplateImport": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "packageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "package": {
+            "$ref": "#/components/schemas/TemplatePackage"
+          }
+        }
+      },
+      "TemplatePackage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "packageVersion": {
+            "type": "string"
+          },
+          "templates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Template"
+            }
+          },
+          "imports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateImport"
+            }
+          }
+        }
+      },
+      "TemplateVersion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "content": {
+            "type": "string"
+          },
+          "hash": {
+            "type": "string"
+          },
+          "dataType": {
+            "type": "string"
+          },
+          "json": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "text": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "isValid": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "templateId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "template": {
+            "$ref": "#/components/schemas/Template"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "TinytoolsApiKey": {
+        "type": "apiKey",
+        "description": "The deployment's API key. Every template operation requires it outside Development.",
+        "name": "X-Api-Key",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "TinytoolsApiKey": [ ]
+    }
+  ],
+  "tags": [
+    {
+      "name": "Templates"
+    }
+  ]
+}
