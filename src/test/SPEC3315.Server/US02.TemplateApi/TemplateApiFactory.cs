@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US02.TemplateApi;
 
 /// <summary>Hosts the API in memory over its own SQLite file.</summary>
-public sealed class TemplateApiFactory(string environment = "Development", string? apiKey = null)
+public sealed class TemplateApiFactory(string environment = "Development", string? apiKey = null, IDictionary<string, string?>? mutableSettings = null)
     : WebApplicationFactory<Program>
 {
     private readonly string _database = Path.Combine(Path.GetTempPath(), $"tinytools-api-{Guid.NewGuid():N}.db");
@@ -17,6 +17,8 @@ public sealed class TemplateApiFactory(string environment = "Development", strin
         builder.UseEnvironment(environment);
         builder.UseSetting("ConnectionStrings:DefaultConnection", $"Data Source={_database}");
         if (apiKey is not null) builder.UseSetting("Tinytools:ApiKey", apiKey);
+        if (mutableSettings is not null)
+            builder.ConfigureAppConfiguration((_, configuration) => configuration.Add(new MutableSettingsSource(mutableSettings)));
     }
 
     /// <summary>Opens the scenario database for facts that assert on persisted state.</summary>

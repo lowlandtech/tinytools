@@ -25,10 +25,12 @@ builder.Services.AddDbContext<TinyToolsDbContext>(options =>
 builder.Services.AddSingleton<ITemplateExecutor, TemplateExecutor>();
 builder.Services.AddScoped<ITemplateLibrary, TemplateService>();
 builder.Services.AddApiKeyPolicy();
+builder.Services.AddSingleton<CallerProvenanceLog>();
 
 var app = builder.Build();
 
 app.UseExceptionHandler();
+app.UseMiddleware<CallerProvenanceMiddleware>();
 app.UseStatusCodePages();
 app.UseAuthorization();
 
