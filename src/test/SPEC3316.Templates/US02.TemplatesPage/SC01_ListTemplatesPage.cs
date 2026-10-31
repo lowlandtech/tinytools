@@ -6,7 +6,7 @@ using LowlandTech.TinyTools.Core.Abstractions;
 using LowlandTech.TinyTools.Frontend.Features.Templates;
 using LowlandTech.TinyTools.Tests.SPEC3315.Server.US04.TemplatePage;
 using Microsoft.Extensions.DependencyInjection;
-using Page = app::LowlandTech.TinyTools.App.Features.Templates.TemplatesPage;
+using Page = LowlandTech.TinyTools.Frontend.Features.Templates.TemplatesPage;
 using TemplateSessionStore = app::LowlandTech.TinyTools.App.Components.TemplateSessionStore;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3316.Templates.US02.TemplatesPage;
@@ -32,6 +32,7 @@ public sealed class SC01_ListTemplatesPage : IDisposable, IClassFixture<UseCases
         _context.Services.AddScoped<ITemplateLibrary>(_ => new TemplateLibraryStub(TemplatePageFixture.TwoTemplates()));
         _context.Services.AddScoped<TemplateEffects>();
         _context.Services.AddScoped<TemplateSessionStore>();
+        _context.Services.AddScoped<ITemplateStore>(services => services.GetRequiredService<TemplateSessionStore>());
     }
 
     [When("the templates page is rendered")]

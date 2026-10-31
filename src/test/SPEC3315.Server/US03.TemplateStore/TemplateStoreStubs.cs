@@ -10,7 +10,8 @@ public sealed class RecordingStore : ITemplateStore
 {
     public TemplateState State { get; } = new();
     public List<object> Dispatched { get; } = [];
-    public void Dispatch(object action) => Dispatched.Add(action);
+    public event Action? Changed;
+    public void Dispatch(object action) { Dispatched.Add(action); Changed?.Invoke(); }
 }
 
 /// <summary>A library that answers with fixed data and records the calls.</summary>

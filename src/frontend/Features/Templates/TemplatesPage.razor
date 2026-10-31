@@ -1,11 +1,10 @@
 @page "/templates"
 @using LowlandTech.Components
-@using LowlandTech.TinyTools.App.Components
 @using LowlandTech.TinyTools.Core.Entities
 @using LowlandTech.TinyTools.Frontend.Features.Templates
 @using Microsoft.AspNetCore.Components.Web
 @implements IDisposable
-@inject TemplateSessionStore Store
+@inject ITemplateStore Store
 @inject TemplateEffects Effects
 
 <PageTitle>Templates</PageTitle>

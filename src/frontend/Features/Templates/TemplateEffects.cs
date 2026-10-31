@@ -12,6 +12,9 @@ public interface ITemplateStore
     TemplateState State { get; }
 
     void Dispatch(object action);
+
+    /// <summary>Raised after a dispatch changed the state, so a view can re-render.</summary>
+    event Action? Changed;
 }
 
 /// <summary>

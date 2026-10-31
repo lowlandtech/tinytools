@@ -26,6 +26,8 @@ builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(apiBaseAd
 builder.Services.AddScoped<ITemplateLibrary, HttpTemplateLibrary>();
 builder.Services.AddScoped<TemplateEffects>();
 builder.Services.AddScoped<TemplateSessionStore>();
+// The package page resolves the seam; the host maps it onto its own store so both names share one instance.
+builder.Services.AddScoped<LowlandTech.TinyTools.Frontend.Features.Templates.ITemplateStore>(services => services.GetRequiredService<TemplateSessionStore>());
 
 var app = builder.Build();
 

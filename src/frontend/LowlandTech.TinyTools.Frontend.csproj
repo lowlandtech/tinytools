@@ -18,10 +18,25 @@
     <PackageTags>lowlandtech tinytools templates blazor frontend</PackageTags>
     <RepositoryUrl>https://github.com/lowlandtech/tinytools</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <!-- Every declared asset path starts with this root, so _content/<PackageId>/ resolves. -->
+    <StaticWebAssetBasePath>_content/LowlandTech.TinyTools.Frontend</StaticWebAssetBasePath>
   </PropertyGroup>
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The plugin descriptor travels with the package twice: packed so a host can read it from
+         the archive, and embedded so a composed host can read it without touching disk. The asset
+         root is the same prefix every declared stylesheet and script uses. -->
+    <None Include="lowlandtech\plugin.json" Pack="true" PackagePath="lowlandtech\" />
+    <EmbeddedResource Include="lowlandtech\plugin.json" LogicalName="lowlandtech/plugin.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The page renders the shared Components surface, so the package declares it the way the other Harness plugins do. -->
+    <PackageReference Include="LowlandTech.Components" Version="2026.10.2-202610242" />
   </ItemGroup>
 
   <ItemGroup>
