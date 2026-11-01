@@ -28,6 +28,8 @@ builder.Services.AddApiKeyPolicy();
 builder.Services.AddSingleton<CallerProvenanceLog>();
 builder.Services.AddSingleton<EnforcementObservationLog>();
 builder.Services.AddSingleton<IdempotencyStore>();
+builder.Services.AddSingleton<RateLimitWindow>();
+builder.Services.AddSingleton<StoreBreaker>();
 
 var app = builder.Build();
 
@@ -35,6 +37,9 @@ app.UseExceptionHandler();
 app.UseMiddleware<CallerProvenanceMiddleware>();
 app.UseMiddleware<EnforcementObservationMiddleware>();
 app.UseMiddleware<ApiVersionMiddleware>();
+// The order is the contract: authorization, then the limit, then the store breaker, then the handler.
+app.UseMiddleware<RateLimitMiddleware>();
+app.UseMiddleware<StoreBreakerMiddleware>();
 app.UseStatusCodePages();
 app.UseAuthorization();
 
