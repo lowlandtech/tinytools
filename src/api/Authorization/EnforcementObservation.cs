@@ -58,6 +58,8 @@ public sealed class EnforcementObservationMiddleware(RequestDelegate next, IConf
 
         context.Response.OnStarting(() =>
         {
+            // The caller needs the same identifier the host records, or a trace cannot be correlated.
+            context.Response.Headers["X-Trace-Id"] = observation.TraceId;
             var status = context.Response.StatusCode;
             var refused = status is StatusCodes.Status401Unauthorized or StatusCodes.Status403Forbidden;
             log.Record(new EnforcementObservation(
