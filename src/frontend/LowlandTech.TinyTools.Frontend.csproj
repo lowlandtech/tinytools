@@ -31,6 +31,8 @@
          the archive, and embedded so a composed host can read it without touching disk. The asset
          root is the same prefix every declared stylesheet and script uses. -->
     <None Include="lowlandtech\plugin.json" Pack="true" PackagePath="lowlandtech\" />
+    <None Include="lowlandtech\deployment.json" Pack="true" PackagePath="lowlandtech\" />
+    <EmbeddedResource Include="lowlandtech\deployment.json" LogicalName="lowlandtech/deployment.json" />
     <EmbeddedResource Include="lowlandtech\plugin.json" LogicalName="lowlandtech/plugin.json" />
   </ItemGroup>
 
