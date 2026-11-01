@@ -72,3 +72,23 @@ public sealed class IdempotencyStore
             _entries.TryRemove(stale.Key, out _);
     }
 }
+
+/// <summary>The work bounds of the template API, declared once so a request is refused before it runs.</summary>
+public static class TemplateBounds
+{
+    /// <summary>The largest template accepted by render, in UTF-8 bytes.</summary>
+    public const int TemplateBytes = 256 * 1024;
+
+    /// <summary>The largest JSON model accepted by render, in UTF-8 bytes.</summary>
+    public const int ModelBytes = 1024 * 1024;
+
+    public const string TooLarge = "https://lowlandtech.dev/problems/payload-too-large";
+
+    public static int Bytes(string value) => System.Text.Encoding.UTF8.GetByteCount(value);
+
+    /// <summary>The bound a request exceeds, or null when it fits.</summary>
+    public static string? Exceeded(string template, string json) =>
+        Bytes(template) > TemplateBytes ? "template"
+        : Bytes(json) > ModelBytes ? "json"
+        : null;
+}

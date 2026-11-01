@@ -110,6 +110,19 @@ public static class TemplateEndpoints
         group.MapPost("/render", (RenderRequest request, ITemplateExecutor executor, HttpContext context) =>
             {
                 TemplateConditions.DeclareUncacheable(context);
+
+                // The bound is checked before the engine runs, so an oversized payload costs one
+                // length measurement rather than a render.
+                var exceeded = TemplateBounds.Exceeded(request.Template, request.Json);
+                if (exceeded is not null)
+                {
+                    return Results.Problem(
+                        type: TemplateBounds.TooLarge,
+                        title: "The payload is too large",
+                        detail: $"The {exceeded} exceeds the bound of this operation.",
+                        statusCode: StatusCodes.Status413PayloadTooLarge);
+                }
+
                 return Results.Ok(new { output = executor.Render(request.Template, request.Json) });
             })
             .WithName("RenderTemplate")
