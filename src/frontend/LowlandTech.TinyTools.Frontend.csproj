@@ -36,7 +36,7 @@
 
   <ItemGroup>
     <!-- The page renders the shared Components surface, so the package declares it the way the other Harness plugins do. -->
-    <PackageReference Include="LowlandTech.Components" Version="2026.10.2-202610242" />
+    <PackageReference Include="LowlandTech.Components" Version="2026.10.3-20261030235445133125670" />
     <!-- The surface attribute the Harness binder reads from this assembly. -->
     <PackageReference Include="LowlandTech.Plugins.Domain" Version="2026.10.1-20261029231326395491648" />
   </ItemGroup>

@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="LowlandTech.Plugins.Domain" Version="2026.10.1-20261030063217803391801" />
+    <PackageReference Include="LowlandTech.Plugins.Domain" Version="2026.10.1-20261029231326395491648" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
