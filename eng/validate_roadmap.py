@@ -1,7 +1,3 @@
-# Vendored from the workspace shared tooling. Do not patch here: re-vendor the upstream file.
-# Source: D:/lowlandtech/eng/harness/validate_roadmap.py
-# Upstream commit: 58beaf6 (chore: preserve shared agent operations and database recovery checkpoints)
-# Reason: the roadmap contract is quoted in every closure, so CI must be able to enforce it.
 """Validate the sole, tables-only roadmap and source-owned workitem contracts."""
 import argparse
 import json
@@ -13,6 +9,10 @@ import sys
 MILESTONES = ['Milestone', 'Title', 'Gate']
 WORKITEMS = ['Work', 'Scope', 'Title', 'Priority', 'Lane', 'Depends on', 'Status', 'Refined', 'Issue']
 WORKITEMS_LEGACY = WORKITEMS[:-1]
+# Every product status the sole board may declare. A proposal is an
+# independent state: it lives in the todo source folder but it is not
+# ordinary TODO work, so it is counted apart from it.
+STATUSES = ['todo', 'blocked', 'proposal', 'doing', 'review', 'done']
 FORBIDDEN = re.compile(r'(?:^|[-_. ])(?:roadmaps?|milestones?)(?:$|[-_. ])|^(?:m|s)\d+(?:$|[-_. ])', re.I)
 IDENTITY = re.compile(r'[A-Z]{4}\d{4}-US\d{2}-SC\d{2,3}')
 
@@ -29,7 +29,7 @@ def validate(root):
 
     if not board.is_file():
         fail('RMP001', board, 0, 'The sole roadmap docs/workitems/README.md is missing.')
-        return dict(ok=False, milestones=0, workitems=0, diagnostics=diagnostics)
+        return dict(ok=False, milestones=0, workitems=0, counts={status: 0 for status in STATUSES}, diagnostics=diagnostics)
     for path in docs.rglob('*'):
         if path == board:
             continue
@@ -74,6 +74,7 @@ def validate(root):
 
     milestones = {}
     workitems = []
+    counts = {status: 0 for status in STATUSES}
     seen_scopes = set()
     linked_sources = set()
     for table in tables:
@@ -128,7 +129,7 @@ def validate(root):
                             actual = actual.split(' (', 1)[0]
                         if actual != expected:
                             fail('RMP014', board, number, f'{key} differs from the authoritative workitem.')
-                    lane = {'todo': 'todo', 'blocked': 'todo', 'doing': 'doing', 'review': 'doing', 'done': 'done'}.get(row['Status'])
+                    lane = {'todo': 'todo', 'blocked': 'todo', 'proposal': 'todo', 'doing': 'doing', 'review': 'doing', 'done': 'done'}.get(row['Status'])
                     if target.parent.name != lane:
                         fail('RMP015', board, number, 'Source file lane does not match product status; refinement must not move it.')
                     if not row['Lane']:
@@ -136,6 +137,8 @@ def validate(root):
             if link and target.is_file():
                 linked_sources.add(target)
                 row['_source'] = source
+            if row['Status'] in counts:
+                counts[row['Status']] += 1
             workitems.append(row)
     for lane_name in ['todo', 'doing']:
         lane_dir = board.parent / lane_name
@@ -155,7 +158,7 @@ def validate(root):
                     and not any(dependency in [item['Work'], item['Scope'].strip('`')] for item in workitems)
                     and '<!-- external-prerequisite: ' + dependency + ' -->' not in row.get('_source', '')):
                 fail('RMP019', board, 0, f"{row['Work']} has an unresolved local dependency {dependency}; external prerequisites belong in its source contract.")
-    return dict(ok=not diagnostics, milestones=len(milestones), workitems=len(workitems), diagnostics=diagnostics)
+    return dict(ok=not diagnostics, milestones=len(milestones), workitems=len(workitems), counts=counts, diagnostics=diagnostics)
 
 
 def main():
@@ -174,6 +177,7 @@ def main():
         print(json.dumps(result, indent=2))
     else:
         print(f"{'PASS' if result['ok'] else 'FAIL'} roadmap: {result['milestones']} milestones, {result['workitems']} workitems")
+        print('counts: ' + ', '.join(f"{status}={result['counts'][status]}" for status in STATUSES))
         for diagnostic in result['diagnostics']:
             print(f"{diagnostic['code']} {diagnostic['path']}:{diagnostic['line']}: {diagnostic['message']}")
     return 0 if result['ok'] else 1
