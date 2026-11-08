@@ -5,7 +5,7 @@ using Bunit;
 using LowlandTech.TinyTools.Core.Abstractions;
 using LowlandTech.TinyTools.Frontend.Features.Templates;
 using Microsoft.Extensions.DependencyInjection;
-using TemplateSessionStore = app::LowlandTech.TinyTools.App.Components.TemplateSessionStore;
+using TemplateSessionStore = LowlandTech.TinyTools.Frontend.Features.Templates.TemplateSessionStore;
 using TemplatesPage = LowlandTech.TinyTools.Frontend.Features.Templates.TemplatesPage;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3315.Server.US04.TemplatePage;

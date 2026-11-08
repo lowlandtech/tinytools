@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LowlandTech.Components" Version="2026.10.3-20261030235445133125670" />
+    <PackageReference Include="LowlandTech.Components" Version="[2026.10.3-20261104130349138981506]" />
   </ItemGroup>
 
   <ItemGroup>

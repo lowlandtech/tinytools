@@ -5,7 +5,7 @@ using LowlandTech.Plugins;
 namespace LowlandTech.TinyTools.Tests.SPEC3317.PluginPackaging.US01.Composition.UseCases;
 
 /// <summary>Caller goal and captured result vocabulary only; executable API usage stays in each scenario.</summary>
-public sealed class PluginPackagingUseCase
+public sealed class PluginPackagingUseCase : IDisposable
 {
     private bool executed;
 
@@ -20,5 +20,11 @@ public sealed class PluginPackagingUseCase
             when();
             executed = true;
         }
+    }
+
+    public void Dispose()
+    {
+        foreach (var value in Cases.Values.OfType<IDisposable>())
+            value.Dispose();
     }
 }

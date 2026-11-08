@@ -38,9 +38,11 @@
 
   <ItemGroup>
     <!-- The page renders the shared Components surface, so the package declares it the way the other Harness plugins do. -->
-    <PackageReference Include="LowlandTech.Components" Version="2026.10.3-20261030235445133125670" />
+    <PackageReference Include="LowlandTech.Components" Version="[2026.10.3-20261104130349138981506]" />
+    <!-- The application-plugin contract: IAppPlugin, PluginDescriptor and the route registry. -->
+    <PackageReference Include="LowlandTech.Core" Version="[2026.10.3-20261101231129]" />
     <!-- The surface attribute the Harness binder reads from this assembly. -->
-    <PackageReference Include="LowlandTech.Plugins.Domain" Version="2026.10.1-20261029231326395491648" />
+    <PackageReference Include="LowlandTech.Plugins.Domain" Version="[2026.10.1-20261102113735045740153]" />
   </ItemGroup>
 
   <ItemGroup>

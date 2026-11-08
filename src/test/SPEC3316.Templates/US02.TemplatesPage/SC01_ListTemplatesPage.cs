@@ -7,7 +7,7 @@ using LowlandTech.TinyTools.Frontend.Features.Templates;
 using LowlandTech.TinyTools.Tests.SPEC3315.Server.US04.TemplatePage;
 using Microsoft.Extensions.DependencyInjection;
 using Page = LowlandTech.TinyTools.Frontend.Features.Templates.TemplatesPage;
-using TemplateSessionStore = app::LowlandTech.TinyTools.App.Components.TemplateSessionStore;
+using TemplateSessionStore = LowlandTech.TinyTools.Frontend.Features.Templates.TemplateSessionStore;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3316.Templates.US02.TemplatesPage;
 

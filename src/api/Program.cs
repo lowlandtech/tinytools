@@ -4,6 +4,7 @@ using LowlandTech.TinyTools.Api.Endpoints;
 using LowlandTech.TinyTools.Api.Services;
 using LowlandTech.TinyTools.Core.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ builder.Services.AddExceptionHandler<MalformedRequestExceptionHandler>();
 // SQLite otherwise, which is what a developer and the tests use.
 builder.Services.AddDbContext<TinyToolsDbContext>(options =>
 {
+    options.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     if (connectionString is not null && connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase))
         options.UseNpgsql(connectionString);
@@ -48,13 +50,12 @@ if (app.Environment.IsDevelopment())
 
 app.MapTemplateEndpoints();
 
-// The database is created rather than migrated: the schema is the imported
-// entity model, and the packaging item owns migrations when the server becomes
-// a deployed plugin.
+// The standalone development host and the composed package use the same
+// provider-aware migration history on the selected connection.
 using (var scope = app.Services.CreateScope())
 {
     var database = scope.ServiceProvider.GetRequiredService<TinyToolsDbContext>();
-    await database.Database.EnsureCreatedAsync();
+    await database.Database.MigrateAsync();
 }
 
 await app.RunAsync();

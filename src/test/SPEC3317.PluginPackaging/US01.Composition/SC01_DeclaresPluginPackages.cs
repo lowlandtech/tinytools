@@ -1,4 +1,6 @@
 using System.Text.Json;
+using LowlandTech.TinyTools.Api.Plugins;
+using LowlandTech.TinyTools.Frontend;
 using LowlandTech.Plugins;
 
 namespace LowlandTech.TinyTools.Tests.SPEC3317.PluginPackaging.US01.Composition;
@@ -16,20 +18,19 @@ public sealed class SC01_DeclaresPluginPackages : IClassFixture<UseCases.PluginP
         useCase.RunOnce(Given, When);
     }
 
-    internal static string RepositoryRoot()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "tinytools.slnx")))
-            directory = directory.Parent;
-        return directory?.FullName ?? throw new InvalidOperationException("Repository root not reachable.");
-    }
-
-    internal static PluginManifest Read(string relative)
+    internal static PluginManifest Read(string package)
     {
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-        var path = Path.Combine(RepositoryRoot(), relative);
-        return JsonSerializer.Deserialize<PluginManifest>(File.ReadAllText(path), options)!;
+        var assembly = package switch
+        {
+            "api" => typeof(TinyToolsApiPlugin).Assembly,
+            "frontend" => typeof(TinyToolsFrontendPlugin).Assembly,
+            _ => throw new ArgumentOutOfRangeException(nameof(package), package, "Unknown package.")
+        };
+        using var stream = assembly.GetManifestResourceStream("lowlandtech/plugin.json")
+            ?? throw new InvalidOperationException($"{package} package has no embedded plugin manifest.");
+        return JsonSerializer.Deserialize<PluginManifest>(stream, options)!;
     }
 
     [Given("the frontend and api plugin manifests beside their project files")]
@@ -40,8 +41,8 @@ public sealed class SC01_DeclaresPluginPackages : IClassFixture<UseCases.PluginP
     [When("both manifests are read through the Plugins.Domain model")]
     private void When()
     {
-        var frontend = Read(Path.Combine("src", "frontend", "lowlandtech", "plugin.json"));
-        var api = Read(Path.Combine("src", "api", "lowlandtech", "plugin.json"));
+        var frontend = Read("frontend");
+        var api = Read("api");
         useCase.Cases["FrontendTarget"] = frontend.Target;
         useCase.Cases["ApiTarget"] = api.Target;
         useCase.Cases["Schema"] = frontend.SchemaVersion;

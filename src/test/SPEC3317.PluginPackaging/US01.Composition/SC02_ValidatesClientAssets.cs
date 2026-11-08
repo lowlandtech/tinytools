@@ -28,7 +28,7 @@ public sealed class SC02_ValidatesClientAssets : IClassFixture<UseCases.PluginPa
     [When("the declared asset and six malformed variants are resolved through the contract")]
     private void When()
     {
-        var manifest = SC01_DeclaresPluginPackages.Read(Path.Combine("src", "frontend", "lowlandtech", "plugin.json"));
+        var manifest = SC01_DeclaresPluginPackages.Read("frontend");
         var stylesheet = manifest.Assets.Stylesheets[0];
         var script = manifest.Assets.Scripts[0];
 
