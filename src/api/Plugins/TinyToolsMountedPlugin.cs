@@ -76,10 +76,20 @@ public sealed class TinyToolsMountedPlugin : SharedPlugin
                 "Tinytools could not resolve the database factory it registered.");
         }
 
+        var migration = LowlandTech.Plugins.PluginMigrationOutcome.Applied;
+        var migrationMessage = string.Empty;
         try
         {
             await using var database = await factory.CreateDbContextAsync(cancellationToken);
+            await TinyToolsLegacySchemaMigration.ApplyAsync(database, cancellationToken);
+            var hasPendingMigrations = (await database.Database.GetPendingMigrationsAsync(cancellationToken)).Any();
             await database.Database.MigrateAsync(cancellationToken);
+            migration = hasPendingMigrations
+                ? LowlandTech.Plugins.PluginMigrationOutcome.Applied
+                : LowlandTech.Plugins.PluginMigrationOutcome.AlreadyApplied;
+            migrationMessage = hasPendingMigrations
+                ? "migrated the Tinytools schema against the host connection"
+                : "Tinytools schema was already applied to the host connection";
         }
         catch (Exception error) when (error is not OperationCanceledException)
         {
@@ -92,8 +102,8 @@ public sealed class TinyToolsMountedPlugin : SharedPlugin
 
         return LowlandTech.Plugins.PluginPhaseResult.Migrated(
             LowlandTech.Plugins.PluginLifecyclePhase.Install,
-            LowlandTech.Plugins.PluginMigrationOutcome.Applied,
-            "migrated the Tinytools schema against the host connection");
+            migration,
+            migrationMessage);
     }
 
     public ValueTask<LowlandTech.Plugins.PluginPhaseResult> ActivateAsync(

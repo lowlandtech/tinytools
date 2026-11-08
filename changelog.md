@@ -1,3 +1,9 @@
+# 2026.10.5
+
+## TinyTools plugin schema isolation
+
+* Give TinyTools tables distinct names on shared SQLite host databases, while retaining the previous migration identity so existing template data is upgraded in place.
+
 # 2026.10.4
 ## MSBuild rendering
 

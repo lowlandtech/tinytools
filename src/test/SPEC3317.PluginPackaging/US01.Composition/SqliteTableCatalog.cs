@@ -12,4 +12,11 @@ public static class SqliteTableCatalog
         command.Parameters.AddWithValue("$name", table);
         return Convert.ToInt32(command.ExecuteScalar()) == 1;
     }
+
+    public static bool HasRows(SqliteConnection connection, string table)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = $"SELECT EXISTS(SELECT 1 FROM \"{table}\")";
+        return Convert.ToInt32(command.ExecuteScalar()) == 1;
+    }
 }

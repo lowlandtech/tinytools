@@ -55,6 +55,7 @@ app.MapTemplateEndpoints();
 using (var scope = app.Services.CreateScope())
 {
     var database = scope.ServiceProvider.GetRequiredService<TinyToolsDbContext>();
+    await TinyToolsLegacySchemaMigration.ApplyAsync(database, CancellationToken.None);
     await database.Database.MigrateAsync();
 }
 

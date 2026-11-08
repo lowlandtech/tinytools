@@ -52,6 +52,7 @@ public sealed class TinyToolsApiPlugin : IApiPlugin
         ArgumentNullException.ThrowIfNull(context);
         var factory = context.Services.GetRequiredService<IDbContextFactory<TinyToolsDbContext>>();
         await using var database = await factory.CreateDbContextAsync(cancellationToken);
+        await TinyToolsLegacySchemaMigration.ApplyAsync(database, cancellationToken);
         await database.Database.MigrateAsync(cancellationToken);
     }
 

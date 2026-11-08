@@ -45,7 +45,7 @@ namespace LowlandTech.TinyTools.Api.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("StepIntents", "tinytools");
+                    b.ToTable("TinyTools_StepIntents", "tinytools");
                 });
 
             modelBuilder.Entity("LowlandTech.TinyTools.Core.Entities.Template", b =>
@@ -63,7 +63,7 @@ namespace LowlandTech.TinyTools.Api.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Templates", "tinytools");
+                    b.ToTable("TinyTools_Templates", "tinytools");
                 });
 
             modelBuilder.Entity("LowlandTech.TinyTools.Core.Entities.TemplateFlow", b =>
@@ -81,7 +81,7 @@ namespace LowlandTech.TinyTools.Api.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TemplateFlows", "tinytools");
+                    b.ToTable("TinyTools_TemplateFlows", "tinytools");
                 });
 
             modelBuilder.Entity("LowlandTech.TinyTools.Core.Entities.TemplateImport", b =>
@@ -104,7 +104,7 @@ namespace LowlandTech.TinyTools.Api.Domain.Migrations
 
                     b.HasIndex("PackageId");
 
-                    b.ToTable("Imports", "tinytools");
+                    b.ToTable("TinyTools_Imports", "tinytools");
                 });
 
             modelBuilder.Entity("LowlandTech.TinyTools.Core.Entities.TemplatePackage", b =>
@@ -126,7 +126,7 @@ namespace LowlandTech.TinyTools.Api.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Packages", "tinytools");
+                    b.ToTable("TinyTools_Packages", "tinytools");
                 });
 
             modelBuilder.Entity("LowlandTech.TinyTools.Core.Entities.TemplateStep", b =>
@@ -175,7 +175,7 @@ namespace LowlandTech.TinyTools.Api.Domain.Migrations
 
                     b.HasIndex("StepIntentId");
 
-                    b.ToTable("TemplateSteps", "tinytools");
+                    b.ToTable("TinyTools_TemplateSteps", "tinytools");
                 });
 
             modelBuilder.Entity("LowlandTech.TinyTools.Core.Entities.TemplateVersion", b =>
@@ -219,7 +219,7 @@ namespace LowlandTech.TinyTools.Api.Domain.Migrations
 
                     b.HasIndex("TemplateId");
 
-                    b.ToTable("TemplateVersions", "tinytools");
+                    b.ToTable("TinyTools_TemplateVersions", "tinytools");
                 });
 
             modelBuilder.Entity("TemplateTemplatePackage", b =>
@@ -234,7 +234,7 @@ namespace LowlandTech.TinyTools.Api.Domain.Migrations
 
                     b.HasIndex("TemplatesId");
 
-                    b.ToTable("TemplateTemplatePackage", "tinytools");
+                    b.ToTable("TinyTools_TemplateTemplatePackage", "tinytools");
                 });
 
             modelBuilder.Entity("LowlandTech.TinyTools.Core.Entities.TemplateImport", b =>

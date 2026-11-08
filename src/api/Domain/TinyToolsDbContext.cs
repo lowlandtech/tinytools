@@ -47,5 +47,16 @@ public sealed class TinyToolsDbContext(DbContextOptions<TinyToolsDbContext> opti
             .HasMany(flow => flow.Steps)
             .WithOne(step => step.Flow)
             .HasForeignKey(step => step.FlowId);
+
+        // SQLite does not support schemas, so multiple plugins that migrate the
+        // host's shared connection otherwise collide on generic names such as
+        // Packages and Templates. Keep every TinyTools-owned table distinct on
+        // schema-less providers as well as in providers that honor the schema.
+        foreach (var entity in modelBuilder.Model.GetEntityTypes())
+        {
+            var table = entity.GetTableName();
+            if (table is not null)
+                entity.SetTableName($"TinyTools_{table}");
+        }
     }
 }

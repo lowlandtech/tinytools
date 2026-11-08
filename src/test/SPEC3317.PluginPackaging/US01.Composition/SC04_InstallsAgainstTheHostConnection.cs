@@ -22,7 +22,7 @@ public sealed class SC04_InstallsAgainstTheHostConnection : IClassFixture<UseCas
         useCase.RunOnce(Given, When);
     }
 
-    [Given("the mounted Tinytools plugin has a configured host database with existing host data")]
+    [Given("the mounted Tinytools plugin has a host database with an existing Packages table")]
     private void Given()
     {
         var databaseName = "tinytools-" + Guid.NewGuid().ToString("N");
@@ -30,7 +30,7 @@ public sealed class SC04_InstallsAgainstTheHostConnection : IClassFixture<UseCas
         var anchor = new SqliteConnection(connectionString);
         anchor.Open();
         using var command = anchor.CreateCommand();
-        command.CommandText = "CREATE TABLE host_marker (Id INTEGER PRIMARY KEY)";
+        command.CommandText = "CREATE TABLE host_marker (Id INTEGER PRIMARY KEY); CREATE TABLE Packages (Id TEXT PRIMARY KEY); INSERT INTO Packages VALUES ('host-package');";
         command.ExecuteNonQuery();
         useCase.Cases["ConnectionString"] = connectionString;
         useCase.Cases["DatabaseName"] = databaseName;
@@ -78,7 +78,8 @@ public sealed class SC04_InstallsAgainstTheHostConnection : IClassFixture<UseCas
         useCase.Cases["MissingConnection"] = plugin.InstallAsync(install with { Connection = null }, CancellationToken.None)
             .GetAwaiter().GetResult().Refusal?.Code;
         useCase.Cases["HostDataPreserved"] = SqliteTableCatalog.Contains(anchor, "host_marker")
-            && SqliteTableCatalog.Contains(anchor, "Templates");
+            && SqliteTableCatalog.Contains(anchor, "Packages") && SqliteTableCatalog.HasRows(anchor, "Packages")
+            && SqliteTableCatalog.Contains(anchor, "TinyTools_Packages") && SqliteTableCatalog.Contains(anchor, "TinyTools_Templates");
     }
 
     [Then("the template library registration should be true")]
@@ -92,7 +93,6 @@ public sealed class SC04_InstallsAgainstTheHostConnection : IClassFixture<UseCas
     [Then("the host data preservation check should be true")]
     [Trait("UAC", "25"), Fact]
     public void UAC25_PreservesHostAndCreatesTemplateSchema() => ((bool)useCase.Cases["HostDataPreserved"]!).Should().BeTrue();
-
     [Then("the missing connection refusal should be MissingHostConnection")]
     [Trait("UAC", "26"), Fact]
     public void UAC26_RefusesMissingHostConnection() => ((PluginLifecycleRefusalCode?)useCase.Cases["MissingConnection"]).Should().Be(PluginLifecycleRefusalCode.MissingHostConnection);
