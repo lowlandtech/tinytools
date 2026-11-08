@@ -36,6 +36,7 @@ public sealed class SC05_ComposesTheFrontendPlugin : IClassFixture<UseCases.Plug
         var services = new ServiceCollection();
         services.AddSingleton<IRouteAssemblyRegistry, RouteAssemblyRegistry>();
         services.AddSingleton<NavigationManager>(new TestNavigationManager());
+        services.AddScoped(_ => new HttpClient());
         plugin.ConfigureServices(services, new ConfigurationBuilder().Build());
 
         using var provider = services.BuildServiceProvider();
@@ -44,6 +45,7 @@ public sealed class SC05_ComposesTheFrontendPlugin : IClassFixture<UseCases.Plug
         var scoped = scope.ServiceProvider;
         useCase.Cases["Identity"] = plugin.Descriptor.Id;
         useCase.Cases["RouteAssembly"] = scoped.GetRequiredService<IRouteAssemblyRegistry>().Assemblies.Contains(typeof(TinyToolsFrontendPlugin).Assembly);
+        _ = scoped.GetRequiredService<ITemplateLibrary>();
         useCase.Cases["ApiBase"] = scoped.GetRequiredService<HttpClient>().BaseAddress?.ToString();
         useCase.Cases["Library"] = scoped.GetRequiredService<ITemplateLibrary>() is not null;
         useCase.Cases["Effects"] = scoped.GetRequiredService<TemplateEffects>() is not null;
@@ -73,4 +75,8 @@ public sealed class SC05_ComposesTheFrontendPlugin : IClassFixture<UseCases.Plug
     [Then("the store identity check should be true")]
     [Trait("UAC", "32"), Fact]
     public void UAC32_UsesOneStoreInstance() => ((bool)useCase.Cases["SharedStore"]!).Should().BeTrue();
+
+    [Then("TinyToolsApiClient.BaseAddress should be https://harness.example/")]
+    [Trait("UAC", "34"), Fact]
+    public void UAC34_ConfiguresTheHostHttpClient() => ((string)useCase.Cases["ApiBase"]!).Should().Be("https://harness.example/");
 }

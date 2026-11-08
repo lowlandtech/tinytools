@@ -1,3 +1,9 @@
+# 2026.10.6
+
+## Composed template API client
+
+* The TinyTools frontend configures its API client from the browser host origin when the host already registered an unconfigured default client, so the packaged Templates page can load its API.
+
 # 2026.10.5
 
 ## TinyTools plugin schema isolation

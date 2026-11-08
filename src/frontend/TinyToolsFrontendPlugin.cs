@@ -45,19 +45,19 @@ public sealed class TinyToolsFrontendPlugin : IAppPlugin
         // The host may name a distinct API origin. Otherwise, the browser host
         // supplies its current origin through NavigationManager.
         var apiBaseAddress = configuration?[ApiBaseUrlKey];
-        if (!string.IsNullOrWhiteSpace(apiBaseAddress))
+        services.TryAddScoped(provider => new HttpClient
         {
-            services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(apiBaseAddress, UriKind.Absolute) });
-        }
-        else
+            BaseAddress = new Uri(provider.GetRequiredService<NavigationManager>().BaseUri, UriKind.Absolute)
+        });
+        services.AddScoped<ITemplateLibrary>(provider =>
         {
-            services.TryAddScoped(provider => new HttpClient
-            {
-                BaseAddress = new Uri(provider.GetRequiredService<NavigationManager>().BaseUri, UriKind.Absolute)
-            });
-        }
-
-        services.AddScoped<ITemplateLibrary, HttpTemplateLibrary>();
+            var client = provider.GetRequiredService<HttpClient>();
+            if (!string.IsNullOrWhiteSpace(apiBaseAddress))
+                client.BaseAddress = new Uri(apiBaseAddress, UriKind.Absolute);
+            else if (client.BaseAddress is null)
+                client.BaseAddress = new Uri(provider.GetRequiredService<NavigationManager>().BaseUri, UriKind.Absolute);
+            return new HttpTemplateLibrary(client);
+        });
         services.AddScoped<TemplateEffects>();
         services.AddScoped<TemplateSessionStore>();
         services.AddScoped<ITemplateStore>(provider => provider.GetRequiredService<TemplateSessionStore>());
