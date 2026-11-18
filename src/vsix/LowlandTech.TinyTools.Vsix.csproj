@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Visual Studio extensions are .NET Framework assemblies; the language
+         server they launch is a separate process and keeps its own runtime. -->
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+    <!-- A language client has no VSPackage to register, so no pkgdef is written. -->
+    <GeneratePkgDefFile>false</GeneratePkgDefFile>
+    <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
+    <IsPackable>false</IsPackable>
+    <!-- The package's own build targets do not declare CreateVsixContainer, so the
+         targets file is imported explicitly. -->
+    <VssdkBuildToolsVersion>18.12.1606</VssdkBuildToolsVersion>
+    <VssdkTargetsPath>$(NuGetPackageRoot)microsoft.vssdk.buildtools\$(VssdkBuildToolsVersion)\tools\VSSDK\Microsoft.VsSDK.targets</VssdkTargetsPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The VS 18 editor contracts and the language-client support the extension ships against. -->
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="18.12.1606" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.VisualStudio.LanguageServer.Client" Version="18.12.55" />
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="$(VssdkBuildToolsVersion)" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <VSIXSourceItem Include="source.extension.vsixmanifest" />
+    <!-- The source manifest is consumed to generate extension.vsixmanifest; it is not payload. -->
+    <None Include="source.extension.vsixmanifest">
+      <IncludeInVSIX>false</IncludeInVSIX>
+    </None>
+  </ItemGroup>
+
+  <!-- The server is a separate process, so it is published beside the manifest and
+       packed as content instead of being referenced as an assembly. -->
+  <Target Name="PublishLanguageServer" BeforeTargets="GetVsixSourceItems">
+    <MSBuild
+      Projects="$(MSBuildThisFileDirectory)..\lsp\LowlandTech.TinyTools.LanguageServer.csproj"
+      Targets="Publish"
+      Properties="Configuration=$(Configuration);PublishDir=$(MSBuildProjectDirectory)\$(IntermediateOutputPath)server\;" />
+    <ItemGroup>
+      <Content Include="$(MSBuildProjectDirectory)\$(IntermediateOutputPath)server\**\*.*">
+        <IncludeInVSIX>true</IncludeInVSIX>
+        <VSIXSubPath>server</VSIXSubPath>
+      </Content>
+    </ItemGroup>
+  </Target>
+
+  <Import Project="$(VssdkTargetsPath)" Condition="Exists('$(VssdkTargetsPath)')" />
+
+</Project>

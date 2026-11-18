@@ -458,3 +458,6 @@ $RECYCLE.BIN/
 *.ncrunchproject
 /output
 /src/lib/output/tmp-verify-tests
+
+# VSIX containers are build output; the project and its manifest are the source.
+*.vsix
