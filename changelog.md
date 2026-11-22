@@ -1,3 +1,9 @@
+# 2026.10.7
+
+## One render per settled change
+
+* The template watcher reports a change only once its file stamp has been observed twice in a row. Writing a file truncates it and then fills it, so a single edit was previously visible as two stamps and could render twice - the Windows acceptance for `watch` failed intermittently on exactly that. The rule also stops a half-written template from being rendered.
+
 # 2026.10.6
 
 ## Composed template API client

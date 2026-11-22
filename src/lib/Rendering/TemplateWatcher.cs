@@ -20,6 +20,11 @@ public sealed class TemplateWatcher(
 
     private readonly Dictionary<string, DateTime> _stamps = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// The stamp of a file that has changed but has not settled yet, so one edit is reported once.
+    /// </summary>
+    private readonly Dictionary<string, DateTime> _unsettled = new(StringComparer.OrdinalIgnoreCase);
+
     /// <summary>The files that can trigger a render, resolved to full paths.</summary>
     public IReadOnlyList<string> RelevantFiles => _relevant;
 
@@ -29,7 +34,11 @@ public sealed class TemplateWatcher(
     /// <summary>Polls until <paramref name="cancellationToken"/> is cancelled.</summary>
     public async Task RunAsync(CancellationToken cancellationToken)
     {
-        foreach (var file in _relevant) _stamps[file] = Stamp(file);
+        foreach (var file in _relevant)
+        {
+            _stamps[file] = Stamp(file);
+            _unsettled.Remove(file);
+        }
 
         var delay = interval ?? TimeSpan.FromMilliseconds(250);
         while (!cancellationToken.IsCancellationRequested)
@@ -40,10 +49,25 @@ public sealed class TemplateWatcher(
             foreach (var file in _relevant)
             {
                 var stamp = Stamp(file);
-                if (stamp != _stamps[file])
+                if (stamp == _stamps[file])
+                {
+                    _unsettled.Remove(file);
+                    continue;
+                }
+
+                // Writing a file changes it more than once - it is truncated, then filled - so a
+                // single edit can be observed as two or more stamps. A change is therefore reported
+                // only once its stamp has been seen twice in a row, which makes one edit render once
+                // and also stops a half-written file from being rendered.
+                if (_unsettled.TryGetValue(file, out var seen) && seen == stamp)
                 {
                     _stamps[file] = stamp;
+                    _unsettled.Remove(file);
                     changed.Add(file);
+                }
+                else
+                {
+                    _unsettled[file] = stamp;
                 }
             }
 
