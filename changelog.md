@@ -1,3 +1,8 @@
+# 2026.10.8
+
+## One render per edit, not per write
+
+* A change is reported once its file stamp has stayed unchanged for a settle window of its own, 250 ms by default and independent of the poll interval. The previous rule required only one quiet poll, so an edit written in two stages - truncate, half the content, pause, the rest - settled twice and rendered twice, and the half-written file rendered first. `TemplateWatcher` now takes a `settle` parameter and exposes it, because a write pausing longer than the window is honestly more than one change.
 # 2026.10.7
 
 ## One render per settled change
