@@ -1,0 +1,101 @@
+using System.Text;
+using LowlandTech.TinyTools.Rendering;
+
+// The consumer half of eng/smoke-package.ps1. It asserts what the published package promises about
+// the watcher, including the boundary where that promise honestly ends.
+var cases = new (string Name, int Renders, int Expected)[]
+{
+    ("single write", await RendersForEdit("single", stagePauseMs: 0), 1),
+    ("staged write, 120 ms pause (inside the settle window)", await RendersForEdit("staged120", stagePauseMs: 120), 1),
+    ("staged write, 400 ms pause (past the settle window)", await RendersForEdit("staged400", stagePauseMs: 400), 2),
+};
+
+Console.WriteLine($"package = {typeof(TemplateWatcher).Assembly.GetName().Version}");
+foreach (var (name, renders, expected) in cases)
+{
+    Console.WriteLine($"{name,-54} renders={renders} expected={expected}");
+}
+
+var unrelated = await RendersForUnrelatedChange();
+Console.WriteLine($"{"unrelated file change",-54} renders={unrelated} expected=0");
+
+var ok = cases.All(c => c.Renders == c.Expected) && unrelated == 0;
+Console.WriteLine(ok ? "RESULT: PASS" : "RESULT: FAIL");
+return ok ? 0 : 1;
+
+static async Task<int> RendersForEdit(string tag, int stagePauseMs)
+{
+    var root = Path.Combine(Path.GetTempPath(), $"tinytools-smoke-{tag}-{Guid.NewGuid():N}");
+    Directory.CreateDirectory(root);
+    try
+    {
+        var template = Path.Combine(root, "hello.tpl");
+        var model = Path.Combine(root, "model.json");
+        await File.WriteAllTextAsync(template, "start");
+        await File.WriteAllTextAsync(model, "{\"Name\":\"Ada\"}");
+
+        var renders = 0;
+        var watcher = new TemplateWatcher(
+            [template, model],
+            _ => Interlocked.Increment(ref renders),
+            TimeSpan.FromMilliseconds(20));
+
+        using var cancellation = new CancellationTokenSource();
+        var run = watcher.RunAsync(cancellation.Token);
+
+        var bytes = Encoding.UTF8.GetBytes("Hello ${Context.Model.Name}!");
+        using (var stream = new FileStream(template, FileMode.Create, FileAccess.Write, FileShare.Read))
+        {
+            await stream.WriteAsync(bytes.AsMemory(0, bytes.Length / 2));
+            await stream.FlushAsync();
+            if (stagePauseMs > 0) await Task.Delay(stagePauseMs);
+            await stream.WriteAsync(bytes.AsMemory(bytes.Length / 2));
+            await stream.FlushAsync();
+        }
+
+        var deadline = DateTime.UtcNow.AddSeconds(15);
+        while (renders == 0 && DateTime.UtcNow < deadline) await Task.Delay(20);
+        await Task.Delay(900);   // let a second render appear before the count is read
+        var afterEdit = renders;
+
+        await cancellation.CancelAsync();
+        try { await run; } catch (OperationCanceledException) { /* documented shutdown */ }
+        return afterEdit;
+    }
+    finally
+    {
+        Directory.Delete(root, recursive: true);
+    }
+}
+
+static async Task<int> RendersForUnrelatedChange()
+{
+    var root = Path.Combine(Path.GetTempPath(), $"tinytools-smoke-unrelated-{Guid.NewGuid():N}");
+    Directory.CreateDirectory(root);
+    try
+    {
+        var template = Path.Combine(root, "hello.tpl");
+        await File.WriteAllTextAsync(template, "start");
+
+        var renders = 0;
+        var watcher = new TemplateWatcher(
+            [template],
+            _ => Interlocked.Increment(ref renders),
+            TimeSpan.FromMilliseconds(20));
+
+        using var cancellation = new CancellationTokenSource();
+        var run = watcher.RunAsync(cancellation.Token);
+
+        await File.WriteAllTextAsync(Path.Combine(root, "unrelated.txt"), "noise");
+        await Task.Delay(900);
+        var unrelatedRenders = renders;
+
+        await cancellation.CancelAsync();
+        try { await run; } catch (OperationCanceledException) { /* documented shutdown */ }
+        return unrelatedRenders;
+    }
+    finally
+    {
+        Directory.Delete(root, recursive: true);
+    }
+}
