@@ -15,6 +15,9 @@
          targets file is imported explicitly. -->
     <VssdkBuildToolsVersion>18.12.1606</VssdkBuildToolsVersion>
     <VssdkTargetsPath>$(NuGetPackageRoot)microsoft.vssdk.buildtools\$(VssdkBuildToolsVersion)\tools\VSSDK\Microsoft.VsSDK.targets</VssdkTargetsPath>
+    <!-- The container name defaults to $(TargetName).vsix, which is empty here, so the archive was
+         produced as a bare '.vsix'. Naming it explicitly gives an installer a file it can be pointed at. -->
+    <TargetVsixContainerName>LowlandTech.TinyTools.Vsix.vsix</TargetVsixContainerName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,14 +25,6 @@
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="18.12.1606" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.VisualStudio.LanguageServer.Client" Version="18.12.55" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="$(VssdkBuildToolsVersion)" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <VSIXSourceItem Include="source.extension.vsixmanifest" />
-    <!-- The source manifest is consumed to generate extension.vsixmanifest; it is not payload. -->
-    <None Include="source.extension.vsixmanifest">
-      <IncludeInVSIX>false</IncludeInVSIX>
-    </None>
   </ItemGroup>
 
   <!-- The server is a separate process, so it is published beside the manifest and
