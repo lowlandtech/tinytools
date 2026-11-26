@@ -1,4 +1,5 @@
 using System.Text;
+using LowlandTech.TinyTools;
 using LowlandTech.TinyTools.Rendering;
 
 // The consumer half of eng/smoke-package.ps1. It asserts what the published package promises about
@@ -19,7 +20,28 @@ foreach (var (name, renders, expected) in cases)
 var unrelated = await RendersForUnrelatedChange();
 Console.WriteLine($"{"unrelated file change",-54} renders={unrelated} expected=0");
 
-var ok = cases.All(c => c.Renders == c.Expected) && unrelated == 0;
+// The core promise of the package, exercised the way a consumer calls it.
+var engine = new TinyTemplateEngine();
+var rendered = engine.Render("Hello ${Context.Model.Name}!", new LowlandTech.TinyTools.ExecutionContext { Model = new { Name = "Ada" } });
+Console.WriteLine($"{"render with a model",-54} output=\"{rendered}\" expected=\"Hello Ada!\"");
+Console.WriteLine($"{"render output matches",-54} match={rendered == "Hello Ada!"} expected=True");
+
+// Strict mode must refuse an unknown variable by name rather than rendering nothing.
+var strictDiagnosed = false;
+try
+{
+    engine.Render("Hello ${Context.Absent}!", new LowlandTech.TinyTools.ExecutionContext { Model = new { Name = "Ada" } }, LowlandTech.TinyTools.TemplateRenderOptions.Strict);
+}
+catch (Exception error)
+{
+    strictDiagnosed = error.Message.Contains("Absent", StringComparison.Ordinal);
+}
+Console.WriteLine($"{"strict mode names the unknown variable",-54} diagnosed={strictDiagnosed} expected=True");
+
+var ok = cases.All(c => c.Renders == c.Expected)
+         && unrelated == 0
+         && rendered == "Hello Ada!"
+         && strictDiagnosed;
 Console.WriteLine(ok ? "RESULT: PASS" : "RESULT: FAIL");
 return ok ? 0 : 1;
 
