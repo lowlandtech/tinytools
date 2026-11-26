@@ -88,6 +88,15 @@ try {
     if (-not (Test-Path $program)) { throw "The consumer program is missing: $program" }
     Copy-Item -Path $program -Destination (Join-Path $consumer 'Program.cs')
 
+    # The consumer is generated outside the repository, so it inherits no SDK pin of its own and the
+    # machine default would be selected - a newer SDK than this repository requires. Carrying the
+    # repository's global.json across makes the gate verify the package on the SDK it will build with.
+    $globalJson = Join-Path $repositoryRoot 'global.json'
+    if (Test-Path $globalJson) { Copy-Item -Path $globalJson -Destination (Join-Path $consumer 'global.json') }
+
+    Push-Location $consumer
+    try { $selectedSdk = (& dotnet --version) } finally { Pop-Location }
+    Write-Host "Selected SDK in the consumer: $selectedSdk"
     Write-Host "Verifying LowlandTech.TinyTools $Version from $Feed"
     Push-Location $consumer
     try {
