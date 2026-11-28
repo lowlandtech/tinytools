@@ -82,4 +82,5 @@
 | M7-014 | SPEC3333-US01-SC01 | [Proposal: migrate the Tinytools package pins to a single central contract source](done/SPEC3333.US01.SC01.central-source-migration-proposal.md) | P2 | tinytools | None | done | true | [#113](https://github.com/lowlandtech/tinytools/issues/113) |
 | M7-015 | SPEC3340-US01-SC01 | [Proposal: templates and handlers as graph data, rendered by the host](todo/SPEC3340.US01.SC01.graph-as-template-server.md) | P2 | tinytools | None | proposal | true | [#120](https://github.com/lowlandtech/tinytools/issues/120) |
 | M7-016 | SPEC3341-US01-SC01 | [Business case: TinyTools to general availability](todo/SPEC3341.US01.SC01.ga-business-case.md) | P1 | tinytools | None | proposal | true | [#121](https://github.com/lowlandtech/tinytools/issues/121) |
+| M7-017 | SPEC3342-US01-SC01 | [Proposal: the first-users validation slice](todo/SPEC3342.US01.SC01.first-users-validation-slice.md) | P1 | tinytools | None | proposal | true | [#122](https://github.com/lowlandtech/tinytools/issues/122) |
 
