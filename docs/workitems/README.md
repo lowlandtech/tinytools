@@ -80,4 +80,5 @@
 | M7-012 | SPEC3331-US01-SC01 | [Assess central-source consolidation against the Tinytools packages](done/SPEC3331.US01.SC01.central-source-impact.md) | P1 | tinytools | None | done | true | [#111](https://github.com/lowlandtech/tinytools/issues/111) |
 | M7-013 | SPEC3332-US01-SC01 | [Proposal: an authenticated path a lane can drive to the deployed plugin page](done/SPEC3332.US01.SC01.authenticated-deployed-page-path.md) | P1 | tinytools | None | done | true | [#112](https://github.com/lowlandtech/tinytools/issues/112) |
 | M7-014 | SPEC3333-US01-SC01 | [Proposal: migrate the Tinytools package pins to a single central contract source](done/SPEC3333.US01.SC01.central-source-migration-proposal.md) | P2 | tinytools | None | done | true | [#113](https://github.com/lowlandtech/tinytools/issues/113) |
+| M7-015 | SPEC3340-US01-SC01 | [Proposal: serve templates from the graph as workflow steps that generate files](todo/SPEC3340.US01.SC01.graph-as-template-server.md) | P2 | tinytools | M7-003, M6-001 | proposal | true | [#120](https://github.com/lowlandtech/tinytools/issues/120) |
 
