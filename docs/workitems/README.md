@@ -81,4 +81,5 @@
 | M7-013 | SPEC3332-US01-SC01 | [Proposal: an authenticated path a lane can drive to the deployed plugin page](done/SPEC3332.US01.SC01.authenticated-deployed-page-path.md) | P1 | tinytools | None | done | true | [#112](https://github.com/lowlandtech/tinytools/issues/112) |
 | M7-014 | SPEC3333-US01-SC01 | [Proposal: migrate the Tinytools package pins to a single central contract source](done/SPEC3333.US01.SC01.central-source-migration-proposal.md) | P2 | tinytools | None | done | true | [#113](https://github.com/lowlandtech/tinytools/issues/113) |
 | M7-015 | SPEC3340-US01-SC01 | [Proposal: templates and handlers as graph data, rendered by the host](todo/SPEC3340.US01.SC01.graph-as-template-server.md) | P2 | tinytools | None | proposal | true | [#120](https://github.com/lowlandtech/tinytools/issues/120) |
+| M7-016 | SPEC3341-US01-SC01 | [Business case: TinyTools to general availability](todo/SPEC3341.US01.SC01.ga-business-case.md) | P1 | tinytools | None | proposal | true | [#121](https://github.com/lowlandtech/tinytools/issues/121) |
 
