@@ -84,4 +84,5 @@
 | M7-016 | SPEC3341-US01-SC01 | [Business case: TinyTools to general availability](todo/SPEC3341.US01.SC01.ga-business-case.md) | P1 | tinytools | None | proposal | true | [#121](https://github.com/lowlandtech/tinytools/issues/121) |
 | M7-017 | SPEC3342-US01-SC01 | [Proposal: the first-users validation slice](todo/SPEC3342.US01.SC01.first-users-validation-slice.md) | P1 | tinytools | None | proposal | true | [#122](https://github.com/lowlandtech/tinytools/issues/122) |
 | M7-018 | SPEC3343-US01-SC01 | [Proposal: the product event vocabulary, and who owns it](todo/SPEC3343.US01.SC01.product-event-vocabulary.md) | P1 | tinytools | None | proposal | true | [#123](https://github.com/lowlandtech/tinytools/issues/123) |
+| M7-019 | SPEC3344-US01-SC01 | [Prepare the evidence instrument for the first-user pilot](done/SPEC3344.US01.SC01.pilot-evidence-instrument.md) | P1 | tinytools | None | done | true | [#124](https://github.com/lowlandtech/tinytools/issues/124) |
 
